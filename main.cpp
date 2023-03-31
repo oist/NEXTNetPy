@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include <epidemics/epidemics/graph.h>
+// #include "extern/epidemics/epidemics/NextReaction.h"
 #include <iostream>
 
 
@@ -8,6 +8,7 @@ namespace py = pybind11;
 double f(double x, double y){
     return x+y;
 }
+
 
 
 
