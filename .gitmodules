@@ -2,9 +2,6 @@
 	path = extern/pybind11
 	url = ../../pybind/pybind11
 	branch = stable
-[submodule "extern/Epidemics-On-Networks"]
-	path = extern/Epidemics-On-Networks
-	url = git@github.com:samuelcure/episimpy.git
 [submodule "extern/epidemics"]
 	path = extern/epidemics
 	url = git@github.com:samuelcure/Epidemics-On-Networks.git
