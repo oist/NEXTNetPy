@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-// #include "extern/epidemics/epidemics/NextReaction.h"
+#include "NextReaction.h"
 #include <iostream>
 
 
