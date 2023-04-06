@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(extern/pybind11)
 
-
 # *** Simulation library sources and headers
 set(LIB_SOURCES
     extern/epidemics/epidemics/graph.cpp
