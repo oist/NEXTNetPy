@@ -20,7 +20,13 @@ set(LIB_SOURCES
 
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
-pybind11_add_module(episimpy ${LIB_SOURCES} main.cpp)
 
-find_package(Boost REQUIRED)
-link_libraries(Boost::boost)
+if(UNIX AND NOT APPLE)
+    # Code to execute on Linux
+    message("Including pybind11 as a submodule")
+    pybind11_add_module(episimpy ${LIB_SOURCES} main.cpp)
+    find_package(Boost REQUIRED)
+    link_libraries(Boost::boost)
+elseif(APPLE)
+    # Code to execute on macOS
+endif()
