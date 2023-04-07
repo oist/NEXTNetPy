@@ -4,7 +4,7 @@
 Clone the repository and add the submodules
 
 ```
-git clone ...
+git clone git@github.com:samuelcure/episimpy.git
 git submodule update --init --recursive
 ```
 
