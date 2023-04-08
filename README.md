@@ -9,7 +9,7 @@ git clone git@github.com:samuelcure/episimpy.git
 git submodule update --init --recursive
 ```
 
-On Linux pybind11 is included as a submodule, however if you are on MacOS you need to install pybind11
+On Linux pybind11 is included as a submodule, however if you are on MacOS you may need to install pybind11 globally using homebrew
 
 ```
 HOMEBREW_NO_AUTO_UPDATE=1 brew install pybind11
@@ -82,7 +82,7 @@ times, infected = episimpy.simulate(g,psi,rho,TMAX = 100)
 ## Parameters
 
 the `episimpy.simulate` can take the following parameters:
-Markup : * `recovery_time` A gamma distribution, by default is `None`
+* `recovery_time` A gamma distribution, by default is `None`
 * `SIR` by default is `False`, and has an effect only if the recovery_time is defined
 * `concurrent_edges` by default is set to `False`. The current implementation adds edges sequentially in the priority queue, since some edges despite being active, do not contribute to the epidemic (for example in networks with short loops). For SI/SIR model, the sequential mode is believed to always be faster, independently of the graph. SIS not sure since the edges have to be reshuffled everytime.
 * `seed` choose the random seed for reproducibility.
