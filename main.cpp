@@ -104,7 +104,6 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object grap
 PYBIND11_MODULE(episimpy, handle) {
     handle.doc() = "episimpy module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
 
-    handle.def("convert",&f);
     handle.def("simulate", &run_simulation, 
     py::arg("graph"),
     py::arg("infection_time"),
@@ -115,7 +114,6 @@ PYBIND11_MODULE(episimpy, handle) {
     py::arg("initial_infected")=1,
     py::arg("seed")=0, 
     "A function that runs a SI epidemic on a graph G.");
-
 
     py::class_<transmission_time_gamma>(handle, "time_distribution")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0)

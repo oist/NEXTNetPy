@@ -71,6 +71,6 @@ times, infected = episimpy.simulate(g,psi,rho,SIR=True)
 # might never reach an absorbing state.
 # by default TMAX=1000, which is VERY long.
 
-times, infected = episimpy.simulate(g,psi,rho,TMAX = 300)
+times, infected = episimpy.simulate(g,psi,rho,TMAX = 100)
 
 ```
