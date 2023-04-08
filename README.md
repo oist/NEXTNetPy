@@ -54,11 +54,15 @@ n = 10**5 # size of the network
 m = 1 # number of edges added per node
 G = nx.barabasi_albert(n,m)
 
-# Define the distribution for the infection times
-psi = episimpy.time_distribution(10,1)
+# Define the distribution for the infection times (Gamma distributed)
+MEAN_INFECTION = 5
+VARIANCE_INFECTION = 1
+psi = episimpy.time_distribution(MEAN_INFECTION,VARIANCE_INFECTION)
 
 # Define the distribution for the recovery times
-rho = e.time_distribution(15,1)
+MEAN_RECOVER = 7
+VARIANCE_RECOVERY= 1
+rho = e.time_distribution(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
 # To simulate a SI epidemic
 times, infected = episimpy.simulate(g,psi)
@@ -74,3 +78,13 @@ times, infected = episimpy.simulate(g,psi,rho,SIR=True)
 times, infected = episimpy.simulate(g,psi,rho,TMAX = 100)
 
 ```
+
+## Parameters
+
+the `episimpy.simulate` can take the following parameters:
+Markup : * `recovery_time` A gamma distribution, by default is `None`
+* `SIR` by default is `False`, and has an effect only if the recovery_time is defined
+* `concurrent_edges` by default is set to `False`. The current implementation adds edges sequentially in the priority queue, since some edges despite being active, do not contribute to the epidemic (for example in networks with short loops). For SI/SIR model, the sequential mode is believed to always be faster, independently of the graph. SIS not sure since the edges have to be reshuffled everytime.
+* `seed` choose the random seed for reproducibility.
+* `TMAX` maximum time set by default to 1000. Advised to modify when simulating a SIS epidemic.
+* `initial_infected` set by default to 1.
