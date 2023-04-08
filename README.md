@@ -66,7 +66,11 @@ times, infected = episimpy.simulate(g,psi)
 # To simulate a SIR epidemic
 times, infected = episimpy.simulate(g,psi,rho,SIR=True)
 
+# To simulate a SIS epidemic
+# WARNING: make sure to define a maximum time since the epidemic
+# might never reach an absorbing state.
+# by default TMAX=1000, which is VERY long.
 
-
+times, infected = episimpy.simulate(g,psi,rho,TMAX = 300)
 
 ```
