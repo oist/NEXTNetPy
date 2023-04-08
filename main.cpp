@@ -8,23 +8,8 @@
 #include "analysis.h"
 #include "NextReaction.h"
 
-
 namespace py = pybind11;
 rng_t engine;
-
-std::vector<std::vector<int>> f(py::list py_list) {
-    std::vector<std::vector<int>> cpp_vector;
-
-    for (auto row : py_list) {
-        std::vector<int> cpp_row;
-        for (auto element : row) {
-            cpp_row.push_back(py::cast<int>(element));
-        }
-        cpp_vector.push_back(cpp_row);
-    }
-
-    return cpp_vector;
-}
 
 class networkx : public virtual graph_adjacencylist {
 public:
@@ -59,21 +44,7 @@ public:
     }
 };
 
-void test_function(py::object graph){
-
-    networkx nw(graph);
-
-    py::print(nw.adjacencylist.size());
-
-    for (int i = 0; i < (int) nw.adjacencylist.size(); i++){
-        std::cout << "\n";
-        for(int v : nw.adjacencylist[i])
-            std::cout << v << " ";
-    }
-}
-
-
-std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR=false, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1){
+std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR=false,double TMAX = 1000, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1){
     
     engine.seed(seed);
 
@@ -100,7 +71,6 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object grap
         node_t random_node = uniform_node_distribution(engine);
         simulation.add_infections({ std::make_pair(random_node, 0)});
     }
-
     
     int current_number_infected = INITIAL_INFECTED;
                         
@@ -120,7 +90,7 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object grap
             default:
                 break;
         }
-        if (current_number_infected<=0)
+        if (current_number_infected<=0 || point->time > TMAX)
             break;
         time_trajectory.push_back(point->time);
         infected_trajectory.push_back(current_number_infected);
@@ -140,6 +110,7 @@ PYBIND11_MODULE(episimpy, handle) {
     py::arg("infection_time"),
     py::arg("recovery_time")=nullptr,
     py::arg("SIR")=false,
+    py::arg("TMAX")=1000,
     py::arg("concurrent_edges")=true,
     py::arg("initial_infected")=1,
     py::arg("seed")=0, 
