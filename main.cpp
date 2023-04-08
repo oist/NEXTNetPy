@@ -1,3 +1,5 @@
+#define PYBIND11_DETAILED_ERROR_MESSAGES
+
 #include <iostream>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
@@ -68,16 +70,10 @@ void test_function(py::object graph){
         for(int v : nw.adjacencylist[i])
             std::cout << v << " ";
     }
-    // py::object nn = graph.attr("neighbors");
-    // py::iterator it = nn(1);
-    // while(it != py::iterator::sentinel()) {
-    //     py::print(*it);
-    //     ++it;
-    // }
 }
 
 
-std::vector<double> run_simulation(py::object graph, int seed = 1){
+std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR=false, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1){
     
     engine.seed(seed);
 
@@ -85,16 +81,16 @@ std::vector<double> run_simulation(py::object graph, int seed = 1){
 
     const int SIZE = (int) network.adjacencylist.size();
 
-    const int INITIAL_INFECTED = 1;
-    const double MEAN_INFECTION = 10;
-    const double VARIANCE_INFECTION = 1;
-    const bool SHUFFLE_NEIGHBOURS = false;
-    const bool EDGES_CONCURRENT = true;
+    bool SHUFFLE_NEIGHBOURS;
+    if (EDGES_CONCURRENT || SIR)
+        SHUFFLE_NEIGHBOURS=false;
+    else 
+        SHUFFLE_NEIGHBOURS = true;
 
-    transmission_time_gamma psi(MEAN_INFECTION, VARIANCE_INFECTION);
-    simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,false);
+    simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
 
-    std::vector<double> trajectory({});
+    std::vector<double> time_trajectory({});
+    std::vector<int> infected_trajectory({});
 
     std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
 
@@ -104,16 +100,32 @@ std::vector<double> run_simulation(py::object graph, int seed = 1){
         node_t random_node = uniform_node_distribution(engine);
         simulation.add_infections({ std::make_pair(random_node, 0)});
     }
+
+    
+    int current_number_infected = INITIAL_INFECTED;
                         
     while (true) {
         auto point = simulation.step(engine);
         if (!point )
             break;
-        trajectory.push_back(point->time);
-        
-    }
 
-    return trajectory;
+        switch (point->kind) {
+            case event_kind::outside_infection:
+            case event_kind::infection:
+                current_number_infected++;
+                break;
+            case event_kind::reset:
+                current_number_infected--;
+                break;
+            default:
+                break;
+        }
+        if (current_number_infected<=0)
+            break;
+        time_trajectory.push_back(point->time);
+        infected_trajectory.push_back(current_number_infected);
+    }
+    return std::make_tuple(time_trajectory, infected_trajectory);
 }
 
 
@@ -123,9 +135,16 @@ PYBIND11_MODULE(episimpy, handle) {
     handle.doc() = "episimpy module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
 
     handle.def("convert",&f);
-    handle.def("simulate", &run_simulation, py::arg("networkx graph"), py::arg("seed")=0, "A function that runs a SI epidemic on a graph G.");
+    handle.def("simulate", &run_simulation, 
+    py::arg("graph"),
+    py::arg("infection_time"),
+    py::arg("recovery_time")=nullptr,
+    py::arg("SIR")=false,
+    py::arg("concurrent_edges")=true,
+    py::arg("initial_infected")=1,
+    py::arg("seed")=0, 
+    "A function that runs a SI epidemic on a graph G.");
 
-    handle.def("test",&test_function);
 
     py::class_<transmission_time_gamma>(handle, "time_distribution")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0)
