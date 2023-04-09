@@ -1,6 +1,6 @@
 # episimpy
 
-episimR* is a python module that allows non-Markovian epidemics for arbitrary transmission time and recovery (reset) time distribution to be simulated on arbitrary contact network graphs. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*episimpy* is a python module that allows non-Markovian epidemics for arbitrary transmission time and recovery (reset) time distribution to be simulated on arbitrary contact network graphs. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
 
 ## Set up
 
