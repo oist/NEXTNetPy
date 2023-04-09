@@ -64,7 +64,7 @@ psi = episimpy.time_distribution(MEAN_INFECTION,VARIANCE_INFECTION)
 # Define the distribution for the recovery times
 MEAN_RECOVER = 7
 VARIANCE_RECOVERY= 1
-rho = e.time_distribution(MEAN_RECOVERY,VARIANCE_RECOVERY)
+rho = episimpy.time_distribution(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
 # To simulate a SI epidemic
 times, infected = episimpy.simulate(g,psi)
