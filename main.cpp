@@ -29,8 +29,7 @@ public:
     // OR Initialise graph with networkx graph
     networkx(py::object graph){
 
-    int SIZE = py::int_( graph.attr("size")() );
-    SIZE +=1;
+    int SIZE = py::int_( graph.attr("number_of_nodes")() );
     adjacencylist.resize(SIZE);
     for (int i = 0; i < SIZE; i++) {
         py::iterator it = graph.attr("neighbors")(i);
