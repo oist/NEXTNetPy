@@ -3,7 +3,6 @@
 #include <iostream>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
-#include <omp.h>
 #include "stdafx.h"
 #include "random.h"
 #include "analysis.h"
@@ -11,7 +10,6 @@
 
 namespace py = pybind11;
 rng_t engine;
-
 
 // Wrapper to convert a python networkx graph to our c++ graph object.
 class networkx : public virtual graph_adjacencylist {
@@ -123,7 +121,6 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
     std::vector<double> time_trajectory(SIZE*NB_SIMULATIONS,0);
     std::vector<double> infected_trajectory(SIZE*NB_SIMULATIONS,0);
 
-    #pragma omp parallel for
     for (int sim = 0; sim < NB_SIMULATIONS; sim++)
         {
 

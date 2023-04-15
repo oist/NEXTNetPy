@@ -16,6 +16,10 @@ set(LIB_SOURCES
     extern/epidemics/epidemics/nMGA.cpp
     extern/epidemics/epidemics/utility.cpp)
 
+set(PY_SOURCES
+    src/binding.cpp)
+
+
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
 
@@ -31,7 +35,7 @@ elseif(APPLE)
     find_package(pybind11 CONFIG)
     # pybind11 method:
     pybind11_add_module(episimpy
-    binding.cpp
+    ${PY_SOURCES}
     ${SIMULATOR_SOURCES}
     ${LIB_SOURCES}
     ${SIMULATOR_HEADERS}
