@@ -1,6 +1,6 @@
 # episimPY
 
-*episimpy* is a python module that allows non-Markovian epidemics for arbitrary transmission time and recovery (reset) time distribution to be simulated on arbitrary contact network graphs. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*episimpy* is a python module can simulate non-Markovian epidemics on arbitrary networks. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
 
 ## Set up
 
@@ -17,7 +17,7 @@ On Linux pybind11 is included as a submodule, however if you are on MacOS you ma
 HOMEBREW_NO_AUTO_UPDATE=1 brew install pybind11
 ```
 
-Make sure that boost is also installed in your system:
+Make sure that boost is also installed in your system (on mac) :
 
 ```
 HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
