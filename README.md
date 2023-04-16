@@ -4,7 +4,7 @@
 
 ## Set up
 
-Clone the repository and add the submodules
+Open a new terminal tab, clone the repository and add the submodules
 
 ```
 git clone git@github.com:samuelcure/episimpy.git
