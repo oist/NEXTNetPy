@@ -1,6 +1,7 @@
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
 #include <iostream>
+#include <numeric>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
 #include "stdafx.h"
@@ -46,7 +47,7 @@ public:
 
 
 double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi){
-
+// double euler_lotka_growth_rate(py::object graph,double mean, double variance){
     networkx network(graph);
 
     const int SIZE = (int) network.adjacencylist.size();
@@ -63,9 +64,11 @@ double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi){
         k2 += pow(k,2) ;
         k3 += pow(k,3) ;
     }
-    const double MU = (1-r) * (k2/k1 - 1 ) + r *(k3/k2 - 1);
+    const double MU = ( (1-r) * (k2/k1 - 1 ) + r *(k3/k2 - 1) );
     const double SHAPE = psi.mean * psi.mean / psi.variance;
-    const double SCALE = psi.variance / psi.variance;
+    const double SCALE = psi.variance / psi.mean;
+    // const double SHAPE = mean * mean / variance;
+    // const double SCALE = variance / variance;
 
     //Only valid for Gamma distribution 
     const double GROWTH_RATE = 1/SCALE * ( pow(MU,1/SHAPE) - 1 );
@@ -147,8 +150,9 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
 
     std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
 
-    std::vector<double> time_trajectory(SIZE*NB_SIMULATIONS,0);
-    std::vector<double> infected_trajectory(SIZE*NB_SIMULATIONS,0);
+    // Make a vector of pair, which is more convienient once we need to sort the times.
+    std::vector<std::pair<double,double>> time_trajectory;
+    std::vector<double> infected_trajectory;
 
     for (int sim = 0; sim < NB_SIMULATIONS; sim++)
         {
@@ -158,7 +162,7 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
             
             for (node_t i = 0; i < INITIAL_INFECTED; i++)
             {
-                node_t random_node = uniform_node_distribution(engine);
+                const node_t random_node = uniform_node_distribution(engine);
                 // sample without replacement:
                 if (simulation.is_infected(random_node)){
                     i--;
@@ -167,50 +171,52 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
                 simulation.add_infections({ std::make_pair(random_node, 0)});
             }
             
-            int64_t current_number_infected = INITIAL_INFECTED;
+            double infection_counter = INITIAL_INFECTED / NB_SIMULATIONS;
                                 
             for (int step = 0; step < SIZE*NB_SIMULATIONS;step++) {
                 auto point = simulation.step(engine);
+                
                 if (!point )
                     break;
 
                 switch (point->kind) {
                     case event_kind::outside_infection:
                     case event_kind::infection:
-                        current_number_infected+= 1;
+                        infection_counter =  1.0 ;
                         break;
                     case event_kind::reset:
-                        current_number_infected-= 1;
+                        infection_counter =  - 1.0 ;
                         break;
                     default:
                         break;
                 }
-                if (current_number_infected<=0 || point->time > TMAX)
+                if (point->time > TMAX)
                     break;
-                time_trajectory[step] = point->time;
-                infected_trajectory[step] = current_number_infected/NB_SIMULATIONS;
+                time_trajectory.push_back(std::make_pair(point->time , infection_counter ) );
+                // infected_trajectory.push_back(current_number_infected/NB_SIMULATIONS);
             }
         }
 
-    while (time_trajectory.back() <= 0.001){
-        time_trajectory.pop_back();
-        infected_trajectory.pop_back();
-    }
 
     std::vector<double> time_trajectory_trimmed;
     std::vector<double> infected_trajectory_trimmed;
-    if (NB_SIMULATIONS > 1 && TRIM){
 
-        sort(time_trajectory.begin(), time_trajectory.end());
+    const int COUNTER = (NB_SIMULATIONS > 1 && TRIM) ? NB_SIMULATIONS : 1;
+    const int NORM = (NB_SIMULATIONS > 1 && TRIM) ? 1 : NB_SIMULATIONS;
 
-        for (int index = 0; index < time_trajectory.size(); index += NB_SIMULATIONS){
-                time_trajectory_trimmed.push_back(time_trajectory[index]);
-                infected_trajectory_trimmed.push_back(infected_trajectory[index]);
-        }
-        return std::make_tuple(time_trajectory_trimmed, infected_trajectory_trimmed);
-    } else {
-        return std::make_tuple(time_trajectory, infected_trajectory);
+    sort(time_trajectory.begin(), time_trajectory.end(),[](const auto& t1, const auto& t2) {
+        return t1.first < t2.first;
+    });
+
+    for (int index = 0; index < time_trajectory.size(); index += COUNTER){
+            time_trajectory_trimmed.push_back(time_trajectory[index].first);
+            infected_trajectory_trimmed.push_back(time_trajectory[index].second / NORM);
     }
+
+    // compute the cumulative sum
+    std::partial_sum(infected_trajectory_trimmed.begin(), infected_trajectory_trimmed.end(), infected_trajectory_trimmed.begin());
+
+    return std::make_tuple(time_trajectory_trimmed, infected_trajectory_trimmed);
 }
 
 
