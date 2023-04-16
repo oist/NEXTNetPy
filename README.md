@@ -90,3 +90,9 @@ the `episimpy.simulate` can take the following parameters:
 * `seed` choose the random seed for reproducibility.
 * `TMAX` maximum time set by default to 1000. Advised to modify when simulating a SIS epidemic.
 * `initial_infected` set by default to 1.
+
+
+It is also possible to simulate the average trajectory on a given network, with `episimpy.simulate_average`.
+The parameters are the same, with the extra:
+* `nb_simulations` set by default to 1.
+* `trim` set by default to `True`. If set to False, the trajectory will be of length `graph.number_of_nodes() * nb_simulations`, which will make the trajectory very long, but allows for more precision if one wants to compute the derivate for example.
