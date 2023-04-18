@@ -17,7 +17,10 @@ set(LIB_SOURCES
     extern/epidemics/epidemics/utility.cpp)
 
 set(PY_SOURCES
-    src/binding.cpp)
+    src/binding.cpp
+    src/networkx.cpp
+    src/simulation_wrapper.cpp
+    src/tools.cpp)
 
 
 # include_directories(extern/epidemics/epidemics)
