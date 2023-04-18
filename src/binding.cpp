@@ -156,7 +156,8 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
 
     for (int sim = 0; sim < NB_SIMULATIONS; sim++)
         {
-
+            // std::cout << sim << "/" << NB_SIMULATIONS << "\r";
+            py::print(sim,"/",NB_SIMULATIONS,"\r",py::arg("end") = "");
             // Initialise/reset simulation object
             simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
             
