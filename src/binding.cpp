@@ -17,6 +17,19 @@ namespace py = pybind11;
 PYBIND11_MODULE(episimpy, handle) {
     handle.doc() = "episimpy module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
 
+    handle.def("depletion",&depletion,
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("seed")=0,
+        "Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.\n"
+        "\n"
+        "Returns:\n"
+        "   vector of size (kmax+1,10) that contains prob. deg. distr. of the sus. nodes at various stages of the epidemic.\n"
+        "   list of 4 trajectories of the first 4 evolving moments of the sus.nodes.\n"
+        "\n");
+
+
+
     handle.def("growth_rate",&euler_lotka_growth_rate,
         py::arg("graph"),
         py::arg("infection_time"),
