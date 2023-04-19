@@ -30,7 +30,7 @@ if(UNIX AND NOT APPLE)
     # Code to execute on Linux
     message("Including pybind11 as a submodule")
     add_subdirectory(extern/pybind11)
-    pybind11_add_module(episimpy ${LIB_SOURCES} binding.cpp)
+    pybind11_add_module(episimpy ${LIB_SOURCES} ${PY_SOURCES})
     find_package(Boost REQUIRED)
     link_libraries(Boost::boost)
 elseif(APPLE)
