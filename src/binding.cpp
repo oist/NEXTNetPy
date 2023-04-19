@@ -20,6 +20,7 @@ PYBIND11_MODULE(episimpy, handle) {
     handle.def("depletion",&depletion,
         py::arg("graph"),
         py::arg("infection_time"),
+        py::arg("frequency_list") = std::vector<double>{0.1,0.25,0.5,0.75,0.9},
         py::arg("seed")=0,
         "Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.\n"
         "\n"

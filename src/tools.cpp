@@ -11,7 +11,7 @@
 
 namespace py=pybind11;
 
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,int seed){
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,const std::vector<double>& freq,int seed){
 
     // Convert the python list into a c++ vector
     // std::vector<int> fraction(py::len(freq)); // create a C++ vector with the same size as the Python list
@@ -19,6 +19,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
     //     fraction[i] = py::cast<int>(freq[i]);
 
     std::vector<double> fraction({0.1,0.25,0.5,0.75,0.9});
+
 
     // vector that contains prob. deg. distr. of the sus. nodes when a fraction f of the network is infected.
     std::vector<std::vector<double>> Prob_degree_K_depleted;
