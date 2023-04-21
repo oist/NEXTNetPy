@@ -44,10 +44,10 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
 
 
     std::vector<double> fraction;
-    for (auto f : freq)
-        fraction.push_back(f);
-
-
+    for (auto fi : freq){
+        fraction.push_back(fi);
+        py::print("frac ",fi,"\n");
+    }
     // vector that contains prob. deg. distr. of the sus. nodes when a fraction f of the network is infected.
     std::vector<std::vector<double>> Prob_degree_K_depleted;
 
@@ -115,7 +115,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
             break;
 
         SIZE_LEFT --;
-        const double f = std::ceil((double) SIZE_LEFT/SIZE * 100) / 100;
+        const double f = std::ceil((double) (SIZE-SIZE_LEFT)/SIZE * 100) / 100;
 
         const node_t infected_node = point->node;
         const int k = network.outdegree(infected_node);
@@ -135,7 +135,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
         // Use std::find to check if the value is in the vector
         auto it = std::find(fraction.begin(), fraction.end(), f);
         if (it != fraction.end()) {
-        
+            py::print("found ",f,"\n");
             fraction.erase(it);
 
             std::vector<double> pk;
