@@ -11,6 +11,30 @@
 
 namespace py=pybind11;
 
+
+// void save_network_epidemic_state(simulate_next_reaction& simulation, std::string filename){
+
+
+// // check if node is infected
+// //simulation.is_infected(node)
+// // convert node to coordinate
+// //save file
+    
+//     // // Open the output file
+//     // std::ofstream outfile(filename);
+
+//     // // Write the vector of vectors to the file
+//     // for (const vector<int>& v : my_vectors) {
+//     //     for (const int& i : v) {
+//     //         outfile << i << " ";
+//     //     }
+//     //     outfile << endl;
+//     // }
+
+//     // // Close the output file
+//     // outfile.close();
+// }
+
 std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,const std::vector<double>& freq,int seed){
 
     // Convert the python list into a c++ vector
