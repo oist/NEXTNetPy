@@ -18,7 +18,10 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
     // for (auto i = 0; i < py::len(freq); i++)
     //     fraction[i] = py::cast<int>(freq[i]);
 
-    std::vector<double> fraction({0.1,0.25,0.5,0.75,0.9});
+
+    std::vector<double> fraction;
+    for (auto f : freq)
+        fraction.push_back(f);
 
 
     // vector that contains prob. deg. distr. of the sus. nodes when a fraction f of the network is infected.

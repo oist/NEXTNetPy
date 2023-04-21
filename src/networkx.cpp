@@ -21,6 +21,7 @@ networkx::networkx(py::list py_list){
 networkx::networkx(py::object graph){
 
     int SIZE = py::int_( graph.attr("number_of_nodes")() );
+
     adjacencylist.resize(SIZE);
     for (int i = 0; i < SIZE; i++) {
         py::iterator it = graph.attr("neighbors")(i);

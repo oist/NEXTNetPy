@@ -37,7 +37,12 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object grap
 
     for (node_t i = 0; i < INITIAL_INFECTED; i++)
     {
-        node_t random_node = uniform_node_distribution(engine);
+        const node_t random_node = uniform_node_distribution(engine);
+        // sample without replacement:
+        if (simulation.is_infected(random_node)){
+            i--;
+            continue;
+        }
         simulation.add_infections({ std::make_pair(random_node, 0)});
     }
     
