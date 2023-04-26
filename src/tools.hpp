@@ -21,4 +21,6 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
 
 // py::list freq = py::list({0.1,0.25,0.5,0.75,0.9})
 
-void save_network_epidemic_state(simulate_next_reaction& simulation, std::string filename);
+// void save_network_epidemic_state(simulate_next_reaction& simulation, std::string filename);
+
+void save_grid(std::vector<std::vector<int>>& grid, std::string filename);

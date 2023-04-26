@@ -11,29 +11,22 @@
 
 namespace py=pybind11;
 
+void save_grid(std::vector<std::vector<int>>& grid, std::string filename){
 
-// void save_network_epidemic_state(simulate_next_reaction& simulation, std::string filename){
+    // Open the file stream
+    std::ofstream out_file(filename);
 
+    // Loop over the outer vector and write each inner vector to the file
+    for (const auto& row : grid) {
+        for (const auto& element : row) {
+            out_file << element << " ";
+        }
+        out_file << std::endl;
+    }
 
-// // check if node is infected
-// //simulation.is_infected(node)
-// // convert node to coordinate
-// //save file
-    
-//     // // Open the output file
-//     // std::ofstream outfile(filename);
-
-//     // // Write the vector of vectors to the file
-//     // for (const vector<int>& v : my_vectors) {
-//     //     for (const int& i : v) {
-//     //         outfile << i << " ";
-//     //     }
-//     //     outfile << endl;
-//     // }
-
-//     // // Close the output file
-//     // outfile.close();
-// }
+    // Close the file stream
+    out_file.close();
+}
 
 std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,const std::vector<double>& freq,int seed){
 
@@ -46,7 +39,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
     std::vector<double> fraction;
     for (auto fi : freq){
         fraction.push_back(fi);
-        py::print("frac ",fi,"\n");
+        // py::print("frac ",fi,"\n");
     }
     // vector that contains prob. deg. distr. of the sus. nodes when a fraction f of the network is infected.
     std::vector<std::vector<double>> Prob_degree_K_depleted;
@@ -135,7 +128,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
         // Use std::find to check if the value is in the vector
         auto it = std::find(fraction.begin(), fraction.end(), f);
         if (it != fraction.end()) {
-            py::print("found ",f,"\n");
+            // py::print("found ",f,"\n");
             fraction.erase(it);
 
             std::vector<double> pk;
