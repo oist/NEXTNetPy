@@ -1,6 +1,7 @@
 #include <iostream>
 #include <numeric>
 #include <algorithm>
+#include <chrono>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
 #include "stdafx.h"
@@ -8,8 +9,103 @@
 #include "tools.hpp"
 #include "NextReaction.h"
 #include "networkx.hpp"
+#include "nMGA.h"
+
 
 namespace py=pybind11;
+
+std::tuple<std::vector<double>, std::vector<double>> run_benchmark_next_reaction(network_ensemble network, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true,int BA_M=1, double TMAX = 1000, bool EDGES_CONCURRENT= false, int seed = 1){
+    
+    // declare random number generator.
+    rng_t engine(seed);
+
+    // import the networkx module
+    py::object nx = py::module_::import("networkx");
+
+    // Method that will call the appropriate networkx function
+    py::object graph_generator;
+
+    py::object graph;
+
+    const bool SHUFFLE_NEIGHBOURS = false;
+    const bool EDGES_CONCURRENT = true;
+
+    std::vector<double> average_run_time({});
+    std::vector<double> std_run_time({});
+    std::vector<int> network_size({});
+
+
+
+    for (int power = 7; power < 21; power ++){
+        const int SIZE = pow(2,power);
+        network_size.push_back(SIZE);
+
+        // Determine the network ensemble and generate a new network
+        switch(network){
+            case network_ensemble::erdos_reyni: { 
+                graph_generator = nx.attr("fast_gnp_random_graph");
+                graph = graph_generator(SIZE,(double) 3/SIZE);
+                break;
+            }
+            case network_ensemble::barabasi_albert: {
+                graph_generator = nx.attr("barabasi_albert_graph");
+                graph = graph_generator(SIZE,BA_M);
+                break;
+            }
+            case network_ensemble::watts_strogatz: {
+                graph_generator = nx.attr("watts_strogatz_graph");
+                graph = graph_generator(SIZE,2,0.15);
+                graph = nx.attr("convert_node_labels_to_integers")(graph);
+                break;
+            }
+            default: {
+                throw std::logic_error("unrecognised ensemble name");
+                break;
+            }
+        }
+
+        networkx network(graph);
+
+        double mean = 0;
+        double mean_square = 0;
+
+        for (int simulation = 0; simulation < 500; simulation++)
+        {
+            auto start = std::chrono::high_resolution_clock::now();
+            
+            simulate_next_reaction simulate(network,psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+
+            while (true) {
+                auto point = simulate.step(engine);
+                if (!point)
+                    break;     
+            }
+
+            auto stop = std::chrono::high_resolution_clock::now();
+
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            
+            mean += (double) duration.count() / 500 ;
+            mean_square += (double) duration.count() * duration.count() / 500 ;
+            
+        }
+
+        //Compute standard deviation
+        const double std_dev = std::sqrt( mean_square - mean * mean ) ;
+        average_run_time.push_back(mean);
+        std_run_time.push_back(std_dev);
+
+    }
+
+    return std::make_tuple(network_size, average_run_time, std_run_time);
+    
+
+    
+
+
+}
+
+
 
 void save_grid(std::vector<std::vector<int>>& grid, std::string filename){
 
@@ -39,7 +135,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
     std::vector<double> fraction;
     for (auto fi : freq){
         fraction.push_back(fi);
-        // py::print("frac ",fi,"\n");
+        py::print("frac ",fi,"\n");
     }
     // vector that contains prob. deg. distr. of the sus. nodes when a fraction f of the network is infected.
     std::vector<std::vector<double>> Prob_degree_K_depleted;
@@ -128,7 +224,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
         // Use std::find to check if the value is in the vector
         auto it = std::find(fraction.begin(), fraction.end(), f);
         if (it != fraction.end()) {
-            // py::print("found ",f,"\n");
+            py::print("found ",f,"\n");
             fraction.erase(it);
 
             std::vector<double> pk;
