@@ -14,7 +14,7 @@
 
 namespace py=pybind11;
 
-std::tuple<std::vector<double>, std::vector<double>> run_benchmark_next_reaction(network_ensemble network, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true,int BA_M=1, double TMAX = 1000, bool EDGES_CONCURRENT= false, int seed = 1){
+std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchmark_next_reaction(network_ensemble network, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true,int BA_M=1, double TMAX = 1000, bool EDGES_CONCURRENT= false, int seed = 1){
     
     // declare random number generator.
     rng_t engine(seed);
@@ -99,10 +99,6 @@ std::tuple<std::vector<double>, std::vector<double>> run_benchmark_next_reaction
 
     return std::make_tuple(network_size, average_run_time, std_run_time);
     
-
-    
-
-
 }
 
 
