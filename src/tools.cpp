@@ -14,6 +14,7 @@
 
 namespace py=pybind11;
 
+<<<<<<< HEAD
 std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchmark_next_reaction(network_ensemble network, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true,int BA_M=1, double TMAX = 1000, bool EDGES_CONCURRENT= false, int seed = 1){
     
     // declare random number generator.
@@ -103,6 +104,59 @@ std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchm
 
 
 
+=======
+
+
+
+std::tuple<std::vector<double>,double> generalised_knn(py::object graph, int moment, double r,int seed){
+    
+    rng_t engine(seed);
+
+    networkx nw(graph);
+
+    if (r != 0.0)
+        add_correlation(r,nw,engine);
+
+    // py::print(file_number,"\r",py::arg("end") = "");
+    // py::print("final assortativity: ",,"\n");
+    r = assortativity(nw);
+    int size = (int) nw.adjacencylist.size();
+    std::vector<double> knn_degree(size, 0);
+    std::vector<double> nb_with_degree(size,0);
+
+    int kmax = 0;
+    for (node_t node = 0; node < size; node++){
+        
+        int k = nw.outdegree(node);
+        
+        kmax = std::max(k,kmax);
+        for (node_t neigh : nw.adjacencylist[node])
+        {
+            const double k_neigh = (double) nw.outdegree(neigh);
+            knn_degree[k] += pow(k_neigh,moment);
+            nb_with_degree[k] += 1;
+        }
+
+    }
+
+    while ((int) knn_degree.size() > kmax + 1){
+        knn_degree.pop_back();
+        nb_with_degree.pop_back();
+    }
+    
+    for (int k=0; k < kmax+1; k++)
+    {
+        if (nb_with_degree[k]!=0){
+            knn_degree[k] =  knn_degree[k]/nb_with_degree[k];
+        }
+
+    }
+    return std::make_tuple(knn_degree,r);
+
+}
+
+
+>>>>>>> f964ebfaa94754447fe8cdc32c1badc5912cfe1b
 void save_grid(std::vector<std::vector<int>>& grid, std::string filename){
 
     // Open the file stream

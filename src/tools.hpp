@@ -10,7 +10,7 @@ namespace py=pybind11;
 
 double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi);
 
-
+std::tuple<std::vector<double>,double> generalised_knn(py::object graph, int moment = 1, double r = 0.0,int seed = 1);
 
 /**
  * @brief Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.
