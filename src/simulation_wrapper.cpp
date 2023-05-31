@@ -11,8 +11,60 @@
 #include "tools.hpp"
 
 // rng_t engine;
+// Wrapper to run a simulation given a network and transmission distribution
+std::vector<double> simulation_discrete(py::object graph,int seed){
+    rng_t engine;
+    engine.seed(seed);
+    networkx network(graph);
 
+    const int SIZE = (int) network.adjacencylist.size();
+    const bool EDGES_CONCURRENT = true;
+    const bool SHUFFLE_NEIGHBOURS = false;
+    const bool SIR = false;
 
+    transmission_time_gamma psi(1,0.0000001);
+    
+    std::vector<double> zn_average(50,0);
+    int n_min = 50;
+    for (int s = 0; s<100;s++){
+        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+        const node_t random_node = uniform_node_distribution(engine);
+        simulation.add_infections({ std::make_pair(random_node, 0)});
+
+        // std::vector<int> zn;
+        // std::vector<int> steps;
+        int current_step = 0;
+        int current_infected = 0;
+        int n = 0;
+        while (true) {
+            auto point = simulation.step(engine);
+            if (!point)
+                break;
+
+            n = (int) std::round(point->time);
+            
+            // py::print("step: ",n," curr: ",current_step,"\n");
+
+            if (n==current_step){
+                current_infected ++;
+            } else if (n > current_step){
+                zn_average[current_step] += current_infected/100;
+                // steps.push_back(n);
+                current_infected = 1;
+                current_step = n;
+            } else{
+                throw std::logic_error("new step cannot be smaller than old step");
+            }
+        }
+        n_min = std::min(n,n_min);
+        py::print(n_min);
+    }
+    while (zn_average.size() > n_min)
+        zn_average.pop_back();
+
+    return zn_average;
+}
 // Wrapper to run a simulation given a network and transmission distribution
 std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
 

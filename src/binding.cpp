@@ -17,13 +17,33 @@ namespace py = pybind11;
 PYBIND11_MODULE(episimpy, handle) {
     handle.doc() = "episimpy module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
 
-    handle.def("generalised_knn",&generalised_knn,
+    // handle.def("run_benchmark_next_reaction", &run_benchmark_next_reaction,
+    //     py::arg("graph_ensemble"),
+    //     py::arg("infection_time"),
+    //     py::arg("recovery_time")=nullptr,
+    //     py::arg("SIR")=false,
+    //     py::arg("TMAX")=1000,
+    //     py::arg("concurrent_edges")=true,
+    //     py::arg("initial_infected")=1,
+    //     py::arg("seed")=0, 
+    //     " Average run time of the next reaction method \n"
+    //     "\n"
+    //     "Returns:\n"
+    //     "   list of network sizes, list average run time, (list) std deviation run time"
+    // );
+
+    // handle.def("generalised_knn",&generalised_knn,
+    //     py::arg("graph"),
+    //     py::arg("moment")=1,
+    //     py::arg("r")=0.0,
+    //     py::arg("seed")=1,
+    //     " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
+    //     );
+    handle.def("simulation_discrete",&simulation_discrete,
         py::arg("graph"),
-        py::arg("moment")=1,
-        py::arg("r")=0.0,
-        py::arg("seed")=1,
-        " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
-        );
+        py::arg("seed")=0,
+        ""
+    );
 
     handle.def("depletion",&depletion,
         py::arg("graph"),
@@ -35,7 +55,7 @@ PYBIND11_MODULE(episimpy, handle) {
         "Returns:\n"
         "   vector of size (kmax+1,10) that contains prob. deg. distr. of the sus. nodes at various stages of the epidemic.\n"
         "   list of 4 trajectories of the first 4 evolving moments of the sus.nodes.\n"
-        "\n");
+    "\n");
 
 
 
@@ -49,7 +69,8 @@ PYBIND11_MODULE(episimpy, handle) {
         "    infection_time (episimpy.time_distribution): a gamma distribution object that describes the infection times.\n"
         "\n"
         "Returns:\n"
-        "    growth_rate (float): the predicted growth rate of the epidemic.");
+        "    growth_rate (float): the predicted growth rate of the epidemic."
+    );
 
 handle.def("simulate_on_lattice", &run_simulation_lattice, 
         py::arg("graph"),
@@ -81,7 +102,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         "    time_traj (list),infected_traj (list): the average trajectory of the epidemic on the graph g.\n"
         
         
-        );
+    );
 
 
     handle.def("simulate", &run_simulation, 
@@ -111,7 +132,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         "    time_traj (list),infected_traj (list): the average trajectory of the epidemic on the graph g.\n"
         
         
-        );
+    );
         
         
 
@@ -146,7 +167,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         
         
         
-        );
+    );
 
     py::class_<transmission_time_gamma>(handle, "time_distribution")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
