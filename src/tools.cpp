@@ -219,7 +219,11 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
 
 
     transmission_time_deterministic psi(1);
-    simulate_next_reaction simulation(network, psi);
+
+    const bool EDGES_CONCURRENT = true;
+    const bool SHUFFLE_NEIGHBOURS = false;
+
+    simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT);
 
     //Infect the first individual by choosing a node at random
     std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
