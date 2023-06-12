@@ -18,7 +18,7 @@ namespace py=pybind11;
 std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchmark(std::string ensemble, std::string method, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true, int MAX_POWER = 21, int NB_SIM = 500, double TMAX = 1000, bool EDGES_CONCURRENT= false,int INITIAL_INFECTED = 1, int seed = 1);
 
 
-double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi);
+std::vector<double> euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi);
 
 std::tuple<std::vector<double>,double> generalised_knn(py::object graph, int moment = 1, double r = 0.0,int seed = 1);
 
@@ -27,16 +27,10 @@ std::tuple<std::vector<double>,double> generalised_knn(py::object graph, int mom
  * 
  * 
  */
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,const std::vector<double>& freq = {0.1,0.25,0.5,0.75,0.9},int seed = 1);
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph,const std::vector<double>& freq = {0.1,0.25,0.5,0.75,0.9},int seed = 1);
 
-
-// py::list freq = py::list({0.1,0.25,0.5,0.75,0.9})
-
-// void save_network_epidemic_state(simulate_next_reaction& simulation, std::string filename);
 
 void save_grid(std::vector<std::vector<int>>& grid, std::string filename);
-
-
 
 /**simulate_next_reaction simulation(graph, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
  * @brief Type of network ensemble
@@ -47,7 +41,6 @@ enum class network_ensemble : unsigned int {
 	watts_strogatz = 2,
 	barabasi_albert_5 = 3
 };
-
 
 
 /**

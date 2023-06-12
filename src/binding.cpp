@@ -39,15 +39,15 @@ PYBIND11_MODULE(episimpy, handle) {
     //     py::arg("seed")=1,
     //     " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
     //     );
-    handle.def("simulation_discrete",&simulation_discrete,
+    handle.def("simulate_discrete",&simulation_discrete,
         py::arg("graph"),
+        py::arg("nb_sim")=100,
         py::arg("seed")=0,
         ""
     );
 
     handle.def("depletion",&depletion,
         py::arg("graph"),
-        py::arg("infection_time"),
         py::arg("frequency_list") = std::vector<double>{0.1,0.25,0.5,0.75,0.9},
         py::arg("seed")=0,
         "Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.\n"
@@ -169,6 +169,19 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         
     );
 
+
+
+
+    // py::class_<transmission_time>(handle, "TransmissionTime")
+    //     .def(py::init<double>(), py::arg("pinf")
+    //     );
+
+    // // Define custom exception classes
+    // py::register_exception<std::range_error>(handle, "RangeError");
+    // py::register_exception<std::runtime_error>(handle, "RuntimeError");
+    // py::register_exception<std::logic_error>(handle, "LogicError");
+
+
     py::class_<transmission_time_gamma>(handle, "time_distribution")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
@@ -184,5 +197,13 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         .def_readonly("mean", &transmission_time_gamma::mean)
         .def_readonly("variance", &transmission_time_gamma::variance);
 
+    py::class_<transmission_time_deterministic>(handle, "time_distribution_deterministic")
+        .def(py::init<double>(), py::arg("tau"),
+        "\n"
+        "Args:\n"
+        "   deterministic time tau.\n"
+        "\n"
+        )
+        .def_readonly("tau", &transmission_time_deterministic::value);
 
 }

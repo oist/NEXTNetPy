@@ -12,21 +12,25 @@
 
 // rng_t engine;
 // Wrapper to run a simulation given a network and transmission distribution
-std::vector<double> simulation_discrete(py::object graph,int seed){
+std::vector<double> simulation_discrete(py::object graph,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
     networkx network(graph);
-
+    
     const int SIZE = (int) network.adjacencylist.size();
+    // const int SIZE = (int) 1e5;
     const bool EDGES_CONCURRENT = true;
     const bool SHUFFLE_NEIGHBOURS = false;
     const bool SIR = false;
 
-    transmission_time_gamma psi(1,0.0000001);
+    transmission_time_deterministic psi(1);
     
     std::vector<double> zn_average(50,0);
     int n_min = 50;
-    for (int s = 0; s<100;s++){
+    for (int s = 0; s<sim;s++){
+        py::print(s,"/",sim,"\r",py::arg("end") = "");
+        
+        // scale_free nw(SIZE,engine);
         simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
         std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
         const node_t random_node = uniform_node_distribution(engine);
@@ -49,7 +53,7 @@ std::vector<double> simulation_discrete(py::object graph,int seed){
             if (n==current_step){
                 current_infected ++;
             } else if (n > current_step){
-                zn_average[current_step] += current_infected/100;
+                zn_average[current_step] += (double) current_infected / sim;
                 // steps.push_back(n);
                 current_infected = 1;
                 current_step = n;
@@ -58,7 +62,7 @@ std::vector<double> simulation_discrete(py::object graph,int seed){
             }
         }
         n_min = std::min(n,n_min);
-        py::print(n_min);
+        // py::print(n_min);
     }
     while (zn_average.size() > n_min)
         zn_average.pop_back();

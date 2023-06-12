@@ -161,13 +161,7 @@ void save_grid(std::vector<std::vector<int>>& grid, std::string filename){
     out_file.close();
 }
 
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph, transmission_time_gamma psi,const std::vector<double>& freq,int seed){
-
-    // Convert the python list into a c++ vector
-    // std::vector<int> fraction(py::len(freq)); // create a C++ vector with the same size as the Python list
-    // for (auto i = 0; i < py::len(freq); i++)
-    //     fraction[i] = py::cast<int>(freq[i]);
-
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph,const std::vector<double>& freq,int seed){
 
     std::vector<double> fraction;
     for (auto fi : freq){
@@ -224,7 +218,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
     std::vector<double> k4_traj({(double) k4 / SIZE});
 
 
-
+    transmission_time_deterministic psi(1);
     simulate_next_reaction simulation(network, psi);
 
     //Infect the first individual by choosing a node at random
@@ -283,7 +277,7 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
 }
 
 
-double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi){
+std::vector<double> euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi){
 // double euler_lotka_growth_rate(py::object graph,double mean, double variance){
     networkx network(graph);
 
@@ -310,5 +304,5 @@ double euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi){
     //Only valid for Gamma distribution 
     const double GROWTH_RATE = 1/SCALE * ( pow(MU,1/SHAPE) - 1 );
 
-    return GROWTH_RATE;
+    return {GROWTH_RATE,MU} ;
 }
