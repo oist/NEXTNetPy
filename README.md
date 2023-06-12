@@ -7,12 +7,12 @@
 Open a new terminal tab, clone the repository and add the submodules
 
 ```
-git clone git@github.com:samuelcure/episimpy.git
+git clone git@github.com:samuelcure/nmepinet.git
 git submodule update --init --recursive
 ```
 
 On Linux pybind11 is included as a submodule, however if you are on MacOS you may need to install pybind11 globally using homebrew
-
+(to avoid long update set auto-update to false for this session)
 ```
 HOMEBREW_NO_AUTO_UPDATE=1 brew install pybind11
 ```
