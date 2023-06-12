@@ -1,6 +1,6 @@
-# episimPY
+# NMepinet
 
-*episimpy* is a python module can simulate non-Markovian epidemics on arbitrary networks. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*NMepinet* is a python module can simulate non-Markovian epidemics on arbitrary networks. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
 
 ## Set up
 
