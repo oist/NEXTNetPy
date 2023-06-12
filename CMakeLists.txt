@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(episimpy VERSION 0.1.0)
+project(nmepinet VERSION 0.1.0)
 
 # Use C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -30,14 +30,14 @@ if(UNIX AND NOT APPLE)
     # Code to execute on Linux
     message("Including pybind11 as a submodule")
     add_subdirectory(extern/pybind11)
-    pybind11_add_module(episimpy ${LIB_SOURCES} ${PY_SOURCES})
+    pybind11_add_module(nmepinet ${LIB_SOURCES} ${PY_SOURCES})
     find_package(Boost REQUIRED)
     link_libraries(Boost::boost)
 elseif(APPLE)
     find_package(Python COMPONENTS Interpreter Development)
     find_package(pybind11 CONFIG)
     # pybind11 method:
-    pybind11_add_module(episimpy
+    pybind11_add_module(nmepinet
     ${PY_SOURCES}
     ${SIMULATOR_SOURCES}
     ${LIB_SOURCES}
