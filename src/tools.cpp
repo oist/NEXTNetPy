@@ -10,11 +10,103 @@
 #include "tools.hpp"
 #include "NextReaction.h"
 #include "networkx.hpp"
+#include "graph.h"
 #include "nMGA.h"
 
 
 namespace py=pybind11;
 
+std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate){
+
+    int size = (int) nw.adjacencylist.size();
+    std::vector<double> knn_degree(size, 0);
+    std::vector<double> nb_with_degree(size,0);
+
+    int kmax = 0;
+    for (node_t node = 0; node < size; node++){
+        if (simulate && simulate -> is_infected(node))
+            continue;
+        int k = nw.outdegree(node);
+        kmax = std::max(k,kmax);
+        for (node_t neigh : nw.adjacencylist[node])
+        {
+            // if (simulate && simulate -> is_infected(node))
+            //     continue;
+            const double k_neigh = (double) nw.outdegree(neigh);
+            knn_degree[k] += k_neigh;
+            nb_with_degree[k] += 1;
+        }
+
+    }
+
+    while ((int) knn_degree.size() > kmax + 1){
+        knn_degree.pop_back();
+        nb_with_degree.pop_back();
+    }
+    
+    for (int k=0; k < kmax+1; k++)
+    {
+        if (nb_with_degree[k]!=0){
+            knn_degree[k] =  knn_degree[k]/nb_with_degree[k];
+        }
+    }
+    return knn_degree;
+
+}
+
+
+
+double assortativity_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate){
+
+   
+    const int SIZE = (int) nw.adjacencylist.size();
+    std::vector<double> Knn = knn_depleted(nw,simulate);
+    
+    double k1 = 0.0;
+    double k2 = 0.0;
+    double k3 = 0.0;
+
+    int kmax = (int) Knn.size();
+    std::vector<double> pk(SIZE,0);
+    
+    int SIZE_LEFT = SIZE;
+    for( int node = 0; node < SIZE; node++ ){
+        if(simulate && simulate -> is_infected(node)){
+            SIZE_LEFT --;
+            continue;
+        }
+        const int k = nw.outdegree(node);
+        pk[k] += (double) 1 ;
+        k1 += (double) k ;
+        k2 += (double) k*k ;
+        k3 += (double) k*k*k ;
+    }
+
+    for (int k = 0; k<= kmax; k++)
+        pk[k] /= SIZE_LEFT;
+    
+    k1 /= SIZE_LEFT;
+    k2 /= SIZE_LEFT;
+    k3 /= SIZE_LEFT;
+    
+    while(pk.size() > kmax)
+        pk.pop_back();
+    
+    const double MU = k2/k1;
+    const double SIGMA = k3/k1 - pow(MU,2);
+
+    double numerator=0;
+    for (int k = 0; k <= kmax; k++){
+        numerator += Knn[k]*k*k*pk[k]/k1;
+    }
+    numerator -= pow(MU,2);
+
+    return numerator/SIGMA;
+
+
+
+
+}
 
 
 // measure_runtime(std::vector<int>& sizes,std::vector<double>& average_run_time, std::vector<double>& std_run_time, Factory factory,

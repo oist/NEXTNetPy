@@ -9,6 +9,9 @@
 
 namespace py=pybind11;
 
+std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate=nullptr);
+double assortativity_depleted(graph_adjacencylist& network, simulate_next_reaction* simulate = nullptr);
+
 
 /**
  * @brief measure the average time taken to simulate an epidemic on a network ensemble.

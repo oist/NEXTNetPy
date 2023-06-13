@@ -12,7 +12,7 @@
 
 // rng_t engine;
 // Wrapper to run a simulation given a network and transmission distribution
-std::vector<double> simulation_discrete(py::object graph,int sim, int seed){
+std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
     networkx network(graph);
@@ -26,6 +26,24 @@ std::vector<double> simulation_discrete(py::object graph,int sim, int seed){
     transmission_time_deterministic psi(1);
     
     std::vector<double> zn_average(50,0);
+    std::vector<double> k1_traj(50,0);
+    std::vector<double> k2_traj(50,0);
+    std::vector<double> k3_traj(50,0);
+    std::vector<double> r_traj(50,0);
+
+    double k2 = 0;
+    double k1 = 0;
+    double k3 = 0;
+    for (node_t node = 0; node < SIZE; node++ ){
+        const int k = network.outdegree(node);
+        k1 += k ;
+        k2 += pow(k,2) ;
+        k3 += pow(k,3);
+    }
+    const double original_k1 = k1;
+    const double original_k2 = k2;
+    const double original_k3 = k3;
+
     int n_min = 50;
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
@@ -36,27 +54,54 @@ std::vector<double> simulation_discrete(py::object graph,int sim, int seed){
         const node_t random_node = uniform_node_distribution(engine);
         simulation.add_infections({ std::make_pair(random_node, 0)});
 
-        // std::vector<int> zn;
-        // std::vector<int> steps;
+        // reinitialise moments for each simulation.
+        k1 = original_k1 ;
+        k2 = original_k2 ;
+        k3 = original_k3;
+        
         int current_step = 0;
         int current_infected = 0;
         int n = 0;
+        int SIZE_LEFT = SIZE;
+        // begin simulation
+
+        const double r = assortativity_depleted(network,&simulation);
+        py::print("debut: ",r,"\n");
         while (true) {
             auto point = simulation.step(engine);
             if (!point)
                 break;
 
+            // update current moments
+            SIZE_LEFT --;
+            const node_t infected_node = point->node;
+            const int k = network.outdegree(infected_node);
+            k1 -= k ;
+            k2 -= pow(k,2) ;
+            k3 -= pow(k,3);
             n = (int) std::round(point->time);
             
             // py::print("step: ",n," curr: ",current_step,"\n");
 
+            // count if the infected is part of generation n or if we have reached the next gen
             if (n==current_step){
                 current_infected ++;
             } else if (n > current_step){
                 zn_average[current_step] += (double) current_infected / sim;
-                // steps.push_back(n);
+
+                // compute moments
+                k1_traj[current_step] += k1 / (sim * SIZE_LEFT);
+                k2_traj[current_step] += k2 / (sim * SIZE_LEFT);
+                k3_traj[current_step] += k3 / (sim * SIZE_LEFT);
+
+                // update step
                 current_infected = 1;
                 current_step = n;
+
+                const double r = assortativity_depleted(network,&simulation);
+                py::print(r,"\n");
+                r_traj.push_back(r);
+
             } else{
                 throw std::logic_error("new step cannot be smaller than old step");
             }
@@ -64,10 +109,14 @@ std::vector<double> simulation_discrete(py::object graph,int sim, int seed){
         n_min = std::min(n,n_min);
         // py::print(n_min);
     }
-    while (zn_average.size() > n_min)
+    while (zn_average.size() > n_min ){
         zn_average.pop_back();
-
-    return zn_average;
+        k1_traj.pop_back();
+        k2_traj.pop_back();
+        k3_traj.pop_back();
+        r_traj.pop_back();
+    }
+    return std::make_tuple(zn_average,k1_traj,k2_traj,k3_traj);
 }
 // Wrapper to run a simulation given a network and transmission distribution
 std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
