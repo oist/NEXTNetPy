@@ -16,6 +16,69 @@
 
 namespace py=pybind11;
 
+std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencylist& nw, simulate_next_reaction* simulate, int kmax){
+
+    const int SIZE = (int) nw.adjacencylist.size();
+    const int SIZE_LEAVES = (int) leaves.size();
+    
+    std::vector<double> KNN(kmax+1, 0);
+    std::vector<double> KNN_counts(kmax+1,0);
+    std::vector<double> PK(kmax+1,0);
+
+    double k1 = 0;
+    double k2 = 0;
+    double k3 = 0;
+    // py::print("leaves size : ",SIZE_LEAVES,"\n");
+    for (node_t node : leaves){
+        
+        // 1. compute the moments and the degree distribution
+        int k = nw.outdegree(node);
+
+        k1 += (double) k / SIZE_LEAVES;
+        k2 += (double) pow(k,2) / SIZE_LEAVES;
+        k3 += (double) pow(k,3) / SIZE_LEAVES;
+        PK[k] += (double) 1 / SIZE_LEAVES ;
+
+        // 2. compute knn. i.e. the average degree of the neighbours of a leaf with deg. k.
+        // here in two parts. first compute the sum of the degree, and normalise later after the loop.
+        for (node_t neigh : nw.adjacencylist[node])
+        {
+            // we discard the ancestor node that gave the disease to this leaf.
+            if (simulate -> is_infected(neigh))
+                continue;
+            const double k_neigh = (double) nw.outdegree(neigh);
+            KNN[k] += k_neigh;
+            KNN_counts[k] += 1.0;
+        }
+    }
+
+    // normalise the counts to express the correct knn
+    for (int k=0; k < kmax+1; k++)
+    {
+        if (KNN_counts[k]!=0){
+            KNN[k] /= KNN_counts[k];
+        }
+    }
+
+    // 3. compute assortativity
+    // sigma * r = [sum_k knn(k) * k^2 *p[k] / <k> ] - mu**2
+
+    const double MU = k2/k1;
+    const double SIGMA = k3/k1 - pow(MU,2);
+
+    double numerator=0;
+    for (int k = 0; k <= kmax; k++){
+        numerator += KNN[k]*k*k*PK[k]/k1;
+    }
+    numerator -= pow(MU,2);
+
+    const double r = numerator/SIGMA;
+    
+    return {r,k1,k2,k3};
+    
+
+}
+
 std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate){
 
     int size = (int) nw.adjacencylist.size();
@@ -30,8 +93,8 @@ std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction
         kmax = std::max(k,kmax);
         for (node_t neigh : nw.adjacencylist[node])
         {
-            // if (simulate && simulate -> is_infected(node))
-            //     continue;
+            if (simulate && simulate -> is_infected(neigh))
+                continue;
             const double k_neigh = (double) nw.outdegree(neigh);
             knn_degree[k] += k_neigh;
             nb_with_degree[k] += 1;
@@ -56,7 +119,7 @@ std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction
 
 
 
-double assortativity_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate){
+double assortativity_depleted(std::vector<node_t>& leaves, graph_adjacencylist& nw, simulate_next_reaction* simulate){
 
    
     const int SIZE = (int) nw.adjacencylist.size();

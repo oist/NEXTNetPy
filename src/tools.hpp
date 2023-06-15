@@ -9,8 +9,10 @@
 
 namespace py=pybind11;
 
+std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencylist& nw, simulate_next_reaction* simulate, int kmax );
+
 std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate=nullptr);
-double assortativity_depleted(graph_adjacencylist& network, simulate_next_reaction* simulate = nullptr);
+double assortativity_depleted(std::vector<node_t>& leaves,graph_adjacencylist& network, simulate_next_reaction* simulate = nullptr);
 
 
 /**
