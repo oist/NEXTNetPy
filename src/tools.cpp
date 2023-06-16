@@ -16,6 +16,141 @@
 
 namespace py=pybind11;
 
+std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> knn_pk(int SIZE, int SIM, int seed){
+    rng_t engine;
+    engine.seed(seed);
+    
+    const bool EDGES_CONCURRENT = true;
+    const bool SHUFFLE_NEIGHBOURS = false;
+    const bool SIR = false;
+
+    transmission_time_deterministic psi(1);
+    
+    int n_min = 50;
+    
+    int global_kmax = SIZE;
+    // knn_average[n] returns average knn at the n_th step of the epidemic.
+    std::vector<std::vector<double>> knn_average(n_min,std::vector<double>(SIZE,0));
+    std::vector<std::vector<double>> pk_average(n_min,std::vector<double>(SIZE,0));
+
+    for (int s = 1; s<=SIM;s++){
+        py::print(s,"/",SIM,"\r",py::arg("end") = "");
+
+        scale_free network(SIZE,engine);        
+        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+
+        //0. obtain initial knn and pk
+        std::vector<double> pk_num(SIZE,0);
+        std::vector<double> KNN_num(SIZE,0);
+        std::vector<double> KNN_den(SIZE,0);
+
+        int local_kmax= 0;
+
+        for (node_t node=0; node < SIZE; node++){
+            const int k = network.outdegree(node);
+            local_kmax = std::max(local_kmax,k);
+            
+            // 0.1. pk
+            pk_num[k] += 1.0;
+
+            // 0.2 knn
+            // here in two parts. first compute the sum of the degree, and normalise later after the loop.
+            for (node_t neigh : network.adjacencylist[node])
+            {
+                const double k_neigh = (double) network.outdegree(neigh);
+                KNN_num[k] += k_neigh;
+                KNN_den[k] += 1.0;
+            }            
+        }
+    
+        for (int k=0;k <= local_kmax; k++){
+            pk_average[0][k] += (double) pk_num[k] / (SIZE * SIM);
+            const bool ZERO = (KNN_den[k]==0);
+            knn_average[0][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
+        }
+    
+        // Initial infection
+        std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+        const node_t random_node = uniform_node_distribution(engine);
+        simulation.add_infections({ std::make_pair(random_node, 0)});
+        
+        int n = 0;
+        int SIZE_LEFT = SIZE;
+
+        // begin simulation
+        while (true) {
+            
+            auto point = simulation.step(engine);
+            if (!point)
+                break;
+
+            SIZE_LEFT --;
+            const node_t infected_node = point->node;
+            const int current_step = (int) std::round(point->time);
+
+            const int k = network.outdegree(infected_node);
+
+            // update pk
+            pk_num[k] --;
+            
+            // keep track of knn
+            for (node_t neigh : network.adjacencylist[infected_node])
+            {
+                const double k_neigh = (double) network.outdegree(neigh);
+                KNN_num[k] -= k_neigh;
+                KNN_den[k] -= 1.0;
+            }         
+
+            // if generation completed, normalise pk and export knn
+            if (current_step > n){
+                n = current_step;
+
+                for (int k = 0; k<=local_kmax; k++){
+                    pk_average[n][k] += (double) pk_num[k] / (SIZE_LEFT * SIM);
+
+                    const bool ZERO = (KNN_den[k]==0);
+                    knn_average[n][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
+                }
+            }
+        
+        } // epidemic ended
+        // update kmax: for the average to be effective we want all arrays to be the same size, hence this min-max k-degree.
+        global_kmax = std::min(local_kmax,global_kmax);
+
+        // if the epidemic never went exponential (died out after a few steps, say, < 6) then skip that step
+        // note: this part of the code is never needed in BA networks as the network is connected (i.e no disconnected components).
+        if (n<=5)
+            continue;
+        n_min = std::min(n,n_min);
+
+    } // simulations ended.
+
+    // remove unused steps
+    while (knn_average.size() > n_min ){
+        knn_average.pop_back();
+        pk_average.pop_back();
+    }
+
+    // remove unused degrees
+    for (int n = 0; n < n_min; n++){
+        while (knn_average[n].size() > global_kmax){
+            knn_average[n].pop_back();
+            pk_average[n].pop_back();
+        }
+    }
+
+    //temp test
+    double sum = 0;
+    for (auto p : pk_average[8])
+        sum += p;
+    py::print("sum is ...",sum,"\n");
+
+    py::print("kmax and nmin: ",global_kmax,"  ",n_min,"\n");
+    py::print(" and ..",knn_average[3].size(),"   ",knn_average.size(),"\n");
+
+    return std::make_tuple(knn_average,pk_average);
+}
+
 std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencylist& nw, simulate_next_reaction* simulate, int kmax){
 
     const int SIZE = (int) nw.adjacencylist.size();
@@ -93,8 +228,8 @@ std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction
         kmax = std::max(k,kmax);
         for (node_t neigh : nw.adjacencylist[node])
         {
-            if (simulate && simulate -> is_infected(neigh))
-                continue;
+            // if (simulate && simulate -> is_infected(neigh))
+            //     continue;
             const double k_neigh = (double) nw.outdegree(neigh);
             knn_degree[k] += k_neigh;
             nb_with_degree[k] += 1;

@@ -12,7 +12,7 @@
 
 // rng_t engine;
 // Wrapper to run a simulation given a network and transmission distribution
-std::tuple<std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim, int seed){
+std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
     networkx network(graph);
@@ -88,7 +88,7 @@ std::tuple<std::vector<double>,std::vector<double>> simulation_discrete(py::obje
     for (int i =2;i<average_leaf_degree.size();i++){
         recursion[i]= recursion[i-1]*(average_leaf_degree[i-1]-1); 
     }
-    return std::make_tuple(zn_average,recursion);
+    return std::make_tuple(zn_average,recursion,average_leaf_degree);
 }
 std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> depletion_discrete(py::object graph,int sim, int seed){
     rng_t engine;
@@ -109,10 +109,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vect
     std::vector<double> k3_traj(n_min,0);
     std::vector<double> r_traj(n_min,0);
 
-    std::vector<double> k1_leaves(n_min,0);
-    std::vector<double> k2_leaves(n_min,0);
-    std::vector<double> k3_leaves(n_min,0);
-    std::vector<double> r_leaves(n_min,0);
 
     double k2 = 0;
     double k1 = 0;
@@ -183,11 +179,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vect
 
                 // py::print("average degree of leaf : ",result[1],"\n");
 
-                r_leaves[current_step] += result[0] / sim;
-                k1_leaves[current_step] += result[1] / sim ;
-                k2_leaves[current_step] += result[2] / sim ;
-                k3_leaves[current_step] += result[3] / sim ;
-
                 // clear the set of leaves
                 leaves.clear();
                 leaves.push_back(point->node);
@@ -208,11 +199,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vect
 
         std::vector<double> result = analyse_leaves(leaves,network,&simulation,kmax);
 
-        r_leaves[current_step] += result[0] / sim;
-        k1_leaves[current_step] += result[1] / sim ;
-        k2_leaves[current_step] += result[2] / sim ;
-        k3_leaves[current_step] += result[3] / sim ;
-
         // if the epidemic never went exponential (died after a few steps) then skip that step
         // note: this part of the code is never needed in BA networks as the network is connected.
         if (n<=5)
@@ -226,12 +212,9 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vect
         k2_traj.pop_back();
         k3_traj.pop_back();
         r_traj.pop_back();
-        k1_leaves.pop_back();
-        k2_leaves.pop_back();
-        k3_leaves.pop_back();
-        r_leaves.pop_back();
+
     }
-    return std::make_tuple(zn_average,k2_traj,k2_leaves,k1_traj,k1_leaves);
+    return std::make_tuple(zn_average,k1_traj,k2_traj,k3_traj,r_traj);
 }
 
 

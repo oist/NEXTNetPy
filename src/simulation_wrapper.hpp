@@ -18,7 +18,7 @@ namespace py = pybind11;
 std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> depletion_discrete(py::object graph,int sim=100,int seed=1);
 
 
-std::tuple<std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim=100,int seed=1);
+std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim=100,int seed=1);
 
 // Wrapper to run a simulation given a network and transmission distribution
 std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR=false,double TMAX = 1000, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1);

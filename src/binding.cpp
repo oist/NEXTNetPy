@@ -17,6 +17,13 @@ namespace py = pybind11;
 PYBIND11_MODULE(nmepinet, handle) {
     handle.doc() = "nmepinet module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
 
+    handle.def("knn_depletion",&knn_pk,
+        py::arg("SIZE"),
+        py::arg("SIM"),
+        py::arg("seed"),
+        "simulate discrete epidemic and measures how knn[k] and p[k] evolves over time"
+    );
+
     // handle.def("run_benchmark_next_reaction", &run_benchmark_next_reaction,
     //     py::arg("graph_ensemble"),
     //     py::arg("infection_time"),
