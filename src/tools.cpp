@@ -26,23 +26,27 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> kn
 
     transmission_time_deterministic psi(1);
     
-    int n_min = 50;
+    int n_min = 40;
     
     int global_kmax = SIZE;
     // knn_average[n] returns average knn at the n_th step of the epidemic.
+    // std::vector<std::unordered_map<int,double>> knn_average(n_min);
+    // std::vector<std::unordered_map<int,double>> knn_counts(n_min);
     std::vector<std::vector<double>> knn_average(n_min,std::vector<double>(SIZE,0));
+    std::vector<std::vector<double>> knn_counts(n_min,std::vector<double>(SIZE,0));
     std::vector<std::vector<double>> pk_average(n_min,std::vector<double>(SIZE,0));
 
     for (int s = 1; s<=SIM;s++){
         py::print(s,"/",SIM,"\r",py::arg("end") = "");
 
-        scale_free network(SIZE,engine);        
+        scale_free network(SIZE,engine);   
+        // erdos_reyni network(SIZE,5,engine);     
         simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
 
         //0. obtain initial knn and pk
         std::vector<double> pk_num(SIZE,0);
-        std::vector<double> KNN_num(SIZE,0);
-        std::vector<double> KNN_den(SIZE,0);
+        // std::vector<double> KNN_num(SIZE,0);
+        // std::vector<double> KNN_den(SIZE,0);
 
         int local_kmax= 0;
 
@@ -50,23 +54,22 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> kn
             const int k = network.outdegree(node);
             local_kmax = std::max(local_kmax,k);
             
-            // 0.1. pk
-            pk_num[k] += 1.0;
+            // pk
+            pk_num[k] += 1.0 ;
 
-            // 0.2 knn
-            // here in two parts. first compute the sum of the degree, and normalise later after the loop.
+            // knn
             for (node_t neigh : network.adjacencylist[node])
             {
                 const double k_neigh = (double) network.outdegree(neigh);
-                KNN_num[k] += k_neigh;
-                KNN_den[k] += 1.0;
+                knn_average[0][k] += k_neigh;
+                knn_counts[0][k] += 1.0;
             }            
         }
     
         for (int k=0;k <= local_kmax; k++){
             pk_average[0][k] += (double) pk_num[k] / (SIZE * SIM);
-            const bool ZERO = (KNN_den[k]==0);
-            knn_average[0][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
+            // const bool ZERO = (KNN_den[k]==0);
+            // knn_average[0][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
         }
     
         // Initial infection
@@ -75,6 +78,7 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> kn
         simulation.add_infections({ std::make_pair(random_node, 0)});
         
         int n = 0;
+        // int current_step = 0;
         int SIZE_LEFT = SIZE;
 
         // begin simulation
@@ -84,33 +88,32 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> kn
             if (!point)
                 break;
 
-            SIZE_LEFT --;
+
             const node_t infected_node = point->node;
             const int current_step = (int) std::round(point->time);
-
             const int k = network.outdegree(infected_node);
 
             // update pk
             pk_num[k] --;
+            SIZE_LEFT --;
             
             // keep track of knn
             for (node_t neigh : network.adjacencylist[infected_node])
             {
                 const double k_neigh = (double) network.outdegree(neigh);
-                KNN_num[k] -= k_neigh;
-                KNN_den[k] -= 1.0;
+                knn_average[current_step][k] -= k_neigh;
+                knn_counts[current_step][k] -= 1.0;
             }         
 
             // if generation completed, normalise pk and export knn
             if (current_step > n){
-                n = current_step;
-
                 for (int k = 0; k<=local_kmax; k++){
-                    pk_average[n][k] += (double) pk_num[k] / (SIZE_LEFT * SIM);
+                    pk_average[current_step][k] += (double) pk_num[k] / (SIZE_LEFT * SIM);
 
-                    const bool ZERO = (KNN_den[k]==0);
-                    knn_average[n][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
+                    // const bool ZERO = (KNN_den[k]==0);
+                    // knn_average[n][k] += (ZERO) ? 0 : KNN_num[k] / (KNN_den[k] * SIM);
                 }
+                n = current_step;
             }
         
         } // epidemic ended
@@ -137,16 +140,22 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> kn
             knn_average[n].pop_back();
             pk_average[n].pop_back();
         }
+
+        for (int k = 0; k < global_kmax; k++){
+            const bool ZERO = (knn_counts[n][k]==0);
+            knn_average[n][k] = ZERO ? 0 : knn_average[n][k]/knn_counts[n][k];
+        }
     }
+
+    
 
     //temp test
     double sum = 0;
-    for (auto p : pk_average[8])
+    for (auto p : pk_average[0])
         sum += p;
     py::print("sum is ...",sum,"\n");
 
-    py::print("kmax and nmin: ",global_kmax,"  ",n_min,"\n");
-    py::print(" and ..",knn_average[3].size(),"   ",knn_average.size(),"\n");
+
 
     return std::make_tuple(knn_average,pk_average);
 }
