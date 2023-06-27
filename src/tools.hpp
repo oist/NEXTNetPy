@@ -9,6 +9,9 @@
 
 namespace py=pybind11;
 
+std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> depleted_distribution(int SIZE, int SIM, int seed);
+
+
 std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> knn_pk(int SIZE, int SIM, int seed);
 
 std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencylist& nw, simulate_next_reaction* simulate, int kmax );
@@ -19,15 +22,12 @@ double assortativity_depleted(std::vector<node_t>& leaves,graph_adjacencylist& n
 
 /**
  * @brief measure the average time taken to simulate an epidemic on a network ensemble.
- * 
- * 
  */
 std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchmark(std::string ensemble, std::string method, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true, int MAX_POWER = 21, int NB_SIM = 500, double TMAX = 1000, bool EDGES_CONCURRENT= false,int INITIAL_INFECTED = 1, int seed = 1);
 
 
 std::vector<double> euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi);
 
-std::tuple<std::vector<double>,double> generalised_knn(py::object graph, int moment = 1, double r = 0.0,int seed = 1);
 
 /**
  * @brief Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.

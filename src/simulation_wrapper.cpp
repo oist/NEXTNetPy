@@ -10,9 +10,85 @@
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
 
+std::vector<std::vector<double>> simulation_discrete_zk(int SIZE,int sim, int seed){
+    rng_t engine;
+    engine.seed(seed);
+    
+    scale_free network(SIZE,engine);
+
+    int kmax = 0;
+    for (node_t node = 0; node < SIZE; node++){   
+        const int k = network.outdegree(node);
+        kmax = std::max(kmax,k);
+    }
+    
+    const bool EDGES_CONCURRENT = true;
+    const bool SHUFFLE_NEIGHBOURS = false;
+    const bool SIR = false;
+
+    transmission_time_deterministic psi(1);
+    
+    int n_min = 50;
+    std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(kmax+1,0));
+    std::vector<double> average_leaf_degree(n_min,0);
+    std::vector<double> step_counter(n_min,0);
+    for (int s = 0; s<sim;s++){
+        py::print(s,"/",sim,"\r",py::arg("end") = "");
+        
+        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+       
+        const node_t random_node = uniform_node_distribution(engine);
+        simulation.add_infections({ std::make_pair(random_node, 0)});
+        
+        
+        int n = 0;
+        int step = 0;
+        // begin simulation
+        while (true) {
+            auto point = simulation.step(engine);
+            
+            if (!point)
+                break;
+            
+            const node_t infected_node = point->node;
+            const int k = network.outdegree(infected_node);
+            n = (int) std::round(point->time);
+            
+            zn_average[n][k] ++ ;
+           
+            if (n>step){
+                step_counter[step]++;
+                step = n;
+            }
+        }
+        step_counter[n]++;
+
+    }
+
+    //delete unused steps
+    while (step_counter.back()==0 ){
+        step_counter.pop_back();
+        zn_average.pop_back();
+    }
+
+    //normalise zn:
+    for (int n = 0; n<step_counter.size(); n++){
+        const double norm = (double) step_counter[n];
+        for( int k =0;k<= kmax;k++){
+            zn_average[n][k] /= norm;
+        }
+    }
+
+    return zn_average;
+}
+
+
+
+
 // rng_t engine;
 // Wrapper to run a simulation given a network and transmission distribution
-std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete(py::object graph,int sim, int seed){
+std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_leaves(py::object graph,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
     networkx network(graph);
@@ -28,7 +104,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
     std::vector<double> zn_average(n_min,0);
     std::vector<double> average_leaf_degree(n_min,0);
     
-
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
         
@@ -38,10 +113,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
         const node_t random_node = uniform_node_distribution(engine);
         simulation.add_infections({ std::make_pair(random_node, 0)});
         
-        //initial condition recursion
-        // average_leaf_degree[0] += (double) network.outdegree(random_node) / sim ;
-
-
         int current_step = 0;
         int current_infected = 0;
         int n = 0;
@@ -66,8 +137,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
         }
 
 
-        // if the epidemic never went exponential (died after a few steps) then skip that step
-        // note: this part of the code is never needed in BA networks as the network is connected.
         if (n<=5)
             continue;
         n_min = std::min(n,n_min);
@@ -90,134 +159,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
     }
     return std::make_tuple(zn_average,recursion,average_leaf_degree);
 }
-std::tuple<std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> depletion_discrete(py::object graph,int sim, int seed){
-    rng_t engine;
-    engine.seed(seed);
-    networkx network(graph);
-    
-    const int SIZE = (int) network.adjacencylist.size();
-    const bool EDGES_CONCURRENT = true;
-    const bool SHUFFLE_NEIGHBOURS = false;
-    const bool SIR = false;
-
-    transmission_time_deterministic psi(1);
-    
-    int n_min = 50;
-    std::vector<double> zn_average(n_min,0);
-    std::vector<double> k1_traj(n_min,0);
-    std::vector<double> k2_traj(n_min,0);
-    std::vector<double> k3_traj(n_min,0);
-    std::vector<double> r_traj(n_min,0);
-
-
-    double k2 = 0;
-    double k1 = 0;
-    double k3 = 0;
-    int kmax = 0;
-    for (node_t node = 0; node < SIZE; node++ ){
-        const int k = network.outdegree(node);
-        kmax = std::max(k,kmax);
-        k1 += k ;
-        k2 += pow(k,2) ;
-        k3 += pow(k,3);
-    }
-    const double original_k1 = k1;
-    const double original_k2 = k2;
-    const double original_k3 = k3;
-
-    for (int s = 0; s<sim;s++){
-        py::print(s,"/",sim,"\r",py::arg("end") = "");
-        
-        // scale_free nw(SIZE,engine);
-        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
-        std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
-        const node_t random_node = uniform_node_distribution(engine);
-        simulation.add_infections({ std::make_pair(random_node, 0)});
-
-        // reinitialise moments for each simulation.
-        k1 = original_k1 ;
-        k2 = original_k2 ;
-        k3 = original_k3;
-        
-        int current_step = 0;
-        int current_infected = 0;
-        int n = 0;
-        int SIZE_LEFT = SIZE;
-        // begin simulation
-        std::vector<node_t> leaves;
-        // const double r = assortativity_depleted(network,&simulation);
-        // py::print("debut: ",r,"\n");
-        while (true) {
-            auto point = simulation.step(engine);
-            if (!point)
-                break;
-
-            // update current moments
-            SIZE_LEFT --;
-            const node_t infected_node = point->node;
-            const int k = network.outdegree(infected_node);
-            k1 -= k ;
-            k2 -= pow(k,2) ;
-            k3 -= pow(k,3);
-            n = (int) std::round(point->time);
-            
-            // py::print("step: ",n,"  curr: ",current_step,"\n");
-            // count if the infected is part of generation n or if we have reached the next gen
-            if (n==current_step){
-                current_infected ++;
-                // add node to the current set of leaves
-                leaves.push_back(point->node);
-            } else if (n > current_step){
-                zn_average[current_step] += (double) current_infected / sim;
-
-                // compute moments
-                k1_traj[current_step] += k1 / (sim * SIZE_LEFT);
-                k2_traj[current_step] += k2 / (sim * SIZE_LEFT);
-                k3_traj[current_step] += k3 / (sim * SIZE_LEFT);
-
-                std::vector<double> result = analyse_leaves(leaves,network,&simulation,kmax);
-
-                // py::print("average degree of leaf : ",result[1],"\n");
-
-                // clear the set of leaves
-                leaves.clear();
-                leaves.push_back(point->node);
-                // py::print("degree of new leaf:", network.outdegree(point->node),"\n");
-                // update step
-                current_infected = 1;
-                current_step = n;
-            } else{
-                throw std::logic_error("new step cannot be smaller than old step");
-            }
-        }
-        // epidemic ended, but we need to update one last time the trajectories:
-        zn_average[current_step] += (double) current_infected / sim;
-        k1_traj[current_step] += k1 / (sim * SIZE_LEFT);
-        k2_traj[current_step] += k2 / (sim * SIZE_LEFT);
-        k3_traj[current_step] += k3 / (sim * SIZE_LEFT);
-
-
-        std::vector<double> result = analyse_leaves(leaves,network,&simulation,kmax);
-
-        // if the epidemic never went exponential (died after a few steps) then skip that step
-        // note: this part of the code is never needed in BA networks as the network is connected.
-        if (n<=5)
-            continue;
-        n_min = std::min(n,n_min);
-        // py::print(n_min);
-    }
-    while (zn_average.size() > n_min ){
-        zn_average.pop_back();
-        k1_traj.pop_back();
-        k2_traj.pop_back();
-        k3_traj.pop_back();
-        r_traj.pop_back();
-
-    }
-    return std::make_tuple(zn_average,k1_traj,k2_traj,k3_traj,r_traj);
-}
-
-
 
 
 // Wrapper to run a simulation given a network and transmission distribution
