@@ -25,10 +25,11 @@ PYBIND11_MODULE(nmepinet, handle) {
     );
 
     handle.def("simulation_discrete_zk",&simulation_discrete_zk,
+        py::arg("graph"),
         py::arg("SIZE"),
         py::arg("SIM"),
         py::arg("seed"),
-        ""
+        "returns a vector of vectors (N x kmax) of the number of newly infected with degree k at each discrete step on a BA network"
     );
 
 
@@ -47,13 +48,14 @@ PYBIND11_MODULE(nmepinet, handle) {
     //     "   list of network sizes, list average run time, (list) std deviation run time"
     // );
 
-    // handle.def("generalised_knn",&generalised_knn,
-    //     py::arg("graph"),
-    //     py::arg("moment")=1,
-    //     py::arg("r")=0.0,
-    //     py::arg("seed")=1,
-    //     " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
-    //     );
+    handle.def("generalised_knn",&generalised_knn,
+        py::arg("size"),
+        py::arg("sim")=1,
+        py::arg("power")=2,
+        py::arg("seed")=1,
+        " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
+        );
+
     handle.def("simulate_discrete_leaves",&simulation_discrete_leaves,
         py::arg("graph"),
         py::arg("nb_sim")=100,

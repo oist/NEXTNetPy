@@ -16,6 +16,66 @@
 
 namespace py=pybind11;
 
+std::tuple<std::vector<double>,std::vector<double>> generalised_knn(int SIZE, int SIM,int POWER, int seed){
+    rng_t engine;
+    engine.seed(seed);
+    
+    // paremeters for the simulations
+    const bool EDGES_CONCURRENT = true;
+    const bool SHUFFLE_NEIGHBOURS = false;
+    const bool SIR = false;
+
+    // infected node will attempt to transmit to all its neighbours 1 unit of time after getting infected.
+    transmission_time_deterministic psi(1);
+    
+    int n_min = 40;
+    // alternative way: count how many times the epidemic reached step n
+    std::vector<int> counting_steps(n_min,0);
+
+    
+    std::vector<double> knn_num(SIZE/2,0);
+    std::vector<double> knn_den(SIZE/2,0);
+
+
+    // simulations
+    for (int s = 1; s<=SIM;s++){
+        py::print(s,"/",SIM,"\r",py::arg("end") = "");
+
+        scale_free network(SIZE,engine);
+
+        for (node_t node = 0; node < SIZE; node++)
+        {
+            const int k = network.outdegree(node);
+
+            for (node_t neigh : network.adjacencylist[node])
+            {
+                const double k_neigh = (double) network.outdegree(neigh);
+                knn_num[k] += pow(k_neigh,POWER);
+                knn_den[k] += 1.0;
+            }   
+        }
+        
+    }
+
+    std::vector<double> knn_k;
+    std::vector<double> knn_average;
+
+    for (int k = 0; k<knn_den.size();k++){
+
+        const int den = knn_den[k];
+        const int num = knn_num[k];
+
+        if (den==0)
+            continue;
+
+        knn_average.push_back((double) num/den);
+        knn_k.push_back(k);
+    }
+
+    return std::make_tuple(knn_k,knn_average);
+}
+
+
 std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> depleted_distribution(int SIZE, int SIM, int seed){
     rng_t engine;
     engine.seed(seed);

@@ -9,18 +9,43 @@
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
+#include "graph.h"
 
-std::vector<std::vector<double>> simulation_discrete_zk(int SIZE,int sim, int seed){
+std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
-    
-    scale_free network(SIZE,engine);
 
+    // networkx network(graph);;
+    // const int mean = 5.5 ;
+    // const int variance = 60;
+    // std::vector<int> degrees = lognormal_degree_list(mean,variance,SIZE,engine);
+
+    // config_model network(degrees,engine);
+    // add_correlation(-0.4,network,engine);
+    // scale_free network(SIZE,engine);
+
+    erdos_reyni network(SIZE,6,engine);
+    add_correlation(0.4,network,engine);
+    
+    double k1 = 0;
+    double k2 = 0;
+    double k3 = 0;
+    double r = assortativity(network);
+    
     int kmax = 0;
+    std::vector<double> pk(SIZE,0);
+
     for (node_t node = 0; node < SIZE; node++){   
         const int k = network.outdegree(node);
+        pk[k] += (double) 1 / SIZE;
         kmax = std::max(kmax,k);
+        k1 += (double) k/SIZE;
+        k2 += (double) k*k/SIZE;
+        k3 += (double) k*k*k/SIZE;
     }
+    while (pk.size()>kmax+1)
+        pk.pop_back();
+
     
     const bool EDGES_CONCURRENT = true;
     const bool SHUFFLE_NEIGHBOURS = false;
@@ -30,7 +55,6 @@ std::vector<std::vector<double>> simulation_discrete_zk(int SIZE,int sim, int se
     
     int n_min = 50;
     std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(kmax+1,0));
-    std::vector<double> average_leaf_degree(n_min,0);
     std::vector<double> step_counter(n_min,0);
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
@@ -80,7 +104,7 @@ std::vector<std::vector<double>> simulation_discrete_zk(int SIZE,int sim, int se
         }
     }
 
-    return zn_average;
+    return std::make_tuple(zn_average,std::vector<double>{k1,k2,k3,r},pk);
 }
 
 

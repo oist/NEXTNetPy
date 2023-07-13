@@ -9,6 +9,8 @@
 
 namespace py=pybind11;
 
+std::tuple<std::vector<double>,std::vector<double>> generalised_knn(int SIZE, int SIM,int POWER, int seed);
+
 std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> depleted_distribution(int SIZE, int SIM, int seed);
 
 
@@ -18,7 +20,6 @@ std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencyli
 
 std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate=nullptr);
 double assortativity_depleted(std::vector<node_t>& leaves,graph_adjacencylist& network, simulate_next_reaction* simulate = nullptr);
-
 
 /**
  * @brief measure the average time taken to simulate an epidemic on a network ensemble.
