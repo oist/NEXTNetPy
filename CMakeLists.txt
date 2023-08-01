@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.5)
 project(nmepinet VERSION 0.1.0)
 
 # Use C++17
@@ -20,7 +20,8 @@ set(PY_SOURCES
     src/binding.cpp
     src/networkx.cpp
     src/simulation_wrapper.cpp
-    src/tools.cpp)
+    src/tools.cpp
+    src/figures_paper.cpp)
 
 
 # include_directories(extern/epidemics/epidemics)

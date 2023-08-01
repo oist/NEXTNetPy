@@ -11,11 +11,11 @@
 #include "tools.hpp"
 #include "graph.h"
 
-std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE,int sim, int seed){
+std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
 
-    // networkx network(graph);;
+    networkx network(graph);
     // const int mean = 5.5 ;
     // const int variance = 60;
     // std::vector<int> degrees = lognormal_degree_list(mean,variance,SIZE,engine);
@@ -24,8 +24,8 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
     // add_correlation(-0.4,network,engine);
     // scale_free network(SIZE,engine);
 
-    erdos_reyni network(SIZE,6,engine);
-    add_correlation(0.4,network,engine);
+    // erdos_reyni network(SIZE,6,engine);
+    // add_correlation(0.4,network,engine);
     
     double k1 = 0;
     double k2 = 0;
@@ -54,6 +54,12 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
     transmission_time_deterministic psi(1);
     
     int n_min = 50;
+    std::vector<double> k1_traj(SIZE,0);
+    std::vector<double> k2_traj(SIZE,0);
+    
+    k1_traj[0]=k1;
+    k2_traj[0]=k2;
+
     std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(kmax+1,0));
     std::vector<double> step_counter(n_min,0);
     for (int s = 0; s<sim;s++){
@@ -69,6 +75,10 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
         int n = 0;
         int step = 0;
         // begin simulation
+        int i = 1;
+
+        double k1_t = k1;
+        double k2_t = k2;
         while (true) {
             auto point = simulation.step(engine);
             
@@ -80,11 +90,17 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
             n = (int) std::round(point->time);
             
             zn_average[n][k] ++ ;
-           
+                   
             if (n>step){
                 step_counter[step]++;
                 step = n;
             }
+
+            k1_t -= (double) k/SIZE;
+            k2_t -= (double) k*k/SIZE;
+            k1_traj[i] +=  (double) k1_t/sim;
+            k2_traj[i] +=  (double) k2_t/sim;
+            i++;
         }
         step_counter[n]++;
 
@@ -104,7 +120,7 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
         }
     }
 
-    return std::make_tuple(zn_average,std::vector<double>{k1,k2,k3,r},pk);
+    return std::make_tuple(zn_average,std::vector<double>{k1,k2,k3,r},pk,k1_traj,k2_traj);
 }
 
 
@@ -186,7 +202,7 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
 
 
 // Wrapper to run a simulation given a network and transmission distribution
-std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
+std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,transmission_time_gamma psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
 
     rng_t engine;
     engine.seed(seed);
@@ -208,19 +224,20 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation(py::object grap
 
     std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
 
-
+    std::unordered_set<node_t> selected_nodes;
     for (node_t i = 0; i < INITIAL_INFECTED; i++)
     {
         const node_t random_node = uniform_node_distribution(engine);
         // sample without replacement:
-        if (simulation.is_infected(random_node)){
+        if (selected_nodes.find(random_node) != selected_nodes.end()){
             i--;
             continue;
         }
         simulation.add_infections({ std::make_pair(random_node, 0)});
+        selected_nodes.insert(random_node);
     }
     
-    int current_number_infected = INITIAL_INFECTED - 1;
+    int current_number_infected = 0;
                         
     while (true) {
         auto point = simulation.step(engine);
@@ -277,18 +294,20 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
             // Initialise/reset simulation object
             simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
             
+            std::unordered_set<node_t> selected_nodes;
             for (node_t i = 0; i < INITIAL_INFECTED; i++)
             {
                 const node_t random_node = uniform_node_distribution(engine);
                 // sample without replacement:
-                if (simulation.is_infected(random_node)){
+                if (selected_nodes.find(random_node) != selected_nodes.end()){
                     i--;
                     continue;
                 }
                 simulation.add_infections({ std::make_pair(random_node, 0)});
+                selected_nodes.insert(random_node);
             }
-            
-            double infection_counter = INITIAL_INFECTED / NB_SIMULATIONS;
+                        
+            double infection_counter = 0;
                                 
             for (int step = 0; step < SIZE*NB_SIMULATIONS;step++) {
                 auto point = simulation.step(engine);

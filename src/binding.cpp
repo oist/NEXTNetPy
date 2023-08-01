@@ -11,11 +11,28 @@
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
+#include "figures_paper.hpp"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(nmepinet, handle) {
     handle.doc() = "nmepinet module to efficiently simulate an epidemic on any networkx graph."; // optional module docstring
+
+    handle.def("simulate_on_lognormal",&simulate_on_lognormal,
+        py::arg("size"),
+        py::arg("mean_degree"),
+        py::arg("variance"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=1, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        ""
+    );
 
     handle.def("depleted_distribution",&depleted_distribution,
         py::arg("SIZE"),
@@ -125,7 +142,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
     );
 
 
-    handle.def("simulate", &run_simulation, 
+    handle.def("simulate", &simulate, 
         py::arg("graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -162,7 +179,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
         py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=false,
+        py::arg("concurrent_edges")=true,
         py::arg("initial_infected")=1,
         py::arg("seed")=0, 
         py::arg("nb_simulations")=1,

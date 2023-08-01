@@ -382,7 +382,8 @@ std::vector<double> euler_lotka_growth_rate(py::object graph,transmission_time_g
         k2 += pow(k,2) ;
         k3 += pow(k,3) ;
     }
-    const double MU = ( (1-r) * (k2/k1 - 1 ) + r *(k3/k2 - 1) );
+
+    const double MU = ( (1-r) * (k2/k1 - 1 ) + r *((k3-k2)/(k2-k1)-1) );
     const double SHAPE = psi.mean * psi.mean / psi.variance;
     const double SCALE = psi.variance / psi.mean;
     // const double SHAPE = mean * mean / variance;
