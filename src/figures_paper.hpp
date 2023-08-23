@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <numeric>
+#include <vector>
 #include "random.h"
 #include "analysis.h"
 #include "algorithm.h"

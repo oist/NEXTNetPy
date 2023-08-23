@@ -11,10 +11,11 @@
 #include "tools.hpp"
 #include "graph.h"
 
-std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE,int sim, int seed){
+std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE,int sim, int seed){
     rng_t engine;
     engine.seed(seed);
 
+    // convert the python graph into our c++ network object
     networkx network(graph);
     // const int mean = 5.5 ;
     // const int variance = 60;
@@ -27,14 +28,15 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
     // erdos_reyni network(SIZE,6,engine);
     // add_correlation(0.4,network,engine);
     
+
+    // Define the degree distribution and the moments
+    std::vector<double> pk(SIZE,0);
+    int kmax = 0;
     double k1 = 0;
     double k2 = 0;
     double k3 = 0;
     double r = assortativity(network);
     
-    int kmax = 0;
-    std::vector<double> pk(SIZE,0);
-
     for (node_t node = 0; node < SIZE; node++){   
         const int k = network.outdegree(node);
         pk[k] += (double) 1 / SIZE;
@@ -46,70 +48,115 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
     while (pk.size()>kmax+1)
         pk.pop_back();
 
-    
+    // Parameters of the simulation method
     const bool EDGES_CONCURRENT = true;
     const bool SHUFFLE_NEIGHBOURS = false;
     const bool SIR = false;
 
+    // the epidemic is in discrete steps
     transmission_time_deterministic psi(1);
     
-    int n_min = 50;
+    // These are the first two moments of the degrees of the remaining healthy in function of the fraction of infected nodes.
+    // In other words: k1_traj[500] = the average degree of a healthy node when 500 nodes have already been infected.
     std::vector<double> k1_traj(SIZE,0);
     std::vector<double> k2_traj(SIZE,0);
-    
     k1_traj[0]=k1;
     k2_traj[0]=k2;
 
+    // Define Z[n,k] as the number of nodes that get infected at step n and have degree k
+    // (Even for tree-networks, n rarely goes above 15 in epidemics)
+    int n_min = 50;
     std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(kmax+1,0));
+    
+    // Average degree of a leaf. i.e. individuals that got infected at step n.
+    // Call it L(n)
+    std::vector<double> leaf_degree(n_min,0);
+    std::vector<double> leaf_norm(n_min,0);
+
+    // Same as above, but only counting the healthy neighbours. Call it H(n)
+    // (for trees H(n)=L(n)-1)
+    std::vector<double> healthy_neigbhours(n_min,0);
+
+    // mu_n is same as k2_traj/k1_traj -1 but instead of being a fct of the # of infected, it is a fct of n
+    std::vector<double> mu_n(n_min,0);
+    mu_n[0]=sim*(k2/k1-1);
+
+    // use to normalise over the number of simulations. 
+    // Necessary because each simulation may not reach the same number of generations: some epidemics finish in 4 steps while others may finish in 8 steps.
+    // Therefore, need to normalise accordingly.
     std::vector<double> step_counter(n_min,0);
+    
+    // Used to sample the initial infected node uniformly
+    std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+
+    // Beginning of the simulations
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
         
         simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
-        std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
        
         const node_t random_node = uniform_node_distribution(engine);
         simulation.add_infections({ std::make_pair(random_node, 0)});
-        
-        
+             
         int n = 0;
-        int step = 0;
-        // begin simulation
-        int i = 1;
+        int recorded_step = 0;
+
+        int infected = 0;
 
         double k1_t = k1;
         double k2_t = k2;
+
+        int nb_infected_in_curr_gen = 0;
         while (true) {
             auto point = simulation.step(engine);
             
             if (!point)
                 break;
             
+            infected ++;
             const node_t infected_node = point->node;
             const int k = network.outdegree(infected_node);
+            
             n = (int) std::round(point->time);
             
             zn_average[n][k] ++ ;
-                   
-            if (n>step){
-                step_counter[step]++;
-                step = n;
+            leaf_degree[n] += k;
+            leaf_norm[n] ++;
+
+            int k_healthy = k;
+            for (node_t neigh : network.adjacencylist[infected_node]){
+                if (simulation.is_infected(neigh))
+                    k_healthy --;
+            }
+            healthy_neigbhours[n] += k_healthy;
+
+            // if we reach the next generation of infected update counter
+            if (n>recorded_step){
+                mu_n[n] += (k2_t / k1_t) - 1 ;
+                step_counter[recorded_step]++;
+                recorded_step = n;
             }
 
+            // This is updated AFTER mu because mu_n represents the state before the infected of the nth generation contribute.
             k1_t -= (double) k/SIZE;
             k2_t -= (double) k*k/SIZE;
-            k1_traj[i] +=  (double) k1_t/sim;
-            k2_traj[i] +=  (double) k2_t/sim;
-            i++;
+            if (infected < SIZE){
+                k1_traj[infected] +=  (double) k1_t/sim;
+                k2_traj[infected] +=  (double) k2_t/sim;
+            }
         }
+        // Epidemic ended, but still need to update the last step
+        // Note that we use n instead of recorded_step in case there is only one infected in gen n.
         step_counter[n]++;
-
     }
 
     //delete unused steps
     while (step_counter.back()==0 ){
         step_counter.pop_back();
         zn_average.pop_back();
+        leaf_degree.pop_back();
+        healthy_neigbhours.pop_back();
+        mu_n.pop_back();
     }
 
     //normalise zn:
@@ -120,14 +167,22 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<doub
         }
     }
 
-    return std::make_tuple(zn_average,std::vector<double>{k1,k2,k3,r},pk,k1_traj,k2_traj);
+    //normalise leaf degree:
+    for (int n = 0; n<step_counter.size(); n++){
+        if (leaf_norm[n]==0)
+            continue;
+        leaf_degree[n]/=leaf_norm[n];
+        healthy_neigbhours[n]/=leaf_norm[n];
+        mu_n[n]/=step_counter[n];
+    }
+
+    return std::make_tuple(zn_average,std::vector<double>{k1,k2,k3,r},pk,k1_traj,k2_traj,leaf_degree,healthy_neigbhours,mu_n);
 }
 
 
 
 
 // rng_t engine;
-// Wrapper to run a simulation given a network and transmission distribution
 std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_leaves(py::object graph,int sim, int seed){
     rng_t engine;
     engine.seed(seed);

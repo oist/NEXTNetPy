@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <numeric>
-// #include <pybind11/pybind11.h>
-// #include <pybind11/numpy.h>
 #include "random.h"
 #include "analysis.h"
 #include "algorithm.h"
@@ -24,7 +22,7 @@ namespace py = pybind11;
 */
 std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_leaves(py::object graph,int sim=100,int seed=1);
 
-std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE, int sim=100, int seed=1);
+std::tuple<std::vector<std::vector<double>>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_zk(py::object graph,int SIZE, int sim=100, int seed=1);
 
 
 // Wrapper to run a simulation given a network and transmission distribution

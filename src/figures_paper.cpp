@@ -1,6 +1,7 @@
 #include <iostream>
 #include <numeric>
 #include <cmath>
+#include <vector>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "random.h"
@@ -22,10 +23,11 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
 
     rng_t engine;
     engine.seed(seed);
-
+    py::print("creating network...\r",py::arg("end") = "");
     std::vector<int> degrees = lognormal_degree_list(mean,variance,SIZE,engine);
 
     config_model network(degrees,engine);
+    py::print("computing moments...");
 
     double k1 = 0;
     double k2 = 0;
@@ -96,6 +98,8 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
         }
     }
 
+    py::print("sorting...");
+
     // All simulations ended, sort the vector (first element by default)
     std::sort(trajectory.begin(),trajectory.end(),[](const auto& x, const auto& y){return x.first < y.first;});
 
@@ -115,8 +119,6 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
 
     return std::make_tuple(time_trajectory, infected_trajectory,params);
 }
-
-
 
 
 // // Wrapper to run a simulation given a network and transmission distribution
