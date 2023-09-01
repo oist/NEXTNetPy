@@ -34,6 +34,21 @@ PYBIND11_MODULE(nmepinet, handle) {
         ""
     );
 
+    handle.def("simulate_on_powerlaw",&simulate_on_powerlaw,
+        py::arg("size"),
+        py::arg("exponent"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=1, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        ""
+    );
+
     handle.def("depleted_distribution",&depleted_distribution,
         py::arg("SIZE"),
         py::arg("SIM"),
@@ -219,7 +234,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
     // py::register_exception<std::logic_error>(handle, "LogicError");
 
 
-    py::class_<transmission_time_gamma>(handle, "time_distribution")
+    py::class_<transmission_time_gamma>(handle, "time_distribution_gamma")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
@@ -242,5 +257,21 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         "\n"
         )
         .def_readonly("tau", &transmission_time_deterministic::value);
+
+
+    py::class_<transmission_time_weibull>(handle, "time_distribution_weibull")
+        .def(py::init<double, double, double>(), py::arg("shape"), py::arg("scale"), py::arg("pinf") = 0.0,
+        
+        "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
+        "For now, the time_distribution is a Gamma distribution by default and only choice."
+        "\n"
+        "Args:\n"
+        "   mean of the distribution.\n"
+        "   variance of the distribution.\n"
+        "   pinf (double) = 0: probability that the event never happens. For pinf=0 the distribution is well-normalised.\n"
+        "However, some functions are not taking this parameter into consideration, for now it is not advised to change pinf.\n"
+        )
+        .def_readonly("mean", &transmission_time_weibull::mean)
+        .def_readonly("variance", &transmission_time_weibull::variance);
 
 }
