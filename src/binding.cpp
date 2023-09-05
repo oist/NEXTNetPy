@@ -16,7 +16,45 @@
 namespace py = pybind11;
 
 template <typename T>
-    void bind_simulation(py::module &handle) {
+void bind_simulation_lognormal(py::module &handle) {
+    handle.def("simulate_on_lognormal",&simulate_on_lognormal<T>,
+        py::arg("size"),
+        py::arg("mean_degree"),
+        py::arg("variance"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=1, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        ""
+    );
+}
+
+template <typename T>
+void bind_simulation_powerlaw(py::module &handle) {
+    handle.def("simulate_on_powerlaw",&simulate_on_powerlaw<T>,
+        py::arg("size"),
+        py::arg("exponent"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=1, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        ""
+    );
+}
+
+template <typename T>
+void bind_simulation(py::module &handle) {
     handle.def("simulate", &simulate<T>, 
         py::arg("graph"),
         py::arg("infection_time"),
@@ -56,36 +94,15 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation<transmission_time_lognormal>(handle);
     bind_simulation<transmission_time_exponential>(handle);
 
-    handle.def("simulate_on_lognormal",&simulate_on_lognormal,
-        py::arg("size"),
-        py::arg("mean_degree"),
-        py::arg("variance"),
-        py::arg("infection_time"),
-        py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=true,
-        py::arg("initial_infected")=1,
-        py::arg("seed")=1, 
-        py::arg("nb_simulations")=1,
-        py::arg("trim")=true,
-        ""
-    );
+    bind_simulation_lognormal<transmission_time_gamma>(handle);
+    bind_simulation_lognormal<transmission_time_weibull>(handle);
+    bind_simulation_lognormal<transmission_time_lognormal>(handle);
+    bind_simulation_lognormal<transmission_time_exponential>(handle);
 
-    handle.def("simulate_on_powerlaw",&simulate_on_powerlaw,
-        py::arg("size"),
-        py::arg("exponent"),
-        py::arg("infection_time"),
-        py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=true,
-        py::arg("initial_infected")=1,
-        py::arg("seed")=1, 
-        py::arg("nb_simulations")=1,
-        py::arg("trim")=true,
-        ""
-    );
+    bind_simulation_powerlaw<transmission_time_gamma>(handle);
+    bind_simulation_powerlaw<transmission_time_weibull>(handle);
+    bind_simulation_powerlaw<transmission_time_lognormal>(handle);
+    bind_simulation_powerlaw<transmission_time_exponential>(handle);
 
     handle.def("depleted_distribution",&depleted_distribution,
         py::arg("SIZE"),
