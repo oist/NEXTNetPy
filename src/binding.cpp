@@ -43,7 +43,7 @@ void bind_simulation_powerlaw(py::module &handle) {
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
+        py::arg("TMAX")=INFINITY,
         py::arg("concurrent_edges")=true,
         py::arg("initial_infected")=1,
         py::arg("seed")=1, 
