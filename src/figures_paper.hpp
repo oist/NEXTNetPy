@@ -16,7 +16,7 @@ namespace py = pybind11;
 
 // figure 3a : power law network with disassortativity
 template <typename Transmission_time>
-std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulate_on_powerlaw(int SIZE,double EXPONENT,Transmission_time psi, Transmission_time* rho=nullptr, bool SIR=true,double TMAX=INFINITY, bool EDGES_CONCURRENT=true,int INITIAL_INFECTED=1, int seed=0,int NB_SIMULATIONS=1, bool TRIM=false,bool add_correlation=false){
+std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulate_on_powerlaw(int SIZE,double EXPONENT,Transmission_time psi, Transmission_time* rho=nullptr, bool SIR=true,double TMAX=INFINITY, bool EDGES_CONCURRENT=true,int INITIAL_INFECTED=1, int seed=0,int NB_SIMULATIONS=1, bool TRIM=false,bool change_correlation=false){
 
     rng_t engine;
     engine.seed(seed);
@@ -25,7 +25,7 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
     std::vector<int> degrees = powerlaw_degree_list(EXPONENT,SIZE,engine);
     config_model network(degrees,engine);
     
-    if (add_correlation)
+    if (change_correlation)
         add_correlation(-0.1,network,engine);
     
     double k1 = 0;

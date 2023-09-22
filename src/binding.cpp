@@ -49,6 +49,7 @@ void bind_simulation_powerlaw(py::module &handle) {
         py::arg("seed")=1, 
         py::arg("nb_simulations")=1,
         py::arg("trim")=true,
+        py::arg("add_correlation")=false,
         ""
     );
 }
