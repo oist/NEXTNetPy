@@ -144,6 +144,12 @@ PYBIND11_MODULE(nmepinet, handle) {
         " nth moment of the degree distribution of the NEIGHBOURS of a node of degree k=0,1,...kmax"
         );
 
+
+    handle.def("m_nn",&neighbours_multiplicity,
+        py::arg("graph"),
+        ""
+        );
+
     handle.def("simulate_discrete_leaves",&simulation_discrete_leaves,
         py::arg("graph"),
         py::arg("nb_sim")=100,
