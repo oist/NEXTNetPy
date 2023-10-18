@@ -16,6 +16,29 @@
 namespace py = pybind11;
 
 template <typename T>
+void bind_simulation_clustered(py::module &handle) {
+    handle.def("simulate_on_clustered",&simulate_on_clustered<T>,
+        py::arg("size"),
+        py::arg("mean_degree"),
+        py::arg("variance"),
+        py::arg("alpha"),
+        py::arg("beta"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=1, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        ""
+    );
+}
+
+
+template <typename T>
 void bind_simulation_lognormal(py::module &handle) {
     handle.def("simulate_on_lognormal",&simulate_on_lognormal<T>,
         py::arg("size"),
@@ -94,6 +117,11 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation<transmission_time_weibull>(handle);
     bind_simulation<transmission_time_lognormal>(handle);
     bind_simulation<transmission_time_exponential>(handle);
+
+    bind_simulation_clustered<transmission_time_gamma>(handle);
+    bind_simulation_clustered<transmission_time_weibull>(handle);
+    bind_simulation_clustered<transmission_time_lognormal>(handle);
+    bind_simulation_clustered<transmission_time_exponential>(handle);
 
     bind_simulation_lognormal<transmission_time_gamma>(handle);
     bind_simulation_lognormal<transmission_time_weibull>(handle);
