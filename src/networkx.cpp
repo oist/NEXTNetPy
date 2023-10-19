@@ -34,7 +34,7 @@ networkx::networkx(py::object graph){
 }
 
 
-std::vector<std::vector<size_t>> edges_ER_clustered(int size,double p,double alpha,double beta,int seed){
+py::object graph_ER_clustered(int size,double p,double alpha,double beta,int seed){
     rng_t engine(seed);
 
     // Generate a Poisson graph with the configuration model
@@ -61,26 +61,31 @@ std::vector<std::vector<size_t>> edges_ER_clustered(int size,double p,double alp
     config_model_clustered_serrano network(degrees,alpha,beta,engine);
 
     // create edge list
-    std::vector<std::vector<size_t>> edges;
-    edges.reserve(total_degree/2);
+    py::list py_edges;
+    // std::vector<std::vector<size_t>> edges;
+    // edges.reserve(total_degree/2);
 
     const std::size_t n = network.adjacencylist.size();
 	for(std::size_t i=0; i < n; ++i) {
 		const std::unordered_set<node_t> neighbours(network.adjacencylist[i].begin(), network.adjacencylist[i].end());
 		for(std::size_t j=0; j < i; ++j) {
-			if (neighbours.find(j) != neighbours.end())
-                edges.push_back(std::vector<size_t> {i,j});
+			if (neighbours.find(j) != neighbours.end()){
+                const py::tuple py_edge = py::make_tuple(i,j);
+                py_edges.append(py_edge);
+            }
 		}
 	}
-    return edges;
 
-    // // convert to networkx graph object
-    // py::object networkx = py::module::import("networkx");
-    // py::object G = networkx.attr("Graph")();
-    // // Add all edges to the graph at once
-    // G.attr("add_edges_from")(edges);
 
-    // return G;
+    // return edges;
+
+    // convert to networkx graph object
+    py::object networkx = py::module::import("networkx");
+    py::object G = networkx.attr("Graph")();
+    // Add all edges to the graph at once
+    G.attr("add_edges_from")(py_edges);
+
+    return G;
 }
 
 

@@ -133,7 +133,7 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation_powerlaw<transmission_time_lognormal>(handle);
     bind_simulation_powerlaw<transmission_time_exponential>(handle);
 
-    handle.def("edges_ER_clustered",&edges_ER_clustered,
+    handle.def("graph_ER_clustered",&graph_ER_clustered,
         py::arg("size"),
         py::arg("p"),
         py::arg("alpha"),
