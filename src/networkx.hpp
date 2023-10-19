@@ -16,3 +16,7 @@ public:
     // OR Initialise graph with networkx graph
     networkx(py::object graph);
 };
+
+// Wrapper function to convert a c++ graph to a python networkx graph
+std::vector<std::vector<size_t>> edges_ER_clustered(int size,double p,double alpha,double beta,int seed=1);
+std::vector<std::vector<size_t>> edges_LOG_clustered(int size,double mean,double variance,double alpha,double beta,int seed=1);

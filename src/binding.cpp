@@ -133,6 +133,25 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation_powerlaw<transmission_time_lognormal>(handle);
     bind_simulation_powerlaw<transmission_time_exponential>(handle);
 
+    handle.def("edges_ER_clustered",&edges_ER_clustered,
+        py::arg("size"),
+        py::arg("p"),
+        py::arg("alpha"),
+        py::arg("beta"),
+        py::arg("seed")=1,
+        ""
+    );
+
+    handle.def("edges_LOG_clustered",&edges_LOG_clustered,
+        py::arg("mean"),
+        py::arg("variance"),
+        py::arg("size"),
+        py::arg("alpha"),
+        py::arg("beta"),
+        py::arg("seed")=1,
+        ""
+    );
+
     handle.def("depleted_distribution",&depleted_distribution,
         py::arg("SIZE"),
         py::arg("SIM"),
