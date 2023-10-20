@@ -197,7 +197,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         ""
         );
     
-    handle.def("edge_multiplicity",&edge_multiplicity,
+    handle.def("edge_multiplicity",&edge_multiplicity2,
         py::arg("graph"),
         ""
         );

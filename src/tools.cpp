@@ -19,7 +19,7 @@ namespace py=pybind11;
 
 
 // std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph){
-std::vector<std::vector<double>> edge_multiplicity(py::object graph){
+std::vector<std::vector<double>> edge_multiplicity2(py::object graph){
 
     networkx nw(graph);
     const int SIZE = (int) nw.adjacencylist.size();
