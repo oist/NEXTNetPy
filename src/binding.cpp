@@ -142,7 +142,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         ""
     );
 
-    handle.def("edges_LOG_clustered",&edges_LOG_clustered,
+    handle.def("graph_LOG_clustered",&graph_LOG_clustered,
         py::arg("mean"),
         py::arg("variance"),
         py::arg("size"),
@@ -193,6 +193,11 @@ PYBIND11_MODULE(nmepinet, handle) {
 
 
     handle.def("m_nn",&neighbours_multiplicity,
+        py::arg("graph"),
+        ""
+        );
+    
+    handle.def("edge_multiplicity",&edge_multiplicity,
         py::arg("graph"),
         ""
         );
