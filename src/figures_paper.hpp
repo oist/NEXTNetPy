@@ -33,6 +33,7 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
     double k3 = 0;
     double r = assortativity(network);
 
+
     for (node_t node = 0; node < SIZE; node++){   
         const int k = network.outdegree(node);
         k1 += (double) k/SIZE;
@@ -230,7 +231,7 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
 
 
 template <typename Transmission_time>
-std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulate_on_lognormal(int SIZE,double mean, double variance,Transmission_time psi, Transmission_time* rho= nullptr,bool SIR=false,double TMAX = 1000, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1,int NB_SIMULATIONS=1, bool TRIM=false,bool VERBOSE=false){
+std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulate_on_lognormal(int SIZE,double mean, double variance,Transmission_time psi, Transmission_time* rho= nullptr,bool SIR=false,double TMAX = 1000, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, int seed = 1,int NB_SIMULATIONS=1, bool TRIM=false,bool VERBOSE=false,double _r = 0.0){
     rng_t engine;
     engine.seed(seed);
     if (VERBOSE)
@@ -238,20 +239,24 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
     std::vector<int> degrees = lognormal_degree_list(mean,variance,SIZE,engine);
 
     config_model network(degrees,engine);
+
+    // erdos_reyni network(SIZE,mean,engine);
     if (VERBOSE)
         py::print("computing moments...");
 
     double k1 = 0;
     double k2 = 0;
     double k3 = 0;
-    double r = assortativity(network);
-
+    if (_r != 0.0){
+        add_correlation(_r,network,engine);
+    }
     for (node_t node = 0; node < SIZE; node++){   
         const int k = network.outdegree(node);
         k1 += (double) k/SIZE;
         k2 += (double) k*k/SIZE;
         k3 += (double) k*k*k/SIZE;
     }
+    double r = assortativity(network);
 
     std::vector<double> params = {k1,k2,k3,r};
 
@@ -330,6 +335,6 @@ std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> simulat
             infected_trajectory.push_back(infected);
         }
     }
-
+    
     return std::make_tuple(time_trajectory, infected_trajectory,params);
 };

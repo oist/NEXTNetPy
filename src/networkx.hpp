@@ -20,3 +20,5 @@ public:
 // Wrapper function to convert a c++ graph to a python networkx graph
 py::object graph_ER_clustered(int size,double p,double alpha,double beta,int seed=1);
 py::object graph_LOG_clustered(int size,double mean,double variance,double alpha,double beta,int seed=1);
+py::object graph_LOG_CM(int size,double mean,double variance,double r,int seed=1);
+py::object graph_ER_correlated(int size,double mean,double r,int seed=1);

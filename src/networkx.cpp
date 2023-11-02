@@ -33,6 +33,41 @@ networkx::networkx(py::object graph){
     }
 }
 
+py::object graph_ER_correlated(int size,double mean,double r,int seed){
+    rng_t engine;
+    engine.seed(seed);
+    // py::print("creating network...\r",py::arg("end") = "");
+    erdos_reyni network(size,mean,engine);
+
+
+    if (r != 0){
+        add_correlation(r,network,engine);
+    }
+    // create edge list
+    py::list py_edges;
+    // std::vector<std::vector<size_t>> edges;
+    // edges.reserve(total_degree/2);
+
+    const std::size_t n = network.adjacencylist.size();
+	for(std::size_t i=0; i < n; ++i) {
+		const std::unordered_set<node_t> neighbours(network.adjacencylist[i].begin(), network.adjacencylist[i].end());
+		for(std::size_t j=0; j < i; ++j) {
+			if (neighbours.find(j) != neighbours.end()){
+                const py::tuple py_edge = py::make_tuple(i,j);
+                py_edges.append(py_edge);
+            }
+		}
+	}
+
+    // convert to networkx graph object
+    py::object networkx = py::module::import("networkx");
+    py::object G = networkx.attr("Graph")();
+    // Add all edges to the graph at once
+    G.attr("add_edges_from")(py_edges);
+
+    return G;
+
+}
 
 py::object graph_ER_clustered(int size,double p,double alpha,double beta,int seed){
     rng_t engine(seed);
@@ -88,6 +123,45 @@ py::object graph_ER_clustered(int size,double p,double alpha,double beta,int see
     return G;
 }
 
+py::object graph_LOG_CM(int size,double mean,double variance,double r, int seed){
+    rng_t engine;
+    engine.seed(seed);
+    py::print("creating network...\r",py::arg("end") = "");
+    std::vector<int> degrees = lognormal_degree_list(mean,variance,size,engine);
+
+    config_model network(degrees,engine);
+
+    if (r != 0){
+        add_correlation(r,network,engine);
+    }
+    // create edge list
+    py::list py_edges;
+    // std::vector<std::vector<size_t>> edges;
+    // edges.reserve(total_degree/2);
+
+    const std::size_t n = network.adjacencylist.size();
+	for(std::size_t i=0; i < n; ++i) {
+		const std::unordered_set<node_t> neighbours(network.adjacencylist[i].begin(), network.adjacencylist[i].end());
+		for(std::size_t j=0; j < i; ++j) {
+			if (neighbours.find(j) != neighbours.end()){
+                const py::tuple py_edge = py::make_tuple(i,j);
+                py_edges.append(py_edge);
+            }
+		}
+	}
+
+
+    // return edges;
+
+    // convert to networkx graph object
+    py::object networkx = py::module::import("networkx");
+    py::object G = networkx.attr("Graph")();
+    // Add all edges to the graph at once
+    G.attr("add_edges_from")(py_edges);
+
+    return G;
+
+}
 
 py::object graph_LOG_clustered(int size,double mean,double variance,double alpha,double beta,int seed){
     rng_t engine(seed);
@@ -96,6 +170,7 @@ py::object graph_LOG_clustered(int size,double mean,double variance,double alpha
 
  
     config_model_clustered_serrano network(degrees,alpha,beta,engine);
+    
 
     // create edge list
     py::list py_edges;

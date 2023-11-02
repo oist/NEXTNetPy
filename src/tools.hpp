@@ -13,11 +13,10 @@ namespace py=pybind11;
 //----------------------------------------------------------
 //---Measure nearest neighbour multiplicity in a network----
 //----------------------------------------------------------
-
 // std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph);
 std::vector<double> neighbours_multiplicity(py::object graph);
 std::vector<std::vector<double>> edge_multiplicity2(py::object graph);
-
+std::vector<std::vector<double>> connectivity_matrix(py::object graph,bool clustering=false);
 
 std::tuple<std::vector<double>,std::vector<double>> generalised_knn(int SIZE, int SIM,int POWER, int seed);
 
