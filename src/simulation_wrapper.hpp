@@ -80,7 +80,7 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,T ps
 
 // Wrapper to run a simulation given a network and transmission distribution
 template <typename T>
-std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::object graph,T psi, T* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE){
+std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::object graph,T psi, T* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES){
     
     rng_t engine;
     engine.seed(seed);
@@ -105,17 +105,24 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
 
         simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
 
-        std::unordered_set<node_t> selected_nodes;
-        for (node_t i = 0; i < INITIAL_INFECTED; i++)
-        {
-            const node_t random_node = uniform_node_distribution(engine);
-            // sample without replacement:
-            if (selected_nodes.find(random_node) != selected_nodes.end()){
-                i--;
-                continue;
+
+        if (ALL_NODES){
+            const node_t initial_node = sim;
+            simulation.add_infections({ std::make_pair(initial_node, 0)});
+        } else {
+
+            std::unordered_set<node_t> selected_nodes;
+            for (node_t i = 0; i < INITIAL_INFECTED; i++)
+            {
+                const node_t random_node = uniform_node_distribution(engine);
+                // sample without replacement:
+                if (selected_nodes.find(random_node) != selected_nodes.end()){
+                    i--;
+                    continue;
+                }
+                simulation.add_infections({ std::make_pair(random_node, 0)});
+                selected_nodes.insert(random_node);
             }
-            simulation.add_infections({ std::make_pair(random_node, 0)});
-            selected_nodes.insert(random_node);
         }
         
         int current_number_infected = 0;

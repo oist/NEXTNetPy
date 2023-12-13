@@ -124,6 +124,7 @@ void bind_simulation_average(py::module &handle) {
         py::arg("nb_simulations")=1,
         py::arg("trim")=true,
         py::arg("verbose")=false,
+        py::arg("all_nodes")=false,
         ""
     );
 }
@@ -200,6 +201,13 @@ PYBIND11_MODULE(nmepinet, handle) {
     );
 
     handle.def("connectivity_matrix",&connectivity_matrix,
+        py::arg("graph"),
+        py::arg("clustering")=0,
+        ""
+    );
+
+
+    handle.def("mu",&mu,
         py::arg("graph"),
         py::arg("clustering")=false,
         ""

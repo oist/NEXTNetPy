@@ -22,7 +22,152 @@ namespace py=pybind11;
     // export_adjacency_matrix(network.adjacencylist,"/home/sam/Desktop/CLUSTERED/graph.dat");
 // }
 
-std::vector<std::vector<double>> connectivity_matrix(py::object graph,bool clustering){
+std::vector<std::vector<double>> connectivity_matrix(py::object graph,int clustering){
+    
+    networkx nw(graph);
+    const int SIZE = (int) nw.adjacencylist.size();
+
+    
+
+    
+    int kmax = 0;
+    std::vector<int> unique_degrees({});
+
+    // Using std::lower_bound
+    
+
+
+
+    for (node_t node = 0; node < SIZE; node++){
+
+        const int k0 = nw.outdegree(node);
+        
+        auto it = std::lower_bound(unique_degrees.begin(), unique_degrees.end(), k0);
+        if (it == unique_degrees.end() || *it != k0)
+            unique_degrees.insert(it, k0);
+        kmax = std::max(k0,kmax);
+    }
+
+    
+    const int klen = (int) unique_degrees.size();
+    
+
+    std::vector<double> pk(klen,0);
+
+
+   // Create an unordered map to store positions
+    std::unordered_map<int, int> pos;
+
+    // Populate the unordered map with values and positions
+    for (int i = 0; i < klen; ++i) {
+        const int k = unique_degrees[i];
+        pos[k] = i;
+    }
+
+
+    
+    // Triangles
+    std::vector<std::vector<double>> T2(klen,std::vector<double>(klen,0));
+    std::vector<double> T1(klen,0);
+    std::vector<std::vector<double>> ekk(klen,std::vector<double>(klen,0));
+    std::vector<std::vector<std::vector<double>>> T(klen, std::vector<std::vector<double>>(klen, std::vector<double>(klen,0)));
+
+    
+    // Squares
+    std::vector<double> S1(klen,0);
+    std::vector<std::vector<double>> S2(klen,std::vector<double>(klen,0));
+    std::vector<std::vector<std::vector<double>>> S3(klen, std::vector<std::vector<double>>(klen, std::vector<double>(klen,0)));
+    // std::vector<std::vector<std::vector<std::vector<double>>>> S(kmax + 1,std::vector<std::vector<std::vector<double>>>(kmax+1,std::vector<std::vector<double>>(kmax+1,std::vector<double>(kmax+1, 0))));
+
+    
+
+    for (node_t node = 0; node < SIZE; node++){
+        
+        const int k0 = nw.outdegree(node);
+        const int i0 = pos[k0];
+        pk[i0]++;
+        for (node_t neigh_1 : nw.adjacencylist[node])
+        {
+            const int k1 = nw.outdegree(neigh_1);
+            const int i1 = pos[k1];
+            ekk[i0][i1] ++;
+            if (clustering >= 3 ){
+                for (node_t neigh_2 : nw.adjacencylist[neigh_1]){
+                    if (neigh_2 == node)
+                        continue;
+                    const int k2 = nw.outdegree(neigh_2);
+                    const int i2 = pos[k2];
+                    node_t small_node = (k0 <= k2) ? node : neigh_2;
+                    node_t large_node = (k0 <= k2) ? neigh_2 : node;
+
+                    // verify if edge exists between node and neighbour n°2
+                    auto it = std::find(nw.adjacencylist[small_node].begin(), nw.adjacencylist[small_node].end(), large_node);
+                    const bool edge_02 = (it != nw.adjacencylist[small_node].end());
+                    if (edge_02){
+                        T2[i0][i1]++;
+                        T1[i0]++;
+                    }
+                    if (clustering >= 4){
+                        for (node_t neigh_3 : nw.adjacencylist[neigh_2]){
+                            if (neigh_3 == neigh_1)
+                                continue;
+                            const int k3 = nw.outdegree(neigh_3);
+                            const int i3 = pos[k3];
+                            node_t small_node_2 = (k0 <= k3) ? node : neigh_3;
+                            node_t large_node_2 = (k0 <= k3) ? neigh_3 : node;
+
+                            // verify if edge exists between node and neighbour n°3
+                            auto it = std::find(nw.adjacencylist[small_node_2].begin(), nw.adjacencylist[small_node_2].end(), large_node_2);
+                            const bool edge_03 = (it != nw.adjacencylist[small_node_2].end());
+
+                            it = std::find(nw.adjacencylist[neigh_1].begin(), nw.adjacencylist[neigh_1].end(), neigh_3);
+                            const bool edge_13 = (it != nw.adjacencylist[neigh_1].end());
+                            if (edge_03 && (!edge_13) && (!edge_02)){
+                                S3[i0][i1][i2]++;
+                                S2[i0][i1]++;
+                                S1[i0]++;
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+    }
+    
+
+    std::vector<std::vector<double>> ckk(kmax+1,std::vector<double>(kmax+1,0));
+
+    for (int k=2; k <= kmax; k++){
+        for (int q=2; q <= kmax; q++){
+            const int i = pos[k];
+            const int j = pos[q];
+            if (ekk[i][j]==0 || pk[j]==0)
+                continue;
+
+            ckk[i][j] = ekk[i][j]*((double) q-1)/ ((double) q * pk[j]) ;
+
+            if (clustering >= 3){
+                ckk[i][j] -= T2[i][j] / ((double) q * pk[j] ) ; 
+                if (clustering >= 4){
+                    // const double mkkc = std::min(k,q)-1;
+                    // const double mkk = T2[i][j] / ( ekk[i][j] );
+                    // if (mkk/mkkc > 1){
+                    //     throw std::runtime_error("probability exceeds one");
+                    // }
+                    ckk[i][j] -= S2[i][j] / ((double) q * pk[j] ) ; 
+                }
+            }
+        }
+    }
+    
+
+    return ckk;
+}
+
+
+// std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph){
+std::vector<double> mu(py::object graph,bool clustering){
 
     networkx nw(graph);
     const int SIZE = (int) nw.adjacencylist.size();
@@ -33,55 +178,53 @@ std::vector<std::vector<double>> connectivity_matrix(py::object graph,bool clust
         kmax = std::max(k0,kmax);
     }
 
-    std::vector<double> pk(kmax+1,0);
-    std::vector<std::vector<double>> T1(kmax+1,std::vector<double>(kmax+1,0));
-    std::vector<double> T2(kmax+1,0);
-    std::vector<std::vector<double>> ekk(kmax+1,std::vector<double>(kmax+1,0));
-    std::vector<std::vector<std::vector<double>>> T(kmax+1, std::vector<std::vector<double>>(kmax+1, std::vector<double>(kmax+1,0)));
-    
+    double m1 = 0;
+    double m2 = 0;
+    double m3 = 0;
+    double m_bar = 0;
+
     for (node_t node = 0; node < SIZE; node++){
         
         const int k0 = nw.outdegree(node);
-        pk[k0]++;
+        m1 += (double) k0/SIZE;
+        m2 += (double) k0*k0/SIZE;
+        m3 += (double) k0*k0*k0/SIZE;
+
         for (node_t neigh_1 : nw.adjacencylist[node])
         {
             const int k1 = nw.outdegree(neigh_1);
-            ekk[k0][k1] ++;
-            if (clustering){
-                for (node_t neigh_2 : nw.adjacencylist[neigh_1]){
-                    if (neigh_2 == node)
-                        continue;
-                    const int k2 = nw.outdegree(neigh_2);
-                    node_t small_node = (k0 <= k2) ? node : neigh_2;
-                    node_t large_node = (k0 <= k2) ? neigh_2 : node;
 
-                    // verify if edge exists between node and neighbour n°2
-                    auto it = std::find(nw.adjacencylist[small_node].begin(), nw.adjacencylist[small_node].end(), large_node);
-                    if (it != nw.adjacencylist[small_node].end()){
-                        T1[k0][k1]++;
-                        T2[k0]++;
-                    }
+            for (node_t neigh_2 : nw.adjacencylist[neigh_1]){
+                if (neigh_2 == node)
+                    continue;
+                const int k2 = nw.outdegree(neigh_2);
+                node_t small_node = (k0 <= k2) ? node : neigh_2;
+                node_t large_node = (k0 <= k2) ? neigh_2 : node;
+
+                // verify if edge exists between node and neighbour n°2
+                auto it = std::find(nw.adjacencylist[small_node].begin(), nw.adjacencylist[small_node].end(), large_node);
+                if (it != nw.adjacencylist[small_node].end()){
+                    m_bar++ ;
                 }
             }
         }
     }
-    std::vector<std::vector<double>> ckk(kmax+1,std::vector<double>(kmax+1,0));
+    
+    m_bar /= SIZE * m1; 
 
-    for (int k=2; k <= kmax; k++){
-        for (int q=2; q <= kmax; q++){
-            if (ekk[k][q]==0 || pk[q]==0)
-                continue;
+    const double mu0 = m2/m1 -1;
+    const double r = assortativity(nw);
+    const double mur = (1-r) * (mu0) + r * ( (m3-m2)/(m2-m1) - 1) ;
+    const double muc = mu0 - m_bar;
+    
+    // py::print("r",r);
+    // py::print("mu",mu0);
+    // py::print("mur",mur);
+    // py::print("muc",muc);
 
-            ckk[k][q] = ekk[k][q]*((double) q-1)/ ((double) q * pk[q]) ;
-            const double mc = (double) std::min(k,q)-1;
-
-            if (clustering){
-                ckk[k][q] -= T1[k][q] * ((double) q-1)/ ((double) q * pk[q]* mc) ; 
-            }
-        }
-    }
-    return ckk;
+    return std::vector<double>{mu0,mur,muc};
 }
+
 
 
 // std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph){
