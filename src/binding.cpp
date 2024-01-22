@@ -173,6 +173,11 @@ PYBIND11_MODULE(nmepinet, handle) {
         ""
     );
 
+    handle.def("degree_clustering_coefficient",&degree_clustering_coefficient,
+        py::arg("graph"),
+        ""
+    );
+
     handle.def("graph_LOG_clustered",&graph_LOG_clustered,
         py::arg("size"),
         py::arg("mean"),
