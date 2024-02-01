@@ -66,7 +66,7 @@ std::vector<double> degree_clustering_coefficient(py::object graph){
     int kmax = 0;
     std::vector<int> unique_degrees({});
 
-        double k1 = 0;
+    double k1 = 0;
 
     for (node_t node = 0; node < SIZE; node++){
 

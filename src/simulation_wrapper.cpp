@@ -11,7 +11,7 @@
 #include "tools.hpp"
 #include "graph.h"
 
-std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_discrete(py::object graph,int sim, int seed,bool VERBOSE){
+std::tuple<std::vector<std::vector<double>>,std::vector<int>> simulation_discrete(py::object graph,int sim, int seed,bool VERBOSE){
     rng_t engine;
     engine.seed(seed);
     
@@ -20,29 +20,38 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_disc
 
     // convert the python graph into our c++ network object
     networkx network(graph);
-    // erdos_reyni network(10000,4,engine);
     const int SIZE = (int) network.adjacencylist.size();
 
-    if (VERBOSE)
-        py::print("computing moments...");
-    // Define the degree distribution and the moments
-    std::vector<double> pk(SIZE,0);
-    int kmax = 0;
-    double k1 = 0;
-    double k2 = 0;
-    double k3 = 0;
-    double r = assortativity(network);
-    
-    for (node_t node = 0; node < SIZE; node++){   
-        const int k = network.outdegree(node);
-        pk[k] += (double) 1 / SIZE;
-        kmax = std::max(kmax,k);
-        k1 += (double) k/SIZE;
-        k2 += (double) k*k/SIZE;
-        k3 += (double) k*k*k/SIZE;
+
+    /* Aim: create a map to get all different degrees.
+    * A vector is inappropriate for degree distribution with large tails
+    * because too many elements will be zero, requiring too much memory.
+    */
+    std::vector<int> unique_degrees({});
+    for (node_t node = 0; node < SIZE; node++){
+        const int k0 = network.outdegree(node);
+        auto it = std::lower_bound(unique_degrees.begin(), unique_degrees.end(), k0);
+        if (it == unique_degrees.end() || *it != k0)
+            unique_degrees.insert(it, k0);
     }
-    while (pk.size()>kmax+1)
-        pk.pop_back();
+    const int klen = (int) unique_degrees.size();
+   // Create an unordered map to store positions
+    std::unordered_map<int, int> pos;
+    for (int i = 0; i < klen; ++i) {
+        const int k = unique_degrees[i];
+        pos[k] = i;
+    }
+
+    // if (VERBOSE)
+    //     py::print("computing moments...");
+    // // Define the degree distribution and the moments
+    // std::vector<double> pk(SIZE,0);
+    // int kmax = 0;
+    // double k1 = 0;
+    // double k2 = 0;
+    // double k3 = 0;
+    // double r = assortativity(network);
+    
 
     // Parameters of the simulation method
     const bool EDGES_CONCURRENT = true;
@@ -55,11 +64,7 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_disc
     // Define Z[n,k] as the number of nodes that get infected at step n and have degree k
     // (Even for tree-networks, n rarely goes above 15 in epidemics)
     int n_min = 30;
-    std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(kmax+1,0));
-    
-    // mu_n is same as k2_traj/k1_traj -1 but instead of being a fct of the # of infected, it is a fct of n
-    std::vector<double> mu_n(n_min,0);
-    mu_n[0]=sim*(k2/k1-1);
+    std::vector<std::vector<double>> zn_average(n_min,std::vector<double>(klen,0));
 
     // use to normalise over the number of simulations. 
     // Necessary because each simulation may not reach the same number of generations: some epidemics finish in 4 steps while others may finish in 8 steps.
@@ -95,13 +100,9 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_disc
 
         int infected = 0;
 
-        double k1_t = k1;
-        double k2_t = k2;
-
         if (VERBOSE)
             py::print("current step",recorded_step);
         
-        int nb_infected_in_curr_gen = 0;
         while (true) {
 
             auto point = simulation.step(engine);
@@ -111,24 +112,20 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_disc
             infected ++;
             const node_t infected_node = point->node;
             const int k = network.outdegree(infected_node);
+            const int k_index = pos[k];
 
 
             n = (int) std::round(point->time);
-
-            zn_average[n][k] ++ ;
+            
+            zn_average[n][k_index] ++ ;
 
             // if we reach the next generation of infected update counter
             if (n>recorded_step){
                 if (VERBOSE)
-                    py::print("rechead new point",n);
-                mu_n[n] += (k2_t / k1_t) - 1 ;
+                    py::print("reached new point",n);
                 step_counter[recorded_step]++;
                 recorded_step = n;
             }
-
-            // This is updated AFTER mu because mu_n represents the state before the infected of the nth generation contribute.
-            k1_t -= (double) k/SIZE;
-            k2_t -= (double) k*k/SIZE;
 
         }
         if (VERBOSE)
@@ -142,26 +139,20 @@ std::tuple<std::vector<std::vector<double>>,std::vector<double>> simulation_disc
     while (step_counter.back()==0 ){
         step_counter.pop_back();
         zn_average.pop_back();
-        mu_n.pop_back();
     }
 
     //normalise zn:
     for (int n = 0; n<step_counter.size(); n++){
         const double norm = (double) step_counter[n];
-        for( int k =0;k<= kmax;k++){
-            zn_average[n][k] /= norm;
+        for( int k =0;k<= klen;k++){
+            const int k_index = pos[k];
+            zn_average[n][k_index] /= norm;
         }
     }
 
-    //normalise mu_n:
-    for (int n = 0; n<step_counter.size(); n++){
-        if (mu_n[n]==0)
-            continue;
-        mu_n[n]/=step_counter[n];
-    }
     if (VERBOSE)
         py::print("success");
-    return std::make_tuple(zn_average,mu_n);
+    return std::make_tuple(zn_average,unique_degrees);
 }
 
 
@@ -339,8 +330,6 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation_lattice(py::obj
             const std::string temp_filename = filename + std::to_string(file_number) + dat;
             save_grid(grid,temp_filename);
         }
-
-
 
     }
     return std::make_tuple(time_trajectory, infected_trajectory);

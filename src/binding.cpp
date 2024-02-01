@@ -129,6 +129,27 @@ void bind_simulation_average(py::module &handle) {
     );
 }
 
+template <typename T>
+void bind_simulation_per_degree_class(py::module &handle) {
+    handle.def("simulate_per_degree_class", &simulation_per_degree_class<T>, 
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        py::arg("all_nodes")=false,
+        ""
+    );
+}
+
+
+
 
 PYBIND11_MODULE(nmepinet, handle) {
 
@@ -139,6 +160,12 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation<transmission_time_lognormal>(handle);
     bind_simulation<transmission_time_exponential>(handle);
     bind_simulation<transmission_time_deterministic>(handle);
+
+    bind_simulation_per_degree_class<transmission_time_gamma>(handle);
+    bind_simulation_per_degree_class<transmission_time_weibull>(handle);
+    bind_simulation_per_degree_class<transmission_time_lognormal>(handle);
+    bind_simulation_per_degree_class<transmission_time_exponential>(handle);
+    bind_simulation_per_degree_class<transmission_time_deterministic>(handle);
 
     bind_simulation_average<transmission_time_gamma>(handle);
     bind_simulation_average<transmission_time_weibull>(handle);

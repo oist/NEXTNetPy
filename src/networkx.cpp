@@ -128,7 +128,7 @@ py::object graph_LOG_CM(int size,double mean,double variance,double r, int seed)
     engine.seed(seed);
     py::print("creating network...\r",py::arg("end") = "");
     std::vector<int> degrees = lognormal_degree_list(mean,variance,size,engine);
-
+    py::print("CONFIG...\r",py::arg("end") = "");
     config_model network(degrees,engine);
 
     if (r != 0){
