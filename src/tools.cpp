@@ -138,7 +138,7 @@ std::vector<double> degree_clustering_coefficient(py::object graph){
 
 
 std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double> connectivity_matrix(py::object graph,int clustering){
-    
+    py::print("calling function \n");
     networkx nw(graph);
     const int SIZE = (int) nw.adjacencylist.size();
     
@@ -198,7 +198,7 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
     std::vector<std::vector<double>> S2(klen,std::vector<double>(klen,0));
     std::vector<std::vector<std::vector<double>>> S3(klen, std::vector<std::vector<double>>(klen, std::vector<double>(klen,0)));
     // std::vector<std::vector<std::vector<std::vector<double>>>> S(kmax + 1,std::vector<std::vector<std::vector<double>>>(kmax+1,std::vector<std::vector<double>>(kmax+1,std::vector<double>(kmax+1, 0))));
-
+    py::print("entering big loop \n");
     double c = 0;
     for (node_t node = 0; node < SIZE; node++){
         double c_node = 0.0;
@@ -296,14 +296,14 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
     
     ck_av /=(double) (1 - pk[pos[0]]/SIZE - pk[pos[1]]/SIZE);
     const double r = assortativity(nw);
-
+    py::print("returning \n");
     const double mu_c = (double) k2/k1 -1 - m_bar;
     const double mu_r = (double) (1-r)*(k2/k1 -1) + r * ( (k3-k2)/(k2-k1) - 1);
-    const double mu1 = ( (k3-2*k2+k1)/(k1 * mu_c) -2*m2_bar/mu_c + pow(m_bar,2)/mu_c );
+    const double mu1 =  mu_c*(1-r)+ r*((k3-2*k2+k1)/(k1) -2*m2_bar)/mu_c  ;
     const double mu2 = (k4 -3*k3+3*k2-k1)/(k1*mu_c*mu_c) -2 * m3_bar/(mu_c*mu_c)+m_bar*m2_bar/(mu_c*mu_c);
-    const double mu_rc = (double) (1-r)*mu_c + r * mu1;
+    const double mu_rc = mu_c*(1-r)+r*( (k3-2*k2+k1)/(k1 * mu_c) -2*m2_bar/mu_c + pow(m_bar,2)/mu_c );
     const double mu_rrc = (double) mu_rc + r*r *( mu2 -mu1/mu_c-mu1+mu_c);
-    return std::make_tuple(ckk,r,c,mu_c,mu_rc,mu_rrc,m_bar);
+    return std::make_tuple(ckk,r,c,mu_c,mu_rc,mu1,m_bar);
 }
 
 
