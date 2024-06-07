@@ -19,7 +19,7 @@ void export_dot(py::object graph, std::string filename, bool directed);
 // std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph);
 std::vector<double> neighbours_multiplicity(py::object graph);
 std::vector<std::vector<double>> edge_multiplicity2(py::object graph);
-std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double> connectivity_matrix(py::object graph,int clustering=0);
+std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double,double,double,double> connectivity_matrix(py::object graph,int clustering=0);
 
 std::vector<double> mu(py::object graph,bool clustering=false);
 

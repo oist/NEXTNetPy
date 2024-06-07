@@ -377,13 +377,14 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         .def_readonly("variance", &transmission_time_gamma::variance);
 
     py::class_<transmission_time_deterministic>(handle, "time_distribution_deterministic")
-        .def(py::init<double>(), py::arg("tau"),
+        .def(py::init<double,double>(), py::arg("tau"),py::arg("pinf") = 0.0,
         "\n"
         "Args:\n"
         "   deterministic time tau.\n"
         "\n"
         )
-        .def_readonly("tau", &transmission_time_deterministic::value);
+        .def_readonly("tau", &transmission_time_deterministic::value)
+        .def_readonly("pinf", &transmission_time_deterministic::pinfinity);
 
 
     py::class_<transmission_time_weibull>(handle, "time_distribution_weibull")
