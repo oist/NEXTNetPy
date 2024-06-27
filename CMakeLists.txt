@@ -19,6 +19,7 @@ set(LIB_SOURCES
 set(PY_SOURCES
     src/binding.cpp
     src/networkx.cpp
+    src/measure_performance.cpp
     src/simulation_wrapper.cpp
     src/tools.cpp
     src/figures_paper.cpp)

@@ -12,6 +12,7 @@
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
 #include "figures_paper.hpp"
+#include "measure_performance.hpp"
 
 namespace py = pybind11;
 
@@ -149,6 +150,38 @@ void bind_simulation_per_degree_class(py::module &handle) {
 }
 
 
+template <typename T>
+void bind_measure_run_time(py::module &handle) {
+    handle.def("measure_run_time",&measure_run_time<T>,
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("verbose")=false,
+        ""
+    );
+}
+
+template <typename T>
+void bind_measure_run_time_nmga(py::module &handle) {
+    handle.def("measure_run_time_nmga",&measure_run_time_nmga<T>,
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("verbose")=false,
+        ""
+    );
+}
 
 
 PYBIND11_MODULE(nmepinet, handle) {
@@ -190,6 +223,18 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation_powerlaw<transmission_time_lognormal>(handle);
     bind_simulation_powerlaw<transmission_time_exponential>(handle);
     bind_simulation_powerlaw<transmission_time_deterministic>(handle);
+
+    bind_measure_run_time<transmission_time_gamma>(handle);
+    bind_measure_run_time<transmission_time_weibull>(handle);
+    bind_measure_run_time<transmission_time_lognormal>(handle);
+    bind_measure_run_time<transmission_time_exponential>(handle);
+    bind_measure_run_time<transmission_time_deterministic>(handle);
+
+    bind_measure_run_time_nmga<transmission_time_gamma>(handle);
+    bind_measure_run_time_nmga<transmission_time_weibull>(handle);
+    bind_measure_run_time_nmga<transmission_time_lognormal>(handle);
+    bind_measure_run_time_nmga<transmission_time_exponential>(handle);
+    bind_measure_run_time_nmga<transmission_time_deterministic>(handle);
 
     handle.def("graph_ER_clustered",&graph_ER_clustered,
         py::arg("size"),

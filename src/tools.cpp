@@ -138,7 +138,7 @@ std::vector<double> degree_clustering_coefficient(py::object graph){
 
 
 std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double,double,double,double> connectivity_matrix(py::object graph,int clustering){
-    py::print("calling function \n");
+    // py::print("calling function \n");
     networkx nw(graph);
     const int SIZE = (int) nw.adjacencylist.size();
     
@@ -153,7 +153,7 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
     double k2 = 0;
     double k3 = 0;
     double k4 = 0;
-    py::print("computing degrees \n");
+    // py::print("computing degrees \n");
 
     for (node_t node = 0; node < SIZE; node++){
 
@@ -175,7 +175,7 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
 
     std::vector<double> pk(klen,0);
 
-    py::print("mapping degrees \n");
+    // py::print("mapping degrees \n");
 
    // Create an unordered map to store positions
     std::unordered_map<int, int> pos;
@@ -190,14 +190,15 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
     py::print("creating triangles and squares \n");
     py::print("number of unique degrees:",klen);
     // Triangles
-    std::vector<std::vector<double>> T2(klen,std::vector<double>(klen,0));
-    std::vector<double> T1(klen,0);
-    std::vector<std::vector<double>> ekk(klen,std::vector<double>(klen,0));
-    std::vector<std::vector<std::vector<double>>> T(klen, std::vector<std::vector<double>>(klen, std::vector<double>(klen,0)));
+    std::vector<std::vector<int>> T2(klen,std::vector<int>(klen,0));
+    std::vector<int> T1(klen,0);
+    std::vector<std::vector<int>> ekk(klen,std::vector<int>(klen,0));
+    std::vector<std::vector<std::vector<int>>> T(klen, std::vector<std::vector<int>>(klen, std::vector<int>(klen,0)));
 
     // std::vector<std::vector<std::vector<std::vector<double>>>> S(kmax + 1,std::vector<std::vector<std::vector<double>>>(kmax+1,std::vector<std::vector<double>>(kmax+1,std::vector<double>(kmax+1, 0))));
     py::print("entering big loop \n");
     double c = 0;
+    // try {
     for (node_t node = 0; node < SIZE; node++){
         double c_node = 0.0;
         const int k0 = nw.outdegree(node);
@@ -233,7 +234,12 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
         }
 
     }
-    
+    // } catch (std::bad_alloc& e) {
+    //     std::cerr << "Memory allocation failed: " << e.what() << '\n';
+    //     py::print("Memory allocation failed: ",e.what(),"\n");
+    //     std::vector<std::vector<double>> ckk(kmax+1,std::vector<double>(kmax+1,0));
+    //     return std::make_tuple(ckk,0,0,0,0,0,0,0,0,0);
+    // }
 
     std::vector<std::vector<double>> ckk(kmax+1,std::vector<double>(kmax+1,0));
     double ck_av = 0;
@@ -263,14 +269,16 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
     
     ck_av /=(double) (1 - pk[pos[0]]/SIZE - pk[pos[1]]/SIZE);
     const double r = assortativity(nw);
-    py::print("returning \n");
+    // py::print("returning \n");
     const double R_unpert = (double) k2/k1 -1 - m_bar;
     const double R_r = (double) (1-r)*(k2/k1 -1) + r * ( (k3-k2)/(k2-k1) - 1);
     const double R_pert =  R_unpert*(1-r)+ r*((k3-2*k2+k1)/(k1) -2*m2_bar+m_bar*m_bar)/R_unpert  ;
     const double sign_test = (k3-2*k2+k1)/(k1) -2*m2_bar+m_bar*m_bar;
     // py::print("check that it is positive: ",sign_test/R_unpert);
     const double R0 = k2/k1-1;
-    return std::make_tuple(ckk,r,c,k1,m_bar,R0,R_r,R_unpert,R_pert,sign_test/R_unpert);
+    // return std::make_tuple(ckk,r,c,k1,m_bar,R0,R_r,R_unpert,R_pert,sign_test/R_unpert);
+    return std::make_tuple(ckk,r,c,k1,k2,k3,m_bar,m2_bar,R_pert,R_unpert);
+
 }
 
 
