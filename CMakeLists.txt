@@ -14,6 +14,7 @@ set(LIB_SOURCES
     extern/epidemics/epidemics/NextReaction.cpp
     extern/epidemics/epidemics/NextReactionMeanField.cpp
     extern/epidemics/epidemics/nMGA.cpp
+    extern/epidemics/epidemics/REGIR.cpp
     extern/epidemics/epidemics/utility.cpp)
 
 set(PY_SOURCES

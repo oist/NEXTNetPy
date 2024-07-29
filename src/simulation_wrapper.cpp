@@ -10,6 +10,7 @@
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
 #include "graph.h"
+#include "REGIR.h"
 
 std::tuple<std::vector<std::vector<double>>,std::vector<int>> simulation_discrete(py::object graph,int sim, int seed,bool VERBOSE){
     rng_t engine;
@@ -155,9 +156,6 @@ std::tuple<std::vector<std::vector<double>>,std::vector<int>> simulation_discret
     return std::make_tuple(zn_average,unique_degrees);
 }
 
-
-
-
 // rng_t engine;
 std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulation_discrete_leaves(py::object graph,int sim, int seed){
     rng_t engine;
@@ -230,8 +228,6 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
     }
     return std::make_tuple(zn_average,recursion,average_leaf_degree);
 }
-
-
 
 std::tuple<std::vector<double>, std::vector<int>> run_simulation_lattice(py::object graph,int ROWS, int COLUMNS,transmission_time_gamma psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED,const std::vector<double>& check_times,int seed){
 

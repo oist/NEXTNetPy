@@ -8,8 +8,7 @@
 #include "NextReaction.h"
 #include "nMGA.h"
 #include "networkx.hpp"
-
-
+#include "REGIR.h"
 
 namespace py = pybind11;
 
@@ -76,9 +75,68 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,T ps
     return std::make_tuple(time_trajectory, infected_trajectory);
 }
 
-
-
 // Wrapper to run a simulation given a network and transmission distribution
+template <typename T>
+std::tuple<std::vector<double>, std::vector<int>> simulate_traj_regir(py::object graph,T psi, T* rho, bool SIR,double TMAX,int INITIAL_INFECTED, int seed){
+
+    rng_t engine;
+    engine.seed(seed);
+
+    networkx network(graph);
+
+    const int SIZE = (int) network.adjacencylist.size();
+
+    simulate_regir::params p;
+	p.approximation_threshold = INITIAL_INFECTED;
+    p.SIR = SIR;
+
+	simulate_regir simulate(network, psi, rho, p);
+
+    std::vector<double> time_trajectory({});
+    std::vector<int> infected_trajectory({});
+
+    std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+
+    std::unordered_set<node_t> selected_nodes;
+    for (node_t i = 0; i < INITIAL_INFECTED; i++)
+    {
+        const node_t random_node = uniform_node_distribution(engine);
+        // sample without replacement:
+        if (selected_nodes.find(random_node) != selected_nodes.end()){
+            i--;
+            continue;
+        }
+        simulate.add_infections({ std::make_pair(random_node, 0.0)});
+        selected_nodes.insert(random_node);
+    }
+    
+    int current_number_infected = 0;
+                        
+    while (true) {
+        auto point = simulate.step(engine);
+        if (!point )
+            break;
+
+        switch (point->kind) {
+            case event_kind::outside_infection:
+            case event_kind::infection:
+                current_number_infected++;
+                break;
+            case event_kind::reset:
+                current_number_infected--;
+                break;
+            default:
+                break;
+        }
+        if (current_number_infected<=0 || point->time > TMAX)
+            break;
+        time_trajectory.push_back(point->time);
+        infected_trajectory.push_back(current_number_infected);
+    }
+    return std::make_tuple(time_trajectory, infected_trajectory);
+}
+
+// Wrapper to run a simulate given a network and transmission distribution
 template <typename T>
 std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::object graph,T psi, T* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES){
     
@@ -187,10 +245,6 @@ std::tuple<std::vector<std::vector<double>>,std::vector<int>> simulation_discret
 // Wrapper to run a simulation on a 2D LATTICE given a network and transmission distribution
 // it was used to create nice GIFs to illustrate the propagation of a non-Markovian epidemic on a 2D lattice.
 std::tuple<std::vector<double>, std::vector<int>> run_simulation_lattice(py::object graph,int ROWS,int COLUMNS,transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR=false,double TMAX = 1000, bool EDGES_CONCURRENT= true,int INITIAL_INFECTED=1, const std::vector<double>& check_times = {0.0,10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0},int seed = 1);
-
-
-
-
 
 // Wrapper to run a simulation given a network and transmission distribution
 template <typename T>
