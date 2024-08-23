@@ -436,7 +436,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         "    growth_rate (float): the predicted growth rate of the epidemic."
     );
 
-handle.def("simulate_on_lattice", &run_simulation_lattice, 
+    handle.def("simulate_on_lattice", &run_simulation_lattice, 
         py::arg("graph"),
         py::arg("rows"),
         py::arg("columns"),
