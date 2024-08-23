@@ -467,6 +467,18 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         
         
     );
+        
+    py::class_<graph>(handle, "graph")
+        .def("nodes", &graph::nodes)
+        .def("neighbour", &graph::neighbour)
+        .def("outdegree", &graph::outdegree);
+    
+    py::class_<graph_adjacencylist, graph>(handle, "graph_adjacencylist")
+        .def_readonly("adjacencylist", &graph_adjacencylist::adjacencylist);     
+
+    py::class_<networkx, graph>(handle, "graph_networkx")
+        .def(py::init<py::list>())
+        .def(py::init<py::object>());
 
     py::class_<transmission_time_gamma>(handle, "time_distribution_gamma")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
