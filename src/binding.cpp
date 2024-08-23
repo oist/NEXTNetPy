@@ -479,8 +479,11 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
     py::class_<networkx, graph>(handle, "graph_networkx")
         .def(py::init<py::list>())
         .def(py::init<py::object>());
+    
+    py::class_<transmission_time>(handle, "transmission_time")
+        .def("sample", &transmission_time::sample);
 
-    py::class_<transmission_time_gamma>(handle, "time_distribution_gamma")
+    py::class_<transmission_time_gamma, transmission_time>(handle, "time_distribution_gamma")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
@@ -495,7 +498,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         .def_readonly("mean", &transmission_time_gamma::mean)
         .def_readonly("variance", &transmission_time_gamma::variance);
 
-    py::class_<transmission_time_deterministic>(handle, "time_distribution_deterministic")
+    py::class_<transmission_time_deterministic, transmission_time>(handle, "time_distribution_deterministic")
         .def(py::init<double>(), py::arg("tau"),
         // .def(py::init<double,double>(), py::arg("tau"),py::arg("pinf") = 0.0,
         "\n"
@@ -507,7 +510,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         // .def_readonly("pinf", &transmission_time_deterministic::pinfinity);
 
 
-    py::class_<transmission_time_weibull>(handle, "time_distribution_weibull")
+    py::class_<transmission_time_weibull, transmission_time>(handle, "time_distribution_weibull")
         .def(py::init<double, double, double>(), py::arg("shape"), py::arg("scale"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
@@ -522,7 +525,7 @@ handle.def("simulate_on_lattice", &run_simulation_lattice,
         .def_readonly("mean", &transmission_time_weibull::mean)
         .def_readonly("variance", &transmission_time_weibull::variance);
 
-    py::class_<transmission_time_lognormal>(handle, "time_distribution_lognormal")
+    py::class_<transmission_time_lognormal, transmission_time>(handle, "time_distribution_lognormal")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
