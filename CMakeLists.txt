@@ -29,23 +29,10 @@ set(PY_SOURCES
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
 
-if(UNIX AND NOT APPLE)
-    # Code to execute on Linux
-    message("Including pybind11 as a submodule")
-    add_subdirectory(extern/pybind11)
-    pybind11_add_module(nmepinet ${LIB_SOURCES} ${PY_SOURCES})
-    find_package(Boost REQUIRED)
-    link_libraries(Boost::boost)
-elseif(APPLE)
-    find_package(Python COMPONENTS Interpreter Development)
-    find_package(pybind11 CONFIG)
-    # pybind11 method:
-    pybind11_add_module(nmepinet
-    ${PY_SOURCES}
-    ${SIMULATOR_SOURCES}
-    ${LIB_SOURCES}
-    ${SIMULATOR_HEADERS}
-    ${LIB_HEADERS}
-    ${LIB_PCH}
-    )
-endif()
+# Code to execute on Linux
+message("Including pybind11 as a submodule")
+add_subdirectory(extern/pybind11)
+pybind11_add_module(nmepinet ${LIB_SOURCES} ${PY_SOURCES})
+find_package(Boost REQUIRED)
+link_libraries(Boost::boost)
+include_directories(${Boost_INCLUDE_DIRS})
