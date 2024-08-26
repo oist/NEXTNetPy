@@ -12,68 +12,9 @@
 
 namespace py = pybind11;
 
-// Wrapper to run a simulation given a network and transmission distribution
-template <typename T>
-std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,T psi, T* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
 
-    rng_t engine;
-    engine.seed(seed);
-
-    networkx network(graph);
-
-    const int SIZE = (int) network.adjacencylist.size();
-
-    bool SHUFFLE_NEIGHBOURS;
-    if (EDGES_CONCURRENT || SIR)
-        SHUFFLE_NEIGHBOURS=false;
-    else 
-        SHUFFLE_NEIGHBOURS = true;
-
-    simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
-
-    std::vector<double> time_trajectory({});
-    std::vector<int> infected_trajectory({});
-
-    std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
-
-    std::unordered_set<node_t> selected_nodes;
-    for (node_t i = 0; i < INITIAL_INFECTED; i++)
-    {
-        const node_t random_node = uniform_node_distribution(engine);
-        // sample without replacement:
-        if (selected_nodes.find(random_node) != selected_nodes.end()){
-            i--;
-            continue;
-        }
-        simulation.add_infections({ std::make_pair(random_node, 0)});
-        selected_nodes.insert(random_node);
-    }
-    
-    int current_number_infected = 0;
-                        
-    while (true) {
-        auto point = simulation.step(engine);
-        if (!point )
-            break;
-
-        switch (point->kind) {
-            case event_kind::outside_infection:
-            case event_kind::infection:
-                current_number_infected++;
-                break;
-            case event_kind::reset:
-                current_number_infected--;
-                break;
-            default:
-                break;
-        }
-        if (current_number_infected<=0 || point->time > TMAX)
-            break;
-        time_trajectory.push_back(point->time);
-        infected_trajectory.push_back(current_number_infected);
-    }
-    return std::make_tuple(time_trajectory, infected_trajectory);
-}
+std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
+std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 
 // Wrapper to run a simulation given a network and transmission distribution
 template <typename T>
