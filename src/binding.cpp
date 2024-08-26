@@ -540,7 +540,7 @@ PYBIND11_MODULE(nmepinet, handle) {
     py::class_<transmission_time>(handle, "transmission_time")
         .def("sample", &transmission_time::sample);
 
-    py::class_<transmission_time_gamma, transmission_time>(handle, "time_distribution_gamma")
+    py::class_<transmission_time_gamma, transmission_time>(handle, "transmission_time_gamma")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
@@ -555,7 +555,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def_readonly("mean", &transmission_time_gamma::mean)
         .def_readonly("variance", &transmission_time_gamma::variance);
 
-    py::class_<transmission_time_deterministic, transmission_time>(handle, "time_distribution_deterministic")
+    py::class_<transmission_time_deterministic, transmission_time>(handle, "transmission_time_deterministic")
         .def(py::init<double>(), py::arg("tau"),
         // .def(py::init<double,double>(), py::arg("tau"),py::arg("pinf") = 0.0,
         "\n"
@@ -567,7 +567,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         // .def_readonly("pinf", &transmission_time_deterministic::pinfinity);
 
 
-    py::class_<transmission_time_weibull, transmission_time>(handle, "time_distribution_weibull")
+    py::class_<transmission_time_weibull, transmission_time>(handle, "transmission_time_weibull")
         .def(py::init<double, double, double>(), py::arg("shape"), py::arg("scale"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
@@ -582,7 +582,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def_readonly("mean", &transmission_time_weibull::mean)
         .def_readonly("variance", &transmission_time_weibull::variance);
 
-    py::class_<transmission_time_lognormal, transmission_time>(handle, "time_distribution_lognormal")
+    py::class_<transmission_time_lognormal, transmission_time>(handle, "transmission_time_lognormal")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0,
         
         "time_transmission class used to describe the times of infection and/or times of recovery of an individual. \n"
