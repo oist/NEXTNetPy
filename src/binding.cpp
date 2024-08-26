@@ -144,24 +144,24 @@ void bind_simulation_regir(py::module &handle) {
 //     );
 // }
 
-template <typename T>
-void bind_simulation_average(py::module &handle) {
-    handle.def("simulate_average", &run_simulation_average<T>, 
-        py::arg("graph"),
-        py::arg("infection_time"),
-        py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=true,
-        py::arg("initial_infected")=1,
-        py::arg("seed")=0, 
-        py::arg("nb_simulations")=1,
-        py::arg("trim")=true,
-        py::arg("verbose")=false,
-        py::arg("all_nodes")=false,
-        ""
-    );
-}
+// template <typename T>
+// void bind_simulation_average(py::module &handle) {
+//     handle.def("simulate_average", &run_simulation_average<T>, 
+//         py::arg("graph"),
+//         py::arg("infection_time"),
+//         py::arg("recovery_time")=nullptr,
+//         py::arg("SIR")=true,
+//         py::arg("TMAX")=1000,
+//         py::arg("concurrent_edges")=true,
+//         py::arg("initial_infected")=1,
+//         py::arg("seed")=0, 
+//         py::arg("nb_simulations")=1,
+//         py::arg("trim")=true,
+//         py::arg("verbose")=false,
+//         py::arg("all_nodes")=false,
+//         ""
+//     );
+// }
 
 template <typename T>
 void bind_simulation_per_degree_class(py::module &handle) {
@@ -261,11 +261,11 @@ PYBIND11_MODULE(nmepinet, handle) {
     bind_simulation_per_degree_class<transmission_time_exponential>(handle);
     bind_simulation_per_degree_class<transmission_time_deterministic>(handle);
 
-    bind_simulation_average<transmission_time_gamma>(handle);
-    bind_simulation_average<transmission_time_weibull>(handle);
-    bind_simulation_average<transmission_time_lognormal>(handle);
-    bind_simulation_average<transmission_time_exponential>(handle);
-    bind_simulation_average<transmission_time_deterministic>(handle);
+    // bind_simulation_average<transmission_time_gamma>(handle);
+    // bind_simulation_average<transmission_time_weibull>(handle);
+    // bind_simulation_average<transmission_time_lognormal>(handle);
+    // bind_simulation_average<transmission_time_exponential>(handle);
+    // bind_simulation_average<transmission_time_deterministic>(handle);
 
     bind_simulation_clustered<transmission_time_gamma>(handle);
     bind_simulation_clustered<transmission_time_weibull>(handle);
@@ -477,13 +477,13 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=false,
+        py::arg("SIR")=true,
         py::arg("TMAX")=1000,
         py::arg("concurrent_edges")=true,
         py::arg("initial_infected")=1,
         py::arg("seed")=0,
         ""
-        );
+    );
 
     handle.def("simulate", 
         py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
@@ -496,8 +496,42 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("initial_infected")=1,
         py::arg("seed")=0,
         ""
-        );
+    );
 
+
+    handle.def("simulate_average",
+        py::overload_cast<graph&, transmission_time&, transmission_time*,bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        py::arg("all_nodes")=false,
+        ""
+    );
+// py::object graph,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool 
+    handle.def("simulate_average",
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        py::arg("all_nodes")=false,
+        ""
+    );
     // handle.def("simulate", &simulate,
     //     py::arg("graph"),
     //     py::arg("infection_time"),
@@ -531,6 +565,10 @@ PYBIND11_MODULE(nmepinet, handle) {
 
     py::class_<erdos_reyni,graph_adjacencylist>(handle, "erdos_reyni", py::multiple_inheritance())
         .def(py::init<int,double,rng_t&>(), py::arg("size"), py::arg("average_degree"),py::arg("rng"),
+        "");
+
+    py::class_<barabasi_albert,graph_adjacencylist>(handle, "barabasi_albert", py::multiple_inheritance())
+        .def(py::init<int,rng_t&,int>(), py::arg("size"),py::arg("rng"),py::arg("m")=1,
         "");
 
     py::class_<networkx, graph>(handle, "graph_networkx", py::multiple_inheritance())

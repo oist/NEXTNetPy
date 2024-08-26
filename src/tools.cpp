@@ -503,7 +503,7 @@ std::tuple<std::vector<double>,std::vector<double>> generalised_knn(int SIZE, in
     for (int s = 1; s<=SIM;s++){
         py::print(s,"/",SIM,"\r",py::arg("end") = "");
 
-        scale_free network(SIZE,engine);
+        barabasi_albert network(SIZE,engine);
 
         for (node_t node = 0; node < SIZE; node++)
         {
@@ -550,7 +550,7 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> de
     // infected node will attempt to transmit to all its neighbours 1 unit of time after getting infected.
     transmission_time_deterministic psi(1);
     
-    scale_free network(SIZE,engine);
+    barabasi_albert network(SIZE,engine);
 
     int kmax = 0;
     for (node_t node = 0; node < SIZE; node++){   
