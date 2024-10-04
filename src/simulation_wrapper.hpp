@@ -5,10 +5,13 @@
 #include "random.h"
 #include "analysis.h"
 #include "algorithm.h"
+
 #include "NextReaction.h"
+// #include "dynamic_graph.h"
 #include "nMGA.h"
 #include "networkx.hpp"
 #include "REGIR.h"
+
 
 namespace py = pybind11;
 

@@ -8,6 +8,8 @@
 #include "random.h"
 #include "analysis.h"
 #include "NextReaction.h"
+#include "dynamic_graph.h"
+
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
@@ -570,6 +572,9 @@ PYBIND11_MODULE(nmepinet, handle) {
     py::class_<barabasi_albert,graph_adjacencylist>(handle, "barabasi_albert", py::multiple_inheritance())
         .def(py::init<int,rng_t&,int>(), py::arg("size"),py::arg("rng"),py::arg("m")=1,
         "");
+
+    py::class_<dynamic_empirical_network, graph>(handle, "temporal_empirical_graph", py::multiple_inheritance())
+        .def(py::init<std::string, double>());
 
     py::class_<networkx, graph>(handle, "graph_networkx", py::multiple_inheritance())
         .def(py::init<py::list>())
