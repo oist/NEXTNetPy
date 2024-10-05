@@ -13,6 +13,80 @@
 #include "REGIR.h"
 
 
+std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed){
+    rng_t engine;
+    engine.seed(seed);
+
+    bool SHUFFLE_NEIGHBOURS;
+    if (EDGES_CONCURRENT || SIR)
+        SHUFFLE_NEIGHBOURS=false;
+    else 
+        SHUFFLE_NEIGHBOURS = true;
+
+    
+    struct {
+        std::unique_ptr<dynamic_empirical_network> g;
+        std::unique_ptr<transmission_time_gamma> psi;
+        std::unique_ptr<transmission_time_gamma> rho;
+        std::unique_ptr<simulate_next_reaction> nr;
+        std::unique_ptr<simulate_on_dynamic_network> simulator;
+    } env;
+    env.g = std::make_unique<dynamic_empirical_network>(network);
+    env.psi = std::make_unique<transmission_time_gamma>(psi);
+    env.rho = std::make_unique<transmission_time_gamma>(*rho);
+    env.nr = std::make_unique<simulate_next_reaction>(*env.g.get(), *env.psi.get(), env.rho.get(),SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+    env.nr->add_infections({ std::make_pair(0, 0.0)});
+    env.simulator = std::make_unique<simulate_on_dynamic_network>(*env.nr.get());
+
+    std::vector<double> infection_times;
+    std::vector<int> infected_array;
+    std::vector<double> network_event_times;
+    std::vector<int> edges_array;
+
+    int number_of_infected = 0;
+    int number_of_edges = 0;
+
+    while(true){
+
+        std::optional<network_or_epidemic_event_t> any_ev = env.simulator -> step(engine,TMAX);
+
+        if (any_ev.has_value()) {
+            if (std::holds_alternative<event_t>(*any_ev)) {
+                /* Epidemic event */
+                const auto& ev = std::get<event_t>(*any_ev);
+                infection_times.push_back(ev.time);
+                switch (ev.kind) {
+                    case event_kind::infection:
+                    case event_kind::outside_infection:
+                        number_of_infected++;
+                        break;
+                    case event_kind::reset: number_of_infected--;
+                    default: throw std::logic_error("invalid event kind");
+                }
+
+                infected_array.push_back(number_of_infected);
+
+            } else if (std::holds_alternative<network_event_t>(*any_ev)) {
+                /* Network event */
+                const auto& ev = std::get<network_event_t>(*any_ev);
+                network_event_times.push_back(ev.time);
+                switch (ev.kind){
+                    case network_event_kind::neighbour_added: number_of_edges++;
+                    case network_event_kind::neighbour_removed: number_of_edges--;
+                    default: throw std::logic_error("invalid event kind");
+                }
+                edges_array.push_back(number_of_edges);
+            } else {
+                throw std::logic_error("unknown event type");
+            }
+        } else {
+            break;
+        }
+    }
+    return std::make_tuple(infection_times, infected_array,network_event_times,edges_array);
+
+}
+
 std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
     rng_t engine;
     engine.seed(seed);

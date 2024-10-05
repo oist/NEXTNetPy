@@ -546,6 +546,18 @@ PYBIND11_MODULE(nmepinet, handle) {
     //     ""
     // );
 
+    handle.def("simulate_on_temporal", &simulate_on_temporal,
+        // py::overload_cast<dynamic_empirical_network&, transmission_time&, transmission_time*, bool, double, bool, int>(&simulate_on_temporal),
+        py::arg("temporal_graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("seed")=0,
+        ""
+    );
+
     py::class_<rng_t>(handle, "rng")
         .def(py::init<>()) 
         .def(py::init<int>(),py::arg("seed"),
@@ -574,7 +586,15 @@ PYBIND11_MODULE(nmepinet, handle) {
         "");
 
     py::class_<dynamic_empirical_network, graph>(handle, "temporal_empirical_graph", py::multiple_inheritance())
-        .def(py::init<std::string, double>());
+        .def(py::init<std::string, double>())
+        .def("present_edges", &dynamic_empirical_network::present_edges,
+            py::arg("t"),
+            "return number of edges existing at time t"
+        )
+        .def("average_degree", &dynamic_empirical_network::average_degree, 
+            py::arg("t"), 
+            "Return average degree of nodes that are active at time t"
+        );
 
     py::class_<networkx, graph>(handle, "graph_networkx", py::multiple_inheritance())
         .def(py::init<py::list>())
