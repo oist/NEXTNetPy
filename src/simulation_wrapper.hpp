@@ -19,7 +19,7 @@ namespace py = pybind11;
 std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 
-std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed);
+std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,double infection_probability);
 
 // Wrapper to run a simulate given a network and transmission distribution
 std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::object graph,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES);

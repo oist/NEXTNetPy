@@ -13,7 +13,7 @@
 #include "REGIR.h"
 
 
-std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed){
+std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,double infection_probability){
     rng_t engine;
     engine.seed(seed);
 
@@ -35,7 +35,25 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
     env.psi = std::make_unique<transmission_time_gamma>(psi);
     env.rho = std::make_unique<transmission_time_gamma>(*rho);
     env.nr = std::make_unique<simulate_next_reaction>(*env.g.get(), *env.psi.get(), env.rho.get(),SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
-    env.nr->add_infections({ std::make_pair(0, 0.0)});
+    
+    
+    const int num_nodes = 1898; // 0 to 1897 inclusive
+    const double time_start = 0.0;
+    const double time_end = 200.0;
+    std::vector<std::pair<int,double>> outside_infections;
+    std::uniform_real_distribution<double> time_dist(time_start, time_end); // For time
+    std::uniform_real_distribution<double> prob_dist(0.0, 1.0); // For probability
+
+    for (int i = 0; i < num_nodes; ++i) {
+        // Generate a random probability to determine infection
+        double prob = prob_dist(engine);
+        if (prob < infection_probability) {
+            // Generate a random time uniformly distributed between time_start and time_end
+            double infection_time = time_dist(engine);
+            outside_infections.push_back(std::make_pair(i, infection_time));
+        }
+    }
+    env.nr->add_infections(outside_infections);
     env.simulator = std::make_unique<simulate_on_dynamic_network>(*env.nr.get());
 
     std::vector<double> infection_times;
@@ -47,6 +65,8 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
     int number_of_edges = 0;
 
     while(true){
+
+    
 
         std::optional<network_or_epidemic_event_t> any_ev = env.simulator -> step(engine,TMAX);
 
@@ -60,7 +80,9 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
                     case event_kind::outside_infection:
                         number_of_infected++;
                         break;
-                    case event_kind::reset: number_of_infected--;
+                    case event_kind::reset:
+						number_of_infected--;
+						break;
                     default: throw std::logic_error("invalid event kind");
                 }
 
@@ -71,8 +93,12 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
                 const auto& ev = std::get<network_event_t>(*any_ev);
                 network_event_times.push_back(ev.time);
                 switch (ev.kind){
-                    case network_event_kind::neighbour_added: number_of_edges++;
-                    case network_event_kind::neighbour_removed: number_of_edges--;
+                    case network_event_kind::neighbour_added: 
+						number_of_edges++;
+						break;
+                    case network_event_kind::neighbour_removed:
+						number_of_edges--;
+						break;
                     default: throw std::logic_error("invalid event kind");
                 }
                 edges_array.push_back(number_of_edges);

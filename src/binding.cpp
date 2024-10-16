@@ -555,6 +555,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("TMAX")=1000,
         py::arg("concurrent_edges")=true,
         py::arg("seed")=0,
+        py::arg("outside_infection_probability")=0.0,
         ""
     );
 
