@@ -20,16 +20,16 @@ set(LIB_SOURCES
 set(PY_SOURCES
     src/binding.cpp
     src/networkx.cpp
-    src/measure_performance.cpp
     src/simulation_wrapper.cpp
-    src/tools.cpp
-    src/figures_paper.cpp)
+    src/tools.cpp)
 
 
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
 
-# Code to execute on Linux
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+message(STATUS "Found Python version: ${Python3_VERSION}")
+
 message("Including pybind11 as a submodule")
 add_subdirectory(extern/pybind11)
 pybind11_add_module(nmepinet ${LIB_SOURCES} ${PY_SOURCES})
