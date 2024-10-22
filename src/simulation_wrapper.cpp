@@ -114,6 +114,7 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
 }
 
 std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
+    
     rng_t engine;
     engine.seed(seed);
 
@@ -125,7 +126,12 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transm
     else 
         SHUFFLE_NEIGHBOURS = true;
 
-    simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+
+    simulate_next_reaction::params p;
+    p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+    p.edges_concurrent = EDGES_CONCURRENT;
+    p.SIR = SIR;
+    simulate_next_reaction simulation(network, psi,rho,p);
 
     std::vector<double> time_trajectory({});
     std::vector<int> infected_trajectory({});
@@ -186,7 +192,12 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,tran
     else 
         SHUFFLE_NEIGHBOURS = true;
 
-    simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+
+    simulate_next_reaction::params p;
+    p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+    p.edges_concurrent = EDGES_CONCURRENT;
+    p.SIR = SIR;
+    simulate_next_reaction simulation(network, psi,rho,p);
 
     std::vector<double> time_trajectory({});
     std::vector<int> infected_trajectory({});
@@ -255,7 +266,11 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(py::
         if (VERBOSE)
             py::print(sim,"/",NB_SIMULATIONS,"\r",py::arg("end") = "");
 
-        simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        simulate_next_reaction::params p;
+        p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+        p.edges_concurrent = EDGES_CONCURRENT;
+        p.SIR = SIR;
+        simulate_next_reaction simulation(network, psi,rho,p);
 
 
         if (ALL_NODES){
@@ -348,7 +363,11 @@ std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(grap
         if (VERBOSE)
             py::print(sim,"/",NB_SIMULATIONS,"\r",py::arg("end") = "");
 
-        simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        simulate_next_reaction::params p;
+        p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+        p.edges_concurrent = EDGES_CONCURRENT;
+        p.SIR = SIR;
+        simulate_next_reaction simulation(network, psi,rho,p);
 
 
         if (ALL_NODES){
@@ -488,7 +507,11 @@ std::tuple<std::vector<std::vector<double>>,std::vector<int>> simulation_discret
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
         
-        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        simulate_next_reaction::params p;
+        p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+        p.edges_concurrent = EDGES_CONCURRENT;
+        p.SIR = SIR;
+        simulate_next_reaction simulation(network, psi,nullptr);
        
         std::unordered_set<node_t> selected_nodes;
         for (node_t i = 0; i < 1; i++)
@@ -582,8 +605,13 @@ std::tuple<std::vector<double>,std::vector<double>,std::vector<double>> simulati
     
     for (int s = 0; s<sim;s++){
         py::print(s,"/",sim,"\r",py::arg("end") = "");
-        
-        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+
+
+        simulate_next_reaction::params p;
+        p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+        p.edges_concurrent = EDGES_CONCURRENT;
+        p.SIR = SIR;        
+        simulate_next_reaction simulation(network, psi,nullptr,p);
         std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
        
         const node_t random_node = uniform_node_distribution(engine);
@@ -667,8 +695,12 @@ std::tuple<std::vector<double>, std::vector<int>> run_simulation_lattice(py::obj
         SHUFFLE_NEIGHBOURS=false;
     else 
         SHUFFLE_NEIGHBOURS = true;
-
-    simulate_next_reaction simulation(network, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        
+    simulate_next_reaction::params p;
+    p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+    p.edges_concurrent = EDGES_CONCURRENT;
+    p.SIR = SIR;
+    simulate_next_reaction simulation(network, psi,rho,p);
 
     std::vector<double> time_trajectory({});
     std::vector<int> infected_trajectory({});

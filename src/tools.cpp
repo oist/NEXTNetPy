@@ -598,8 +598,11 @@ std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> de
         pk_counts = pk_reference;
         knn_num = knn_num_reference;
         knn_den = knn_den_reference;
-
-        simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+        simulate_next_reaction::params p;
+        p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+        p.edges_concurrent = EDGES_CONCURRENT;
+        p.SIR = SIR;
+        simulate_next_reaction simulation(network, psi,nullptr,p);
 
         // Initial infection
         std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
@@ -758,8 +761,10 @@ std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> d
 
     const bool EDGES_CONCURRENT = true;
     const bool SHUFFLE_NEIGHBOURS = false;
-
-    simulate_next_reaction simulation(network, psi,nullptr,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT);
+    simulate_next_reaction::params p;
+    p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+    p.edges_concurrent = EDGES_CONCURRENT;
+    simulate_next_reaction simulation(network, psi,nullptr,p);
 
     //Infect the first individual by choosing a node at random
     std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);

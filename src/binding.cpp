@@ -203,8 +203,8 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def(py::init<int,rng_t&,int>(), py::arg("size"),py::arg("rng"),py::arg("m")=1,
         "");
 
-    py::class_<dynamic_empirical_network, graph>(handle, "temporal_empirical_graph", py::multiple_inheritance())
-        .def(py::init<std::string, double>());
+    // py::class_<dynamic_empirical_network, graph>(handle, "temporal_empirical_graph", py::multiple_inheritance())
+    //     .def(py::init<std::string, double>());
         // .def("present_edges", &dynamic_empirical_network::present_edges,
         //     py::arg("t"),
         //     "return number of edges existing at time t"
@@ -213,6 +213,15 @@ PYBIND11_MODULE(nmepinet, handle) {
         //     py::arg("t"), 
         //     "Return average degree of nodes that are active at time t"
         // );
+
+    py::class_<dynamic_empirical_network, graph_mutable>(handle, "TemporalEmpiricalGraph", py::multiple_inheritance())
+        .def(py::init([](std::string path_to_file, bool is_infinintesimal_duration, double dt) {
+            // Convert the boolean to the appropriate enum
+            dynamic_empirical_network::edge_duration_kind contact_type = 
+                is_infinintesimal_duration ? dynamic_empirical_network::edge_duration_kind::infitesimal_duration 
+                                           : dynamic_empirical_network::edge_duration_kind::finite_duration;
+            return new dynamic_empirical_network(path_to_file, contact_type, dt);
+        }));
 
     py::class_<networkx, graph>(handle, "graph_networkx", py::multiple_inheritance())
         .def(py::init<py::list>())
