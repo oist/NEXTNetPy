@@ -464,15 +464,6 @@ std::vector<double> neighbours_multiplicity(py::object graph){
         }
     }
 
-    // for (int k = 2; k<= kmax; k++){
-    //     if (T2[k] == 0)
-    //         continue;
-    //     for (int q=2; q <= kmax; q++){
-    //             if (e_kk[k][q]==0)
-    //                 continue;
-    //             m_nn[k] += T1[k][q] * T2[q] / (T2[k] * q * pk[q]);
-    //     }
-    // }
 
     return m_nn;
 }

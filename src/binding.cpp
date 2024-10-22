@@ -13,8 +13,6 @@
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
-#include "figures_paper.hpp"
-#include "measure_performance.hpp"
 
 namespace py = pybind11;
 
