@@ -3,17 +3,21 @@
 #include <cmath>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include "random.h"
+
+#include "algorithm.h"
 #include "analysis.h"
-#include "NextReaction.h"
-#include "networkx.hpp"
-#include "simulation_wrapper.hpp"
-#include "tools.hpp"
+#include "dynamic_graph.h"
 #include "graph.h"
+#include "networkx.hpp"
+#include "NextReaction.h"
+#include "random.h"
 #include "REGIR.h"
 
+#include "simulation_wrapper.hpp"
+#include "tools.hpp"
 
-std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_empirical_network& network,transmission_time_gamma& psi, transmission_time_gamma* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,double infection_probability){
+
+std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vector<int>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,double infection_probability){
     rng_t engine;
     engine.seed(seed);
 
@@ -23,18 +27,30 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
     else 
         SHUFFLE_NEIGHBOURS = true;
 
-    
-    struct {
-        std::unique_ptr<dynamic_empirical_network> g;
-        std::unique_ptr<transmission_time_gamma> psi;
-        std::unique_ptr<transmission_time_gamma> rho;
-        std::unique_ptr<simulate_next_reaction> nr;
-        std::unique_ptr<simulate_on_dynamic_network> simulator;
-    } env;
-    env.g = std::make_unique<dynamic_empirical_network>(network);
-    env.psi = std::make_unique<transmission_time_gamma>(psi);
-    env.rho = std::make_unique<transmission_time_gamma>(*rho);
-    env.nr = std::make_unique<simulate_next_reaction>(*env.g.get(), *env.psi.get(), env.rho.get(),SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+    // dynamic_empirical_network g(TEST_DATA_DIR "/college.tab", dynamic_empirical_network::infitesimal_duration, 3);
+
+    simulate_next_reaction::params p;
+    p.SIR = SIR;
+    p.edges_concurrent = EDGES_CONCURRENT;
+
+	simulate_next_reaction nr(network, psi,rho,p);
+	nr.add_infections({ std::make_pair(0, 0.0) });
+
+    // struct {
+    //     std::unique_ptr<dynamic_empirical_network> g;
+    //     std::unique_ptr<transmission_time_gamma> psi;
+    //     std::unique_ptr<transmission_time_gamma> rho;
+    //     std::unique_ptr<simulate_next_reaction> nr;
+    //     std::unique_ptr<simulate_on_dynamic_network> simulator;
+    // } env;
+    // env.g = std::make_unique<dynamic_network>(network);
+    // env.psi = std::make_unique<transmission_time_gamma>(psi);
+    // env.rho = std::make_unique<transmission_time_gamma>(*rho);
+    // simulate_next_reaction::params p;
+    // p.shuffle_neighbours=SHUFFLE_NEIGHBOURS;
+    // p.SIR= SIR;
+    // p.edges_concurrent= EDGES_CONCURRENT;
+    // env.nr = std::make_unique<simulate_next_reaction>(*env.g.get(), *env.psi.get(), env.rho.get(),p);
     
     
     const int num_nodes = 1898; // 0 to 1897 inclusive
@@ -53,8 +69,12 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
             outside_infections.push_back(std::make_pair(i, infection_time));
         }
     }
-    env.nr->add_infections(outside_infections);
-    env.simulator = std::make_unique<simulate_on_dynamic_network>(*env.nr.get());
+
+    nr.add_infections(outside_infections);
+    simulate_on_dynamic_network sim(nr);
+
+    // env.nr->add_infections(outside_infections);
+    // env.simulator = std::make_unique<simulate_on_dynamic_network>(*env.nr.get());
 
     std::vector<double> infection_times;
     std::vector<int> infected_array;
@@ -68,7 +88,9 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
 
     
 
-        std::optional<network_or_epidemic_event_t> any_ev = env.simulator -> step(engine,TMAX);
+        // std::optional<network_or_epidemic_event_t> any_ev = env.simulator -> step(engine,TMAX);
+        std::optional<network_or_epidemic_event_t> any_ev = sim.step(engine,TMAX);
+
 
         if (any_ev.has_value()) {
             if (std::holds_alternative<event_t>(*any_ev)) {
@@ -99,6 +121,9 @@ std::tuple<std::vector<double>, std::vector<int>,std::vector<double>, std::vecto
                     case network_event_kind::neighbour_removed:
 						number_of_edges--;
 						break;
+                    case network_event_kind::instantenous_contact:
+                        number_of_edges++;
+                        break;
                     default: throw std::logic_error("invalid event kind");
                 }
                 edges_array.push_back(number_of_edges);

@@ -88,8 +88,8 @@ PYBIND11_MODULE(nmepinet, handle) {
         "Simulate average trajectory on a networkx graph"
     );
 
-    handle.def("simulate_on_temporal", &simulate_on_temporal,
-        // py::overload_cast<dynamic_empirical_network&, transmission_time&, transmission_time*, bool, double, bool, int>(&simulate_on_temporal),
+    handle.def("simulate_on_temporal",
+        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,double>(&simulate_on_temporal),
         py::arg("temporal_graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -174,6 +174,20 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def("nodes", &graph::nodes)
         .def("neighbour", &graph::neighbour)
         .def("outdegree", &graph::outdegree);
+
+    py::class_<dynamic_network>(handle, "dynamic_graph", py::multiple_inheritance())
+        .def("next", &dynamic_network::next)
+        .def("step", &dynamic_network::step)
+        .def("notify_epidemic_event", &dynamic_network::notify_epidemic_event);
+
+//     struct dynamic_network : public virtual graph {
+// 	virtual absolutetime_t next(rng_t& engine) = 0;
+
+// 	virtual std::optional<network_event_t> step(rng_t& engine, absolutetime_t max_time = NAN) = 0;
+
+// 	virtual void notify_epidemic_event(event_t ev, rng_t& engine);
+// };
+
     
     // py::class_<graph_adjacencylist, graph>(handle, "graph_adjacencylist", py::multiple_inheritance())
     //     .def_readonly("adjacencylist", &graph_adjacencylist::adjacencylist, py::return_value_policy::reference_internal)
@@ -203,23 +217,18 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def(py::init<int,rng_t&,int>(), py::arg("size"),py::arg("rng"),py::arg("m")=1,
         "");
 
-    // py::class_<dynamic_empirical_network, graph>(handle, "temporal_empirical_graph", py::multiple_inheritance())
-    //     .def(py::init<std::string, double>());
-        // .def("present_edges", &dynamic_empirical_network::present_edges,
-        //     py::arg("t"),
-        //     "return number of edges existing at time t"
-        // )
-        // .def("average_degree", &dynamic_empirical_network::average_degree, 
-        //     py::arg("t"), 
-        //     "Return average degree of nodes that are active at time t"
-        // );
 
-    py::class_<dynamic_empirical_network, graph_mutable>(handle, "TemporalEmpiricalGraph", py::multiple_inheritance())
-        .def(py::init([](std::string path_to_file, bool is_infinintesimal_duration, double dt) {
-            // Convert the boolean to the appropriate enum
+    py::class_<activity_driven_network,dynamic_network>(handle, "activity_driven_graph", py::multiple_inheritance())
+        .def(py::init<std::vector<double>,double,double,double,rng_t&>(), py::arg("activity_rates"),py::arg("eta"),py::arg("m")=1,py::arg("recovery_rate"),py::arg("rng"),
+        "");
+
+
+    py::class_<dynamic_empirical_network, dynamic_network>(handle, "temporal_empirical_graph", py::multiple_inheritance())
+        .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
+            // Map the bool to the appropriate enum value
             dynamic_empirical_network::edge_duration_kind contact_type = 
-                is_infinintesimal_duration ? dynamic_empirical_network::edge_duration_kind::infitesimal_duration 
-                                           : dynamic_empirical_network::edge_duration_kind::finite_duration;
+                is_finite_duration ? dynamic_empirical_network::finite_duration : dynamic_empirical_network::infitesimal_duration;
+            
             return new dynamic_empirical_network(path_to_file, contact_type, dt);
         }));
 
