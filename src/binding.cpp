@@ -72,7 +72,7 @@ PYBIND11_MODULE(nmepinet, handle) {
     );
 
     handle.def("simulate_average",
-        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&simulate_average), 
         py::arg("graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -89,7 +89,7 @@ PYBIND11_MODULE(nmepinet, handle) {
     );
 
     handle.def("simulate_on_temporal",
-        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,double>(&simulate_on_temporal),
+        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,int,bool,bool>(&simulate_on_temporal),
         py::arg("temporal_graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -97,10 +97,13 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("TMAX")=1000,
         py::arg("concurrent_edges")=true,
         py::arg("seed")=0,
-        py::arg("outside_infection_probability")=0.0,
+        py::arg("initial_infected")=1,
+        py::arg("network_size")=1,
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
         ""
     );
-
 
     /*---------------------------*/
     /* Graphs that are clustered */
@@ -222,6 +225,11 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def(py::init<std::vector<double>,double,double,double,rng_t&>(), py::arg("activity_rates"),py::arg("eta"),py::arg("m")=1,py::arg("recovery_rate"),py::arg("rng"),
         "");
 
+    py::class_<dynamic_sirx_network,dynamic_network>(handle, "dynamic_sirx_network", py::multiple_inheritance())
+        .def(py::init<graph&, double,double>(), py::arg("graph"),py::arg("kappa0"),py::arg("kappa"),
+        "");
+
+//  dynamic_sirx_network : public virtual dynamic_network
 
     py::class_<dynamic_empirical_network, dynamic_network>(handle, "temporal_empirical_graph", py::multiple_inheritance())
         .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {

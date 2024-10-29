@@ -27,7 +27,7 @@ set(PY_SOURCES
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
 
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python 3.13 COMPONENTS Interpreter Development REQUIRED)
 message(STATUS "Found Python version: ${Python3_VERSION}")
 
 message("Including pybind11 as a submodule")
