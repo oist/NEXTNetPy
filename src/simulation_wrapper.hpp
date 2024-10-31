@@ -19,7 +19,7 @@ namespace py = pybind11;
 std::tuple<std::vector<double>, std::vector<int>> simulate(graph& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 std::tuple<std::vector<double>, std::vector<int>> simulate(py::object graph,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 
-std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,int nb_simulations,bool trim,bool verbose);
+std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,bool trim,bool verbose,double t0);
 
 
 // Wrapper to run a simulate given a network and transmission distribution

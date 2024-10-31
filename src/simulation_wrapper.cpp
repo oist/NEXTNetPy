@@ -371,7 +371,7 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_average(py::object
 // }
 
 
-std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,int nb_simulations,bool trim,bool verbose){
+std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,bool trim,bool verbose,double t0){
     rng_t engine;
     engine.seed(seed);
 
@@ -399,7 +399,7 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynami
             i--;
             continue;
         }
-        nr.add_infections({ std::make_pair(random_node, 0)});
+        nr.add_infections({ std::make_pair(random_node, t0)});
         selected_nodes.insert(random_node);
     }
     
@@ -412,7 +412,6 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynami
     std::vector<double> infected_array;
 
     int number_of_infected = 0;
-    int number_of_edges = 0;
                         
     while(true){
 
@@ -428,11 +427,11 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynami
                     case event_kind::infection:
                     case event_kind::outside_infection:
                         number_of_infected++;
-                        infected_array.push_back((double) 1.0/nb_simulations);
+                        infected_array.push_back((double) 1.0);
                         break;
                     case event_kind::reset:
                         number_of_infected--;
-                        infected_array.push_back((double) -1.0/nb_simulations);
+                        infected_array.push_back((double) -1.0);
                         break;
                     default: throw std::logic_error("invalid event kind");
                 }
@@ -443,17 +442,13 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynami
                 // network_event_times.push_back(ev.time);
                 switch (ev.kind){
                     case network_event_kind::neighbour_added: 
-                        number_of_edges++;
                         break;
                     case network_event_kind::neighbour_removed:
-                        number_of_edges--;
                         break;
                     case network_event_kind::instantenous_contact:
-                        number_of_edges++;
                         break;
                     default: throw std::logic_error("invalid event kind");
                 }
-                // edges_array.push_back(number_of_edges);
             } else {
                 throw std::logic_error("unknown event type");
             }
