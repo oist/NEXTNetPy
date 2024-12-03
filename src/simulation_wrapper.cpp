@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
+#include "tests/simulate.h"
 #include "algorithm.h"
 #include "analysis.h"
 #include "dynamic_graph.h"
@@ -370,6 +371,57 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_average(py::object
 
 // }
 
+std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations,bool SIR){
+	rng_t engine(seed);
+
+	using namespace std::string_literals;
+
+	const std::size_t M = nb_simulations;
+
+	const int N = (int) activity_rates.size();
+
+    std::uniform_int_distribution<> uniform_node_distribution(0, N-1);
+    std::vector<std::pair<node_t,double>> initial_infections;
+    for (node_t i = 0; i < initial_infected; i++)
+    {
+        const node_t random_node = uniform_node_distribution(engine);
+        initial_infections.push_back({ std::make_pair(random_node, t0)});
+    }
+
+	std::vector<double> t_sim, y_sim_new, y_sim_total;
+	average_trajectories(engine, [&](rng_t& engine) {
+		struct {
+			std::unique_ptr<activity_driven_network> g;
+			std::unique_ptr<transmission_time_exponential> psi;
+			std::unique_ptr<transmission_time_exponential> rho;
+			std::unique_ptr<simulate_next_reaction> nr;
+			std::unique_ptr<simulate_on_dynamic_network> simulator;
+		} env;
+		env.g = std::make_unique<activity_driven_network>(activity_rates,eta,m,inactivation_rate,engine);
+		env.psi = std::make_unique<transmission_time_exponential>(beta);
+		env.rho = std::make_unique<transmission_time_exponential>(mu);
+        simulate_next_reaction::params p;
+        p.SIR = SIR;
+		env.nr = std::make_unique<simulate_next_reaction>(*env.g.get(), *env.psi.get(), env.rho.get(),p);
+		env.nr->add_infections(initial_infections);
+		env.simulator = std::make_unique<simulate_on_dynamic_network>(*env.nr.get());
+		return env;
+	}, [](network_or_epidemic_event_t any_ev) {
+		/* Translate event into a pair (time, delta) */
+		if (std::holds_alternative<event_t>(any_ev)) {
+			/* Epidemic event */
+			const auto ev = std::get<event_t>(any_ev);
+			return std::make_pair(ev.time, delta_infected(ev.kind));
+		} else if (std::holds_alternative<network_event_t>(any_ev)) {
+			/* Network event */
+			const auto ev = std::get<network_event_t>(any_ev);
+			return std::make_pair(ev.time, 0);
+		} else throw std::logic_error("unknown event type");
+	}, t_sim, y_sim_total, y_sim_new, TMAX, M);
+
+    return std::make_tuple(t_sim, y_sim_new);
+
+}
 
 std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,bool trim,bool verbose,double t0){
     rng_t engine;

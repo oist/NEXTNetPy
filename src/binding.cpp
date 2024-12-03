@@ -88,8 +88,26 @@ PYBIND11_MODULE(nmepinet, handle) {
         "Simulate average trajectory on a networkx graph"
     );
 
+    handle.def("simulate_on_activity_driven",&simulate_on_activity_average,
+        py::arg("activity_rates"),
+        py::arg("inactivation_rate"),
+        py::arg("eta"),
+        py::arg("m"),
+        py::arg("beta"),
+        py::arg("mu"),
+        py::arg("TMAX")=1000,
+        py::arg("seed")=0,
+        py::arg("initial_infected")=1,
+        py::arg("t0")=0,
+        py::arg("nb_simulations")=1,
+        py::arg("SIR")=true,
+        ""
+    );
+    // std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations);
+
+
     handle.def("simulate_on_temporal",
-        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,int,bool,bool>(&simulate_on_temporal),
+        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,bool,bool,double>(&simulate_on_temporal),
         py::arg("temporal_graph"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -99,9 +117,9 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("seed")=0,
         py::arg("initial_infected")=1,
         py::arg("network_size")=1,
-        py::arg("nb_simulations")=1,
         py::arg("trim")=true,
         py::arg("verbose")=false,
+        py::arg("t0")=0,
         ""
     );
 
@@ -223,7 +241,11 @@ PYBIND11_MODULE(nmepinet, handle) {
 
     py::class_<activity_driven_network,dynamic_network>(handle, "activity_driven_graph", py::multiple_inheritance())
         .def(py::init<std::vector<double>,double,double,double,rng_t&>(), py::arg("activity_rates"),py::arg("eta"),py::arg("m")=1,py::arg("recovery_rate"),py::arg("rng"),
-        "");
+        "initialise instance of an activity-driven network")
+        .def("advance_time", 
+         &activity_driven_network::advance_time, 
+         py::arg("engine"), py::arg("max_time") = std::numeric_limits<double>::quiet_NaN(),
+         "Simulate the network until equilibrium in the average degree is reached or the specified max_time.");
 
     py::class_<dynamic_sirx_network,dynamic_network>(handle, "dynamic_sirx_network", py::multiple_inheritance())
         .def(py::init<graph&, double,double>(), py::arg("graph"),py::arg("kappa0"),py::arg("kappa"),
@@ -304,4 +326,8 @@ PYBIND11_MODULE(nmepinet, handle) {
         .def_readonly("mean", &transmission_time_lognormal::mean)
         .def_readonly("variance", &transmission_time_lognormal::variance);
 
+    py::class_<transmission_time_exponential, transmission_time>(handle, "transmission_time_exponential")
+        .def(py::init<double>(), py::arg("rate"),
+        ""
+        );
 }
