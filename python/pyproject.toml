@@ -1,14 +1,12 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "pybind11>=2.6.0",
-    "cibuildwheel>=2.5.0"
+    "scikit-build-core>=0.4.0",
+    "pybind11>=2.10",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
 
 [project]
-name = "my_project"  # Replace with your desired project name
+name = "nmepinet"  # Replace with your desired project name
 version = "0.1.0"
 description = "A Python binding for a C++ project using pybind11"
 readme = "../README.md"
@@ -18,23 +16,24 @@ authors = [
     { name = "Samuel Cure", email = "samuel.cure@oist.jp" },
     { name = "Florian Pflug"}
 ]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: C++",
+
+[tool.scikit-build]
+cmake.source-dir = ".."
+cmake.build-type = "Release"
+
+
+[tool.scikit-build-core.cmake]
+source-dir = ".."  # CMakeLists.txt is located in the parent directory
+define = [
+    "CMAKE_BUILD_TYPE=Release"
 ]
 
-[tool.setuptools]
-package-dir = {"" = "python"}  # Adjust Python package directory
-
-[tool.cibuildwheel]
-output-dir = "../dist"
-
-[tool.cibuildwheel.environment]
-BOOST_INCLUDE_DIR = "/usr/include/boost"  # Update if using custom paths
-BOOST_LIBRARY_DIR = "/usr/lib"           # Update if using custom paths
-
-[tool.cibuildwheel.build]
-# Uncomment and customize if specific versions/platforms are required
-# requires-python = ">=3.6"
+[tool.scikit-build-core.msdist]
+# Include additional files in source distributions
+include = [
+    "../README.md",
+    "../LICENSE",
+    "../src/**",
+    "../extern/**",
+    "../CMakeLists.txt"
+]

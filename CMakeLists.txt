@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(nmepinet VERSION 0.1.0)
 
 # Use C++17
@@ -23,7 +23,6 @@ set(PY_SOURCES
     src/simulation_wrapper.cpp
     src/tools.cpp)
 
-
 # include_directories(extern/epidemics/epidemics)
 include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
 
@@ -33,8 +32,11 @@ message(STATUS "Found Python version: ${Python3_VERSION}")
 message("Including pybind11 as a submodule")
 add_subdirectory(extern/pybind11)
 pybind11_add_module(nmepinet ${LIB_SOURCES} ${PY_SOURCES})
+set_target_properties(nmepinet PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/nmepinet)
 find_package(Boost CONFIG REQUIRED)
 link_libraries(Boost::boost)
 find_package(TBB REQUIRED)
 target_link_libraries(nmepinet PRIVATE TBB::tbb)
 include_directories(${Boost_INCLUDE_DIRS})
+
+
