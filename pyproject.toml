@@ -1,5 +1,6 @@
 [build-system]
 requires = [
+    "setuptools>=61.0",
     "scikit-build-core>=0.4.0",
     "pybind11>=2.10",
     "wheel",
@@ -37,4 +38,12 @@ include = [
     "src/**",
     "extern/**",
     "CMakeLists.txt"
+]
+
+[tool.setuptools]
+packages = ["nmepinet"]
+
+[tool.setuptools.package-data]
+nmepinet = [
+    "extern/epidemics/**",
 ]

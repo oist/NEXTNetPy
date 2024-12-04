@@ -1,20 +1,14 @@
 # NMepinet
 
-*NMepinet* is a python module can simulate non-Markovian epidemics on arbitrary networks. episimpy is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*NMepinet* is a python module can simulate non-Markovian epidemics on arbitrary networks. NMepinet is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
 
 ## Set up
 
-Open a new terminal tab, clone the repository and add the submodules
+Open a new terminal window, clone the repository and add the submodules
 
 ```
 git clone git@github.com:samuelcure/nmepinet.git
 git submodule update --init --recursive
-```
-
-On Linux pybind11 is included as a submodule, however if you are on MacOS you may need to install pybind11 globally using homebrew
-(to avoid long update set auto-update to false for this session)
-```
-HOMEBREW_NO_AUTO_UPDATE=1 brew install pybind11
 ```
 
 Make sure that boost is also installed in your system (on mac) :
@@ -33,18 +27,6 @@ cmake ..
 make -j4
 ```
 
-Now if you open a python interpreter inside the build folder you can use the library.
-Make sure that networkx is installed before hand:
-
-```
-pip install networkx
-```
-
-or using anaconda
-
-```
-conda install -c anaconda networkx 
-```
 
 ## How to use
 
