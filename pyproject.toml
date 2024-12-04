@@ -10,7 +10,7 @@ build-backend = "scikit_build_core.build"
 name = "nmepinet"  # Replace with your desired project name
 version = "0.1.0"
 description = "A Python binding for a C++ project using pybind11"
-readme = "../README.md"
+readme = "README.md"
 requires-python = ">=3.6"
 license = { text = "MIT" }
 authors = [
@@ -19,12 +19,12 @@ authors = [
 ]
 
 [tool.scikit-build]
-cmake.source-dir = ".."
+cmake.source-dir = "."
 cmake.build-type = "Release"
 
 
 [tool.scikit-build-core.cmake]
-source-dir = ".."  # CMakeLists.txt is located in the parent directory
+source-dir = "."  # CMakeLists.txt is located in the parent directory
 define = [
     "CMAKE_BUILD_TYPE=Release"
 ]
@@ -32,9 +32,9 @@ define = [
 [tool.scikit-build-core.msdist]
 # Include additional files in source distributions
 include = [
-    "../README.md",
-    "../LICENSE",
-    "../src/**",
-    "../extern/**",
-    "../CMakeLists.txt"
+    "README.md",
+    "LICENSE",
+    "src/**",
+    "extern/**",
+    "CMakeLists.txt"
 ]
