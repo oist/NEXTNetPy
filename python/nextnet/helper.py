@@ -4,6 +4,11 @@ import time
 from tqdm import tqdm
 import networkx as nx
 
+
+def test_function():
+    print("it works")
+
+    
 # def measure_time(N, nb_simulations,a=0.1,b=1):
 #     activity_rates = [a] * N
 #     inactivation_rate =b 

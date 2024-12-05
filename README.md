@@ -1,6 +1,6 @@
-# NMepinet
+# NEXT-Net
 
-*NMepinet* is a python module can simulate non-Markovian epidemics on arbitrary networks. NMepinet is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*NEXT-Net* is a python module can simulate non-Markovian epidemics on arbitrary networks. NMepinet is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
 
 ## Set up
 
