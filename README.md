@@ -1,80 +1,50 @@
 # NEXT-Net
 
-*NEXT-Net* is a python module can simulate non-Markovian epidemics on arbitrary networks. NMepinet is based on a pybind11 wrapper around the C++ simulator https://github.com/samuelcure/Epidemics-On-Networks.
+*NEXT-Net* is a python module can simulate non-Markovian epidemics on arbitrary networks. NEXT-Net is based on a pybind11 wrapper around the C++ simulator https://github.com/oist/NEXTNet
 
 ## Set up
 
-Open a new terminal window, clone the repository and add the submodules
+Download the latest release and in a new terminal window run:
 
 ```
-git clone git@github.com:samuelcure/nmepinet.git
-git submodule update --init --recursive
+pip install nextnet-0.1.0.tar.gz
 ```
 
-Make sure that boost is also installed in your system (on mac) :
+In case the installation fails, make sure that you have all dependencies installed:
 
 ```
-HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
+python3 -m pip install scikit-build-core pybind11 build cmake boost
 ```
 
-build the module:
-
-```
-mkdir -p build
-cd build
-
-cmake ..
-make -j4
-```
 
 
 ## How to use
 
+Here is an example of how to run a SIR simulation on a Barabasi-Albert random graph using networkx.
+
 ```python
-import episimpy
+import nextnet as nn
 import networkx as nx
 
 n = 10**5 # size of the network
 m = 1 # number of edges added per node
-G = nx.barabasi_albert(n,m)
+graph = nx.barabasi_albert(n,m)
 
 # Define the distribution for the infection times (Gamma distributed)
 MEAN_INFECTION = 5
 VARIANCE_INFECTION = 1
-psi = episimpy.time_distribution(MEAN_INFECTION,VARIANCE_INFECTION)
+psi = nn.transmission_time_gamma(MEAN_INFECTION,VARIANCE_INFECTION)
 
 # Define the distribution for the recovery times
 MEAN_RECOVER = 7
 VARIANCE_RECOVERY= 1
-rho = episimpy.time_distribution(MEAN_RECOVERY,VARIANCE_RECOVERY)
+rho = nn.transmission_time_lognormal(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
-# To simulate a SI epidemic
-times, infected = episimpy.simulate(g,psi)
-
-# To simulate a SIR epidemic
-times, infected = episimpy.simulate(g,psi,rho,SIR=True)
-
-# To simulate a SIS epidemic
-# WARNING: make sure to define a maximum time since the epidemic
-# might never reach an absorbing state.
-# by default TMAX=1000, which is VERY long.
-
-times, infected = episimpy.simulate(g,psi,rho,TMAX = 100)
+# To simulate a SIR epidemic with one initial infected individual
+times, infected = nn.simulate(graph,psi,rho,SIR=True,initial_infected=1)
 
 ```
 
-## Parameters
+## Documentation
 
-the `episimpy.simulate` can take the following parameters:
-* `recovery_time` A gamma distribution, by default is `None`
-* `SIR` by default is `False`, and has an effect only if the recovery_time is defined
-* `concurrent_edges` by default is set to `False`. The current implementation adds edges sequentially in the priority queue, since some edges despite being active, do not contribute to the epidemic (for example in networks with short loops). For SI/SIR model, the sequential mode is believed to always be faster, independently of the graph. SIS not sure since the edges have to be reshuffled everytime.
-* `seed` choose the random seed for reproducibility.
-* `TMAX` maximum time set by default to 1000. Advised to modify when simulating a SIS epidemic.
-* `initial_infected` set by default to 1.
-
-
-It is also possible to simulate the average trajectory on a given network, with `episimpy.simulate_average`.
-The parameters are the same, with the extra:
-* `nb_simulations` set by default to 1.
-* `trim` set by default to `True`. If set to False, the trajectory will be of length `graph.number_of_nodes() * nb_simulations`, which will make the trajectory very long, but allows for more precision if one wants to compute the derivate for example.
+TBA
