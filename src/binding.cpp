@@ -16,9 +16,9 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(nmepinet, handle) {
+PYBIND11_MODULE(nextnet, handle) {
 
-    handle.doc() = "nmepinet module to efficiently simulate an epidemic on any networkx graph, custom graph, or temporal graph.";
+    handle.doc() = "nextnet module to efficiently simulate an epidemic on any networkx graph, custom graph, or temporal graph.";
 
     handle.def("simulation_discrete",&simulation_discrete,
         py::arg("graph"),
@@ -68,7 +68,7 @@ PYBIND11_MODULE(nmepinet, handle) {
         py::arg("trim")=true,
         py::arg("verbose")=false,
         py::arg("all_nodes")=false,
-        "Simulate average trajectory for custom NMepinet graph object"
+        "Simulate average trajectory for custom nextnet graph object"
     );
 
     handle.def("simulate_average",
