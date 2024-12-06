@@ -19,7 +19,9 @@ authors = [
     { name = "Florian Pflug"}
 ]
 dependencies = [
-    "numpy"
+    "numpy",
+    "tqdm",
+    "networkx"
 ]
 
 [tool.scikit-build]
