@@ -88,6 +88,9 @@ PYBIND11_MODULE(nextnet, handle) {
         "Simulate average trajectory on a networkx graph"
     );
 
+#if 0
+    // Disabled because simulate_on_activity_average depeneds on stuff from tests/,
+    // which doesn't work with the bundled boost
     handle.def("simulate_on_activity_driven",&simulate_on_activity_average,
         py::arg("activity_rates"),
         py::arg("inactivation_rate"),
@@ -103,8 +106,7 @@ PYBIND11_MODULE(nextnet, handle) {
         py::arg("SIR")=true,
         ""
     );
-    // std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations);
-
+#endif
 
     handle.def("simulate_on_temporal",
         py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,bool,bool,double>(&simulate_on_temporal),

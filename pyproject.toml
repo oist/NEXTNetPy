@@ -21,14 +21,12 @@ authors = [
 
 dependencies = [
     "cmake",
-    "boost",
     "build",
 ]
 
 [tool.scikit-build]
 cmake.source-dir = "."
 cmake.build-type = "Release"
-
 
 [tool.scikit-build-core.cmake]
 source-dir = "."  # CMakeLists.txt is located in the parent directory

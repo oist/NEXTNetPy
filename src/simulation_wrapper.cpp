@@ -4,7 +4,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
-#include "tests/simulate.h"
 #include "algorithm.h"
 #include "analysis.h"
 #include "dynamic_graph.h"
@@ -371,6 +370,9 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_average(py::object
 
 // }
 
+#if 0
+// Disabled because average_trajectories is from the unit tests, and
+// doesn't work with the bundled boost
 std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations,bool SIR){
 	rng_t engine(seed);
 
@@ -422,6 +424,7 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_averag
     return std::make_tuple(t_sim, y_sim_new);
 
 }
+#endif
 
 std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(dynamic_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,bool trim,bool verbose,double t0){
     rng_t engine;
