@@ -4,7 +4,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
-#include "tests/simulate.h"
 #include "algorithm.h"
 #include "analysis.h"
 #include "temporal_network.h"

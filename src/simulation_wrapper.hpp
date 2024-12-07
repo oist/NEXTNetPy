@@ -19,12 +19,12 @@ namespace py = pybind11;
 std::tuple<std::vector<double>, std::vector<int>> simulate(network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 std::tuple<std::vector<double>, std::vector<int>> simulate(py::object network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed);
 
-std::tuple<std::vector<double>, std::vector<double>> simulate_on_temporal(temporal_network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT, int seed,int initial_infected,int size,bool trim,bool verbose,double t0);
-std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations,bool SIR);
+//simulate_on_activity_average disables because it depends on average_trajectories which
+//is only meant for unit tests and doesn't work with the bundled boost
+//std::tuple<std::vector<double>, std::vector<double>> simulate_on_activity_average(std::vector<double>& activity_rates, double inactivation_rate,double eta, int m, double beta, double mu,double TMAX,int seed,int initial_infected,double t0,int nb_simulations,bool SIR);
 
 // Wrapper to run a simulate given a network and transmission distribution
 std::tuple<std::vector<double>, std::vector<double>> simulate_average(py::object network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES);
-std::tuple<std::vector<double>, std::vector<double>> run_simulation_average(network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES);
 
 
 // Wrapper to run a simulation given a network and transmission distribution

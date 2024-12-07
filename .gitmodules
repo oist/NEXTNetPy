@@ -5,3 +5,15 @@
 [submodule "extern/NEXTNet"]
 	path = extern/NEXTNet
 	url = https://github.com/oist/NEXTNet.git
+[submodule "extern/epidemics"]
+	path = extern/epidemics
+	url = git@github.com:samuelcure/Epidemics-On-Networks.git
+[submodule "extern/boost-core"]
+	path = extern/boost-core
+	url = git@github.com:boostorg/core.git
+[submodule "extern/boost-utility"]
+	path = extern/boost-utility
+	url = git@github.com:boostorg/utility.git
+[submodule "extern/boost-math"]
+	path = extern/boost-math
+	url = git@github.com:boostorg/math.git
