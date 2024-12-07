@@ -7,15 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # *** Simulation library sources and headers
 set(LIB_SOURCES
-    extern/epidemics/epidemics/graph.cpp
-    extern/epidemics/epidemics/dynamic_graph.cpp
-    extern/epidemics/epidemics/algorithm.cpp
-    extern/epidemics/epidemics/random.cpp
-    extern/epidemics/epidemics/NextReaction.cpp
-    extern/epidemics/epidemics/NextReactionMeanField.cpp
-    extern/epidemics/epidemics/nMGA.cpp
-    extern/epidemics/epidemics/REGIR.cpp
-    extern/epidemics/epidemics/utility.cpp)
+    extern/NEXTNet/nextnet/network.cpp
+    extern/NEXTNet/nextnet/temporal_network.cpp
+    extern/NEXTNet/nextnet/algorithm.cpp
+    extern/NEXTNet/nextnet/random.cpp
+    extern/NEXTNet/nextnet/NextReaction.cpp
+    extern/NEXTNet/nextnet/NextReactionMeanField.cpp
+    extern/NEXTNet/nextnet/nMGA.cpp
+    extern/NEXTNet/nextnet/REGIR.cpp
+    extern/NEXTNet/nextnet/utility.cpp)
 
 set(PY_SOURCES
     src/binding.cpp
@@ -23,8 +23,7 @@ set(PY_SOURCES
     src/simulation_wrapper.cpp
     src/tools.cpp)
 
-# include_directories(extern/epidemics/epidemics)
-include_directories(AFTER SYSTEM extern/epidemics/epidemics extern/epidemics/ext/dyndist)
+include_directories(AFTER SYSTEM extern/NEXTNet/nextnet extern/NEXTNet/ext/dyndist)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 message(STATUS "Found Python version: ${Python3_VERSION}")
@@ -38,5 +37,3 @@ link_libraries(Boost::boost)
 find_package(TBB REQUIRED)
 target_link_libraries(nextnet PRIVATE TBB::tbb)
 include_directories(${Boost_INCLUDE_DIRS})
-
-

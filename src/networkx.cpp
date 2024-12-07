@@ -4,7 +4,7 @@
 
 namespace py = pybind11;
 
-// Wrapper to convert a python networkx graph to our c++ graph object.
+// Wrapper to convert a python networkx network to our c++ network object.
 networkx::networkx(py::list py_list){
 
     for (auto row : py_list) {
@@ -17,14 +17,14 @@ networkx::networkx(py::list py_list){
 
 }
 
-    // OR Initialise graph with networkx graph
-networkx::networkx(py::object graph){
+    // OR Initialise network with networkx network
+networkx::networkx(py::object network){
 
-    int SIZE = py::int_( graph.attr("number_of_nodes")() );
+    int SIZE = py::int_( network.attr("number_of_nodes")() );
 
     adjacencylist.resize(SIZE);
     for (int i = 0; i < SIZE; i++) {
-        py::iterator it = graph.attr("neighbors")(i);
+        py::iterator it = network.attr("neighbors")(i);
         while(it != py::iterator::sentinel()){
             const int j = py::cast<int>(*it);
             adjacencylist[i].push_back(j);
@@ -33,7 +33,7 @@ networkx::networkx(py::object graph){
     }
 }
 
-py::object graph_ER_correlated(int size,double mean,double r,int seed){
+py::object network_ER_correlated(int size,double mean,double r,int seed){
     rng_t engine;
     engine.seed(seed);
     // py::print("creating network...\r",py::arg("end") = "");
@@ -59,20 +59,20 @@ py::object graph_ER_correlated(int size,double mean,double r,int seed){
 		}
 	}
 
-    // convert to networkx graph object
+    // convert to networkx network object
     py::object networkx = py::module::import("networkx");
-    py::object G = networkx.attr("Graph")();
-    // Add all edges to the graph at once
+    py::object G = networkx.attr("network")();
+    // Add all edges to the network at once
     G.attr("add_edges_from")(py_edges);
 
     return G;
 
 }
 
-py::object graph_ER_clustered(int size,double p,double alpha,double beta,int seed){
+py::object network_ER_clustered(int size,double p,double alpha,double beta,int seed){
     rng_t engine(seed);
 
-    // Generate a Poisson graph with the configuration model
+    // Generate a Poisson network with the configuration model
     std::poisson_distribution<> poisson((double) size * p);
     std::vector<int> degrees(size,0);
     std::size_t total_degree = 0;
@@ -83,7 +83,7 @@ py::object graph_ER_clustered(int size,double p,double alpha,double beta,int see
         total_degree += k;
     }
 
-    // make sure the total degree is even, otherwise no graph can exist
+    // make sure the total degree is even, otherwise no network can exist
     while (total_degree % 2 == 1) {
         // re-generate a random degree
         const std::size_t i = std::uniform_int_distribution<>(0, size-1)(engine);
@@ -114,16 +114,16 @@ py::object graph_ER_clustered(int size,double p,double alpha,double beta,int see
 
     // return edges;
 
-    // convert to networkx graph object
+    // convert to networkx network object
     py::object networkx = py::module::import("networkx");
-    py::object G = networkx.attr("Graph")();
-    // Add all edges to the graph at once
+    py::object G = networkx.attr("network")();
+    // Add all edges to the network at once
     G.attr("add_edges_from")(py_edges);
 
     return G;
 }
 
-py::object graph_LOG_CM(int size,double mean,double variance,double r, int seed){
+py::object network_LOG_CM(int size,double mean,double variance,double r, int seed){
     rng_t engine;
     engine.seed(seed);
     py::print("creating network...\r",py::arg("end") = "");
@@ -153,17 +153,17 @@ py::object graph_LOG_CM(int size,double mean,double variance,double r, int seed)
 
     // return edges;
 
-    // convert to networkx graph object
+    // convert to networkx network object
     py::object networkx = py::module::import("networkx");
-    py::object G = networkx.attr("Graph")();
-    // Add all edges to the graph at once
+    py::object G = networkx.attr("network")();
+    // Add all edges to the network at once
     G.attr("add_edges_from")(py_edges);
 
     return G;
 
 }
 
-py::object graph_LOG_clustered(int size,double mean,double variance,double alpha,double beta,int seed){
+py::object network_LOG_clustered(int size,double mean,double variance,double alpha,double beta,int seed){
     rng_t engine(seed);
 
     std::vector<int> degrees = lognormal_degree_list(mean,variance,size,engine);
@@ -191,10 +191,10 @@ py::object graph_LOG_clustered(int size,double mean,double variance,double alpha
 
     // return edges;
 
-    // convert to networkx graph object
+    // convert to networkx network object
     py::object networkx = py::module::import("networkx");
-    py::object G = networkx.attr("Graph")();
-    // Add all edges to the graph at once
+    py::object G = networkx.attr("network")();
+    // Add all edges to the network at once
     G.attr("add_edges_from")(py_edges);
 
     return G;

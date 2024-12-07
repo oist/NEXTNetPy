@@ -8,7 +8,7 @@
 #include "random.h"
 #include "analysis.h"
 #include "NextReaction.h"
-#include "dynamic_graph.h"
+#include "temporal_network.h"
 
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
@@ -18,10 +18,10 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(nextnet, handle) {
 
-    handle.doc() = "nextnet module to efficiently simulate an epidemic on any networkx graph, custom graph, or temporal graph.";
+    handle.doc() = "nextnet module to efficiently simulate an epidemic on any networkx network, custom network, or temporal network.";
 
     handle.def("simulation_discrete",&simulation_discrete,
-        py::arg("graph"),
+        py::arg("network"),
         py::arg("nb_simulations")=1,
         py::arg("seed")=1,
         py::arg("verbose")=false,
@@ -29,8 +29,8 @@ PYBIND11_MODULE(nextnet, handle) {
     );
     
     handle.def("simulate", 
-        py::overload_cast<graph&, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
-        py::arg("graph"),
+        py::overload_cast<network&, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
+        py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
@@ -43,7 +43,7 @@ PYBIND11_MODULE(nextnet, handle) {
 
     handle.def("simulate", 
         py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
-        py::arg("graph"),
+        py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
@@ -55,8 +55,8 @@ PYBIND11_MODULE(nextnet, handle) {
     );
 
     handle.def("simulate_average",
-        py::overload_cast<graph&, transmission_time&, transmission_time*,bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
-        py::arg("graph"),
+        py::overload_cast<network&, transmission_time&, transmission_time*,bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
+        py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
@@ -68,12 +68,12 @@ PYBIND11_MODULE(nextnet, handle) {
         py::arg("trim")=true,
         py::arg("verbose")=false,
         py::arg("all_nodes")=false,
-        "Simulate average trajectory for custom nextnet graph object"
+        "Simulate average trajectory for custom nextnet network object"
     );
 
     handle.def("simulate_average",
         py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&simulate_average), 
-        py::arg("graph"),
+        py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
@@ -85,7 +85,7 @@ PYBIND11_MODULE(nextnet, handle) {
         py::arg("trim")=true,
         py::arg("verbose")=false,
         py::arg("all_nodes")=false,
-        "Simulate average trajectory on a networkx graph"
+        "Simulate average trajectory on a networkx network"
     );
 
     handle.def("simulate_on_activity_driven",&simulate_on_activity_average,
@@ -107,8 +107,8 @@ PYBIND11_MODULE(nextnet, handle) {
 
 
     handle.def("simulate_on_temporal",
-        py::overload_cast<dynamic_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,bool,bool,double>(&simulate_on_temporal),
-        py::arg("temporal_graph"),
+        py::overload_cast<temporal_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,bool,bool,double>(&simulate_on_temporal),
+        py::arg("temporal_network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
@@ -124,10 +124,10 @@ PYBIND11_MODULE(nextnet, handle) {
     );
 
     /*---------------------------*/
-    /* Graphs that are clustered */
+    /* networks that are clustered */
     /*---------------------------*/
 
-    handle.def("graph_ER_clustered",&graph_ER_clustered,
+    handle.def("network_ER_clustered",&network_ER_clustered,
         py::arg("size"),
         py::arg("p"),
         py::arg("alpha"),
@@ -136,7 +136,7 @@ PYBIND11_MODULE(nextnet, handle) {
         ""
     );
 
-    handle.def("graph_LOG_clustered",&graph_LOG_clustered,
+    handle.def("network_LOG_clustered",&network_LOG_clustered,
         py::arg("size"),
         py::arg("mean"),
         py::arg("variance"),
@@ -146,7 +146,7 @@ PYBIND11_MODULE(nextnet, handle) {
         ""
     );
 
-    handle.def("graph_LOG_CM",&graph_LOG_CM,
+    handle.def("network_LOG_CM",&network_LOG_CM,
         py::arg("size"),
         py::arg("mean"),
         py::arg("variance"),
@@ -155,7 +155,7 @@ PYBIND11_MODULE(nextnet, handle) {
         ""
     );
 
-    handle.def("graph_ER_correlated",&graph_ER_correlated,
+    handle.def("network_ER_correlated",&network_ER_correlated,
         py::arg("size"),
         py::arg("mean"),
         py::arg("r")=0,
@@ -170,12 +170,12 @@ PYBIND11_MODULE(nextnet, handle) {
     
     
     handle.def("degree_clustering_coefficient",&degree_clustering_coefficient,
-        py::arg("graph"),
+        py::arg("network"),
         "computes the average clustering coefficient for nodes of degree k"
     );
 
     handle.def("connectivity_matrix",&connectivity_matrix,
-        py::arg("graph"),
+        py::arg("network"),
         py::arg("clustering")=0,
         ""
     );
@@ -191,17 +191,17 @@ PYBIND11_MODULE(nextnet, handle) {
         ""
         );
       
-    py::class_<graph>(handle, "graph", py::multiple_inheritance())
-        .def("nodes", &graph::nodes)
-        .def("neighbour", &graph::neighbour)
-        .def("outdegree", &graph::outdegree);
+    py::class_<network>(handle, "network", py::multiple_inheritance())
+        .def("nodes", &network::nodes)
+        .def("neighbour", &network::neighbour)
+        .def("outdegree", &network::outdegree);
 
-    py::class_<dynamic_network>(handle, "dynamic_graph", py::multiple_inheritance())
-        .def("next", &dynamic_network::next)
-        .def("step", &dynamic_network::step)
-        .def("notify_epidemic_event", &dynamic_network::notify_epidemic_event);
+    py::class_<temporal_network>(handle, "temporal_network", py::multiple_inheritance())
+        .def("next", &temporal_network::next)
+        .def("step", &temporal_network::step)
+        .def("notify_epidemic_event", &temporal_network::notify_epidemic_event);
 
-//     struct dynamic_network : public virtual graph {
+//     struct temporal_network : public virtual network {
 // 	virtual absolutetime_t next(rng_t& engine) = 0;
 
 // 	virtual std::optional<network_event_t> step(rng_t& engine, absolutetime_t max_time = NAN) = 0;
@@ -210,36 +210,36 @@ PYBIND11_MODULE(nextnet, handle) {
 // };
 
     
-    // py::class_<graph_adjacencylist, graph>(handle, "graph_adjacencylist", py::multiple_inheritance())
-    //     .def_readonly("adjacencylist", &graph_adjacencylist::adjacencylist, py::return_value_policy::reference_internal)
+    // py::class_<adjacencylist_network, network>(handle, "adjacencylist_network", py::multiple_inheritance())
+    //     .def_readonly("adjacencylist", &adjacencylist_network::adjacencylist, py::return_value_policy::reference_internal)
     //     .def("al_len", &al_len);    
 
 
-    // int al_len(graph_adjacencylist* al) {
+    // int al_len(adjacencylist_network* al) {
     //     return al->adjacencylist.size();
     // }
 
 
-    py::class_<graph_adjacencylist, graph>(handle, "graph_adjacencylist", py::multiple_inheritance())
-        .def_readonly("adjacencylist", &graph_adjacencylist::adjacencylist, py::return_value_policy::reference_internal)
-        .def("al_len", [](const graph_adjacencylist* al) {
+    py::class_<adjacencylist_network, network>(handle, "adjacencylist_network", py::multiple_inheritance())
+        .def_readonly("adjacencylist", &adjacencylist_network::adjacencylist, py::return_value_policy::reference_internal)
+        .def("al_len", [](const adjacencylist_network* al) {
             return al->adjacencylist.size();
         });
 
-    py::class_<watts_strogatz,graph_adjacencylist>(handle, "watts_strogatz", py::multiple_inheritance())
+    py::class_<watts_strogatz,adjacencylist_network>(handle, "watts_strogatz", py::multiple_inheritance())
         .def(py::init<node_t, int,double,rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"),py::arg("rng"),
         "");
 
-    py::class_<erdos_reyni,graph_adjacencylist>(handle, "erdos_reyni", py::multiple_inheritance())
+    py::class_<erdos_reyni,adjacencylist_network>(handle, "erdos_reyni", py::multiple_inheritance())
         .def(py::init<int,double,rng_t&>(), py::arg("size"), py::arg("average_degree"),py::arg("rng"),
         "");
 
-    py::class_<barabasi_albert,graph_adjacencylist>(handle, "barabasi_albert", py::multiple_inheritance())
+    py::class_<barabasi_albert,adjacencylist_network>(handle, "barabasi_albert", py::multiple_inheritance())
         .def(py::init<int,rng_t&,int>(), py::arg("size"),py::arg("rng"),py::arg("m")=1,
         "");
 
 
-    py::class_<activity_driven_network,dynamic_network>(handle, "activity_driven_graph", py::multiple_inheritance())
+    py::class_<activity_driven_network,temporal_network>(handle, "activity_driven_network", py::multiple_inheritance())
         .def(py::init<std::vector<double>,double,double,double,rng_t&>(), py::arg("activity_rates"),py::arg("eta"),py::arg("m")=1,py::arg("recovery_rate"),py::arg("rng"),
         "initialise instance of an activity-driven network")
         .def("advance_time", 
@@ -247,22 +247,22 @@ PYBIND11_MODULE(nextnet, handle) {
          py::arg("engine"), py::arg("max_time") = std::numeric_limits<double>::quiet_NaN(),
          "Simulate the network until equilibrium in the average degree is reached or the specified max_time.");
 
-    py::class_<dynamic_sirx_network,dynamic_network>(handle, "dynamic_sirx_network", py::multiple_inheritance())
-        .def(py::init<graph&, double,double>(), py::arg("graph"),py::arg("kappa0"),py::arg("kappa"),
+    py::class_<temporal_sirx_network,temporal_network>(handle, "temporal_sirx_network", py::multiple_inheritance())
+        .def(py::init<network&, double,double>(), py::arg("network"),py::arg("kappa0"),py::arg("kappa"),
         "");
 
-//  dynamic_sirx_network : public virtual dynamic_network
+//  temporal_sirx_network : public virtual temporal_network
 
-    py::class_<dynamic_empirical_network, dynamic_network>(handle, "temporal_empirical_graph", py::multiple_inheritance())
+    py::class_<empirical_temporal_network, temporal_network>(handle, "empirical_temporal_network", py::multiple_inheritance())
         .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
             // Map the bool to the appropriate enum value
-            dynamic_empirical_network::edge_duration_kind contact_type = 
-                is_finite_duration ? dynamic_empirical_network::finite_duration : dynamic_empirical_network::infitesimal_duration;
+            empirical_temporal_network::edge_duration_kind contact_type = 
+                is_finite_duration ? empirical_temporal_network::finite_duration : empirical_temporal_network::infitesimal_duration;
             
-            return new dynamic_empirical_network(path_to_file, contact_type, dt);
+            return new empirical_temporal_network(path_to_file, contact_type, dt);
         }));
 
-    py::class_<networkx, graph>(handle, "graph_networkx", py::multiple_inheritance())
+    py::class_<networkx, network>(handle, "network_networkx", py::multiple_inheritance())
         .def(py::init<py::list>())
         .def(py::init<py::object>());
     

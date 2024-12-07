@@ -16,22 +16,24 @@ requires-python = ">=3.6"
 license = { text = "MIT" }
 authors = [
     { name = "Samuel Cure", email = "samuel.cure@oist.jp" },
-    { name = "Florian Pflug"}
+    { name = "Florian Pflug" }
 ]
 
 dependencies = [
     "cmake",
     "boost",
     "build",
+    "numpy",
+    "networkx",
+    "tqdm",
 ]
 
 [tool.scikit-build]
 cmake.source-dir = "."
 cmake.build-type = "Release"
 
-
 [tool.scikit-build-core.cmake]
-source-dir = "."  # CMakeLists.txt is located in the parent directory
+source-dir = "."
 define = [
     "CMAKE_BUILD_TYPE=Release"
 ]
@@ -50,6 +52,6 @@ include = [
 packages = ["nextnet"]
 
 [tool.setuptools.package-data]
-nmepinet = [
+nextnet = [
     "extern/epidemics/**",
 ]

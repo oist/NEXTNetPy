@@ -2,6 +2,6 @@
 	path = extern/pybind11
 	url = ../../pybind/pybind11
 	branch = stable
-[submodule "extern/epidemics"]
-	path = extern/epidemics
-	url = git@github.com:samuelcure/Epidemics-On-Networks.git
+[submodule "extern/NEXTNet"]
+	path = extern/NEXTNet
+	url = https://github.com/oist/NEXTNet.git

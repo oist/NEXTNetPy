@@ -10,53 +10,13 @@
 namespace py=pybind11;
 
 
-void export_dot(py::object graph, std::string filename, bool directed);
+void export_dot(py::object network, std::string filename, bool directed);
 
+std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double> connectivity_matrix(py::object network,int clustering=3);
 
-//----------------------------------------------------------
-//---Measure nearest neighbour multiplicity in a network----
-//----------------------------------------------------------
-// std::tuple<std::vector<double>,std::vector<double>,std::vector<std::vector<std::vector<double>>>> neighbours_multiplicity(py::object graph);
-std::vector<double> neighbours_multiplicity(py::object graph);
-std::vector<std::vector<double>> edge_multiplicity2(py::object graph);
-std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,double,double,double,double> connectivity_matrix(py::object graph,int clustering=0);
+std::vector<double> degree_clustering_coefficient(py::object network);
 
-std::vector<double> mu(py::object graph,bool clustering=false);
-
-std::vector<double> degree_clustering_coefficient(py::object graph);
-
-std::tuple<std::vector<double>,std::vector<double>> generalised_knn(int SIZE, int SIM,int POWER, int seed);
-
-std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> depleted_distribution(int SIZE, int SIM, int seed);
-
-
-std::tuple<std::vector<std::vector<double>>,std::vector<std::vector<double>>> knn_pk(int SIZE, int SIM, int seed);
-
-std::vector<double> analyse_leaves(std::vector<node_t>& leaves,graph_adjacencylist& nw, simulate_next_reaction* simulate, int kmax );
-
-std::vector<double> knn_depleted(graph_adjacencylist& nw, simulate_next_reaction* simulate=nullptr);
-double assortativity_depleted(std::vector<node_t>& leaves,graph_adjacencylist& network, simulate_next_reaction* simulate = nullptr);
-
-/**
- * @brief measure the average time taken to simulate an epidemic on a network ensemble.
- */
-std::tuple<std::vector<int>,std::vector<double>, std::vector<double>> run_benchmark(std::string ensemble, std::string method, transmission_time_gamma psi, transmission_time_gamma* rho= nullptr,bool SIR= true, int MAX_POWER = 21, int NB_SIM = 500, double TMAX = 1000, bool EDGES_CONCURRENT= false,int INITIAL_INFECTED = 1, int seed = 1);
-
-
-std::vector<double> euler_lotka_growth_rate(py::object graph,transmission_time_gamma psi);
-
-
-/**
- * @brief Function that returns the empirical degree distribution of the susceptible nodes at different stages of the epidemic.
- * 
- * 
- */
-std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> depletion(py::object graph,const std::vector<double>& freq = {0.1,0.25,0.5,0.75,0.9},int seed = 1);
-
-
-void save_grid(std::vector<std::vector<int>>& grid, std::string filename);
-
-/**simulate_next_reaction simulation(graph, psi,rho,SHUFFLE_NEIGHBOURS,EDGES_CONCURRENT,SIR);
+/*
  * @brief Type of network ensemble
  */
 enum class network_ensemble : unsigned int {
