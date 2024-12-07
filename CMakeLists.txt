@@ -27,8 +27,8 @@ include_directories(AFTER SYSTEM
 	extern/boost-core/include
 	extern/boost-math/include
 	extern/boost-utility/include
-	extern/epidemics/epidemics
-	extern/epidemics/ext/dyndist)
+	extern/NEXTNet/nextnet
+	extern/NEXTNet/ext/dyndist)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 message(STATUS "Found Python version: ${Python3_VERSION}")
@@ -37,3 +37,6 @@ message("Including pybind11 as a submodule")
 add_subdirectory(extern/pybind11)
 pybind11_add_module(nextnet ${LIB_SOURCES} ${PY_SOURCES})
 set_target_properties(nextnet PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/nextnet)
+# TBB needed for me
+find_package(TBB REQUIRED)
+target_link_libraries(nextnet PRIVATE TBB::tbb)
