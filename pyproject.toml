@@ -9,8 +9,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "nextnet"  # Replace with your desired project name
-version = "0.1.0"
-description = "A Python binding for a C++ project using pybind11"
+version = "0.2.0"
+description = "A Python binding to simulate in C++ epidemics on random networks."
 readme = "README.md"
 requires-python = ">=3.6"
 license = { text = "MIT" }
