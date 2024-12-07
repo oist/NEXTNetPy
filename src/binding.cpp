@@ -19,14 +19,6 @@ namespace py = pybind11;
 PYBIND11_MODULE(nextnet, handle) {
 
     handle.doc() = "nextnet module to efficiently simulate an epidemic on any networkx network, custom network, or temporal network.";
-
-    handle.def("simulation_discrete",&simulation_discrete,
-        py::arg("network"),
-        py::arg("nb_simulations")=1,
-        py::arg("seed")=1,
-        py::arg("verbose")=false,
-        "returns a vector of vectors (N x kmax) of the number of newly infected with degree k at each discrete step"
-    );
     
     handle.def("simulate", 
         py::overload_cast<network&, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
@@ -54,22 +46,22 @@ PYBIND11_MODULE(nextnet, handle) {
         ""
     );
 
-    handle.def("simulate_average",
-        py::overload_cast<network&, transmission_time&, transmission_time*,bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
-        py::arg("network"),
-        py::arg("infection_time"),
-        py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=true,
-        py::arg("initial_infected")=1,
-        py::arg("seed")=0, 
-        py::arg("nb_simulations")=1,
-        py::arg("trim")=true,
-        py::arg("verbose")=false,
-        py::arg("all_nodes")=false,
-        "Simulate average trajectory for custom nextnet network object"
-    );
+    // handle.def("simulate_average",
+    //     py::overload_cast<network&, transmission_time&, transmission_time*,bool, double, bool, int, int,int,bool,bool,bool>(&run_simulation_average), 
+    //     py::arg("network"),
+    //     py::arg("infection_time"),
+    //     py::arg("recovery_time")=nullptr,
+    //     py::arg("SIR")=true,
+    //     py::arg("TMAX")=1000,
+    //     py::arg("concurrent_edges")=true,
+    //     py::arg("initial_infected")=1,
+    //     py::arg("seed")=0, 
+    //     py::arg("nb_simulations")=1,
+    //     py::arg("trim")=true,
+    //     py::arg("verbose")=false,
+    //     py::arg("all_nodes")=false,
+    //     "Simulate average trajectory for custom nextnet network object"
+    // );
 
     handle.def("simulate_average",
         py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&simulate_average), 
@@ -108,22 +100,6 @@ PYBIND11_MODULE(nextnet, handle) {
     );
 #endif
 
-    handle.def("simulate_on_temporal",
-        py::overload_cast<temporal_network&, transmission_time&, transmission_time*, bool, double, bool, int,int,int,bool,bool,double>(&simulate_on_temporal),
-        py::arg("temporal_network"),
-        py::arg("infection_time"),
-        py::arg("recovery_time")=nullptr,
-        py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
-        py::arg("concurrent_edges")=true,
-        py::arg("seed")=0,
-        py::arg("initial_infected")=1,
-        py::arg("network_size")=1,
-        py::arg("trim")=true,
-        py::arg("verbose")=false,
-        py::arg("t0")=0,
-        ""
-    );
 
     /*---------------------------*/
     /* networks that are clustered */
