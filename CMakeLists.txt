@@ -25,6 +25,9 @@ set(PY_SOURCES
 
 include_directories(AFTER SYSTEM
 	extern/boost-core/include
+	extern/boost-config/include
+	extern/boost-range/include
+	extern/boost-lexical_cast/include
 	extern/boost-math/include
 	extern/boost-utility/include
 	extern/NEXTNet/nextnet

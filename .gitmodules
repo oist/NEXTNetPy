@@ -4,7 +4,7 @@
 	branch = stable
 [submodule "extern/NEXTNet"]
 	path = extern/NEXTNet
-	url = https://github.com/oist/NEXTNet.git
+	url = git@github.com:oist/NEXTNet.git
 [submodule "extern/epidemics"]
 	path = extern/epidemics
 	url = git@github.com:samuelcure/Epidemics-On-Networks.git
@@ -17,3 +17,12 @@
 [submodule "extern/boost-math"]
 	path = extern/boost-math
 	url = git@github.com:boostorg/math.git
+[submodule "extern/boost-config"]
+	path = extern/boost-config
+	url = git@github.com:boostorg/config.git
+[submodule "extern/boost-range"]
+	path = extern/boost-range
+	url = git@github.com:boostorg/range.git
+[submodule "extern/boost-lexical_cast"]
+	path = extern/boost-lexical_cast
+	url = git@github.com:boostorg/lexical_cast.git
