@@ -8,15 +8,15 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "nextnet"  # Replace with your desired project name
+name = "nextnet" 
 version = "0.2.0"
-description = "A Python binding to simulate in C++ epidemics on random networks."
+description = "Python bindings for NEXT-NET, a simulator of epidemics on complex networks."
 readme = "README.md"
-requires-python = ">=3.6"
-license = { text = "MIT" }
+requires-python = ">=3.7"
+license = { text = "LGPLv3" }
 authors = [
     { name = "Samuel Cure", email = "samuel.cure@oist.jp" },
-    { name = "Florian Pflug" }
+    { name = "Florian Pflug"  }
 ]
 dependencies = [
     "numpy",
@@ -35,22 +35,17 @@ define = [
 ]
 
 [tool.scikit-build-core.msdist]
-# Include additional files in source distributions
 include = [
     "README.md",
-    "LICENSE",
+    "COPYING",
     "src/**",
     "extern/pybind11/include",
     "extern/NEXTNet/nextnet/*",
     "extern/NEXTNet/ext/dyndist/dyndist/*",
+    "extern/NEXTNet/ext/prio_queue/prio_queue.hpp",
     "extern/boost-*/include/**",
     "CMakeLists.txt"
 ]
 
 [tool.setuptools]
 packages = ["nextnet"]
-
-[tool.setuptools.package-data]
-nextnet = [
-    "extern/epidemics/**",
-]
