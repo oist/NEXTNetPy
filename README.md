@@ -4,12 +4,24 @@
 
 ## Set up
 
+### From Release
 Download the latest release and in a new terminal window run:
 
-```
+```bash
 pip install nextnet-0.2.0.tar.gz
 ```
+### From Source
 
+In a new terminal window run:
+```bash
+#Download the repository
+git clone git@github.com:oist/NEXTNetPy.git
+cd NEXTNetPy
+# Download the required dependencies (boost, pybind11)
+git submodule update --init --recursive
+# install the python package
+pip install .
+```
 
 ## How to use
 
