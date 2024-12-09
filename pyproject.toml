@@ -40,7 +40,10 @@ include = [
     "README.md",
     "LICENSE",
     "src/**",
-    "extern/**",
+    "extern/pybind11/include",
+    "extern/NEXTNet/nextnet/*",
+    "extern/NEXTNet/ext/dyndist/dyndist/*",
+    "extern/boost-*/include/**",
     "CMakeLists.txt"
 ]
 
