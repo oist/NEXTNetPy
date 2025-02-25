@@ -16,7 +16,76 @@
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
 
-std::tuple<std::vector<double>, std::vector<int>> simulate(network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
+std::vector<std::tuple<double, int, int, int>> simulate(py::object py_nw,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
+
+    rng_t engine;
+    engine.seed(seed);
+
+    networkx nw(py_nw);
+
+    const int SIZE = (int) nw.adjacencylist.size();
+
+    bool SHUFFLE_NEIGHBOURS;
+    if (EDGES_CONCURRENT || SIR)
+        SHUFFLE_NEIGHBOURS=false;
+    else 
+        SHUFFLE_NEIGHBOURS = true;
+
+
+    simulate_next_reaction::params p;
+    p.shuffle_neighbours = SHUFFLE_NEIGHBOURS;
+    p.edges_concurrent = EDGES_CONCURRENT;
+    p.SIR = SIR;
+    simulate_next_reaction simulation(nw, psi,rho,p);
+
+
+
+    std::vector<std::tuple<double, int, int, int>> trajectory;
+
+    std::uniform_int_distribution<> uniform_node_distribution(0, SIZE-1);
+
+    std::unordered_set<node_t> selected_nodes;
+    for (node_t i = 0; i < INITIAL_INFECTED; i++)
+    {
+        const node_t random_node = uniform_node_distribution(engine);
+        // sample without replacement:
+        if (selected_nodes.find(random_node) != selected_nodes.end()){
+            i--;
+            continue;
+        }
+        simulation.add_infections({ std::make_pair(random_node, 0)});
+        selected_nodes.insert(random_node);
+    }
+    
+    int current_number_infected = 0;
+                        
+    while (true) {
+        auto point = simulation.step(engine);
+        if (!point )
+            break;
+
+        int event_type = 0;
+        switch (point->kind) {
+            case epidemic_event_kind::outside_infection:
+            case epidemic_event_kind::infection:
+                current_number_infected++;
+                break;
+            case epidemic_event_kind::reset:
+                current_number_infected--;
+                event_type = 1;
+                break;
+            default:
+                break;
+        }
+        if (current_number_infected<=0 || point->time > TMAX)
+            break;
+        trajectory.emplace_back(point->time,point->node,point->source_node,event_type);
+    }
+    return trajectory;
+}
+
+
+std::tuple<std::vector<double>, std::vector<int>> simulate_single_trajectory(network& network,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
     
     rng_t engine;
     engine.seed(seed);
@@ -80,7 +149,7 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(network& network,tran
     return std::make_tuple(time_trajectory, infected_trajectory);
 }
 
-std::tuple<std::vector<double>, std::vector<int>> simulate(py::object py_nw,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
+std::tuple<std::vector<double>, std::vector<int>> simulate_single_trajectory(py::object py_nw,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed){
 
     rng_t engine;
     engine.seed(seed);
@@ -146,7 +215,7 @@ std::tuple<std::vector<double>, std::vector<int>> simulate(py::object py_nw,tran
     return std::make_tuple(time_trajectory, infected_trajectory);
 }
 
-std::tuple<std::vector<double>, std::vector<double>> simulate_average(py::object py_nw,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES){
+std::tuple<std::vector<double>, std::vector<double>> simulate_average_trajectory(py::object py_nw,transmission_time& psi, transmission_time* rho, bool SIR,double TMAX, bool EDGES_CONCURRENT,int INITIAL_INFECTED, int seed, int NB_SIMULATIONS, bool TRIM,bool VERBOSE, bool ALL_NODES){
     
     rng_t engine;
     engine.seed(seed);
