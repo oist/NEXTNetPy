@@ -21,7 +21,39 @@ PYBIND11_MODULE(nextnet, handle) {
     handle.doc() = "nextnet module to efficiently simulate an epidemic on any networkx network, custom network, or temporal network.";
 
     handle.def("simulate", 
-        py::overload_cast<network&, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
+        py::arg("network"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0,
+        R"(
+        Simulate the epidemic spread on a NetworkX-based network.
+
+        Returns a list of [infection_time, infected_node,source_node, bool(is_recovery)]
+
+        Args:
+            network (networkx graph): The NetworkX structure on which the simulation will run.
+            infection_time (transmission_time): The time an individual stays infected before recovering.
+            recovery_time (transmission_time*, optional): The time an individual stays in recovery (default: NULL).
+            SIR (bool, optional): If TRUE, the SIR model is used; otherwise, a custom model is used (default: TRUE).
+            tmax (double, optional): The maximum simulation time (default: 1000).
+            concurrent_edges (bool, optional): If TRUE, concurrent edges are allowed in the simulation (default: TRUE).
+            initial_infected (int, optional): The number of initially infected individuals (default: 1).
+            seed (int, optional): The random seed to ensure reproducibility (default: 0).
+
+        Returns:
+            list: A list of infection times for each infected individual.
+            list: A list of the number of infected individuals at each time step.
+        )"
+    );
+
+
+    handle.def("simulate_trajectory", 
+        py::overload_cast<network&, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate_single_trajectory),
         py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -56,8 +88,8 @@ PYBIND11_MODULE(nextnet, handle) {
         )"
     );
 
-    handle.def("simulate", 
-        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate),
+    handle.def("simulate_trajectory", 
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int>(&simulate_single_trajectory),
         py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
@@ -91,13 +123,13 @@ PYBIND11_MODULE(nextnet, handle) {
         )"
     );
 
-    handle.def("simulate_average",
-        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int, int, bool, bool, bool>(&simulate_average), 
+    handle.def("simulate_average_trajectory",
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int, int, bool, bool, bool>(&simulate_average_trajectory), 
         py::arg("network"),
         py::arg("infection_time"),
         py::arg("recovery_time")=nullptr,
         py::arg("SIR")=true,
-        py::arg("TMAX")=1000,
+        py::arg("TMAX")=300,
         py::arg("concurrent_edges")=true,
         py::arg("initial_infected")=1,
         py::arg("seed")=0, 
@@ -116,7 +148,7 @@ PYBIND11_MODULE(nextnet, handle) {
             infection_time (transmission_time): The time an individual stays infected before recovering.
             recovery_time (transmission_time*, optional): The time an individual stays in recovery (default: NULL).
             SIR (bool, optional): If TRUE, the SIR model is used; otherwise, a custom model is used (default: TRUE).
-            TMAX (double, optional): The maximum simulation time (default: 1000).
+            TMAX (double, optional): The maximum simulation time (default: 300).
             concurrent_edges (bool, optional): If TRUE, concurrent edges are allowed in the simulation (default: TRUE).
             initial_infected (int, optional): The number of initially infected individuals (default: 1).
             seed (int, optional): The random seed to ensure reproducibility (default: 0).
