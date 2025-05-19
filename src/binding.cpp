@@ -307,11 +307,7 @@ PYBIND11_MODULE(nextnet, handle) {
         .def("step", &temporal_network::step)
         .def("notify_epidemic_event", &temporal_network::notify_epidemic_event);
 
-    py::class_<adjacencylist_network, network>(handle, "adjacencylist_network", py::multiple_inheritance())
-        .def_readonly("adjacencylist", &adjacencylist_network::adjacencylist, py::return_value_policy::reference_internal)
-        .def("al_len", [](const adjacencylist_network* al) {
-            return al->adjacencylist.size();
-        });
+    py::class_<adjacencylist_network, network>(handle, "adjacencylist_network", py::multiple_inheritance());
 
     py::class_<watts_strogatz,adjacencylist_network>(handle, "watts_strogatz", py::multiple_inheritance())
         .def(py::init<node_t, int, double, rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"), py::arg("rng"));
