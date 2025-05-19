@@ -314,7 +314,7 @@ PYBIND11_MODULE(nextnet, handle) {
     py::class_<watts_strogatz,adjacencylist_network>(handle, "watts_strogatz", py::multiple_inheritance())
         .def(py::init<node_t, int, double, rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"), py::arg("rng"));
 
-    py::class_<erdos_reyni,adjacencylist_network>(handle, "erdos_reyni", py::multiple_inheritance())
+    py::class_<erdos_renyi,adjacencylist_network>(handle, "erdos_renyi", py::multiple_inheritance())
         .def(py::init<int, double, rng_t&>(), py::arg("size"), py::arg("average_degree"), py::arg("rng"));
 
     py::class_<barabasi_albert,adjacencylist_network>(handle, "barabasi_albert", py::multiple_inheritance())
@@ -324,13 +324,16 @@ PYBIND11_MODULE(nextnet, handle) {
         .def(py::init<std::vector<double>, double, double, double, rng_t&>(), py::arg("activity_rates"), py::arg("eta"), py::arg("m")=1, py::arg("recovery_rate"), py::arg("rng"));
 
     py::class_<temporal_sirx_network,temporal_network>(handle, "temporal_sirx_network", py::multiple_inheritance())
-        .def(py::init<network&, double, double>(), py::arg("network"), py::arg("kappa0"), py::arg("kappa"));
+        .def(py::init<network&, double, double, rng_t&>(), py::arg("network"), py::arg("kappa0"), py::arg("kappa"), py::arg("rng"));
 
-    py::class_<empirical_temporal_network, temporal_network>(handle, "empirical_temporal_network", py::multiple_inheritance())
+    py::class_<empirical_contact_network, temporal_network>(handle, "empirical_contact_network", py::multiple_inheritance())
         .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
-            empirical_temporal_network::edge_duration_kind contact_type = 
-                is_finite_duration ? empirical_temporal_network::finite_duration : empirical_temporal_network::infitesimal_duration;
-            return new empirical_temporal_network(path_to_file, contact_type, dt);
+            empirical_contact_network::edge_duration_kind contact_type = 
+                is_finite_duration ? empirical_contact_network::finite_duration : empirical_contact_network::infitesimal_duration;
+            std::fstream file(path_to_file);
+            if (!file)
+                throw std::runtime_error("failed to open file" + path_to_file);
+            return new empirical_contact_network(file, contact_type, dt);
         }));
 
     py::class_<networkx, network>(handle, "network_networkx", py::multiple_inheritance())
