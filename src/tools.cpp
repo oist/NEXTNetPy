@@ -22,6 +22,8 @@ namespace py=pybind11;
     // export_adjacency_matrix(network.adjacencylist,"/home/sam/Desktop/CLUSTERED/network.dat");
 // }
 
+#if 0
+
 void export_dot(py::object network, std::string filename, bool directed){
 	networkx nw(network);
 
@@ -270,3 +272,4 @@ std::tuple<std::vector<std::vector<double>>,double,double,double,double,double,d
 
 }
 
+#endif

@@ -246,6 +246,7 @@ PYBIND11_MODULE(nextnet, handle) {
         )"
     );
 
+#if 0
     //---------------------------------
     //-----------TOOLS ----------------
     //---------------------------------
@@ -279,6 +280,7 @@ PYBIND11_MODULE(nextnet, handle) {
             matrix: The connectivity matrix of the network.
         )"
     );
+#endif
 
     //---------------------------------
     //---------------------------------

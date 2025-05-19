@@ -33,6 +33,8 @@ networkx::networkx(py::object network){
     }
 }
 
+#if 0
+
 py::object network_ER_correlated(int size,double mean,double r,int seed){
     rng_t engine;
     engine.seed(seed);
@@ -199,3 +201,5 @@ py::object network_LOG_clustered(int size,double mean,double variance,double alp
 
     return G;
 }
+
+#endif
