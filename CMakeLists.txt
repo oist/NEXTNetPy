@@ -26,11 +26,27 @@ set(PY_SOURCES
 include_directories(AFTER SYSTEM
 	extern/boost-core/include
 	extern/boost-config/include
-	extern/boost-range/include
-	extern/boost-lexical_cast/include
-	extern/boost-math/include
 	extern/boost-utility/include
-	extern/NEXTNet/nextnet
+	extern/boost-preprocessor/include
+	extern/boost-mpl/include
+	extern/boost-static_assert/include
+	extern/boost-assert/include
+	extern/boost-type_traits/include
+	extern/boost-move/include
+	extern/boost-throw_exception/include
+	extern/boost-tuple/include
+	extern/boost-bind/include
+	extern/boost-detail/include
+	extern/boost-iterator/include
+	extern/boost-range/include
+	extern/boost-math/include
+	extern/boost-container_hash/include
+	extern/boost-describe/include
+	extern/boost-mp11/include
+	extern/boost-lexical_cast/include
+	extern/boost-multi_index/include
+	extern/NEXTNet
+        extern/NEXTNet/ext
 	extern/NEXTNet/ext/dyndist)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
