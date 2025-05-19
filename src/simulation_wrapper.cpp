@@ -4,15 +4,14 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
-#include "algorithm.h"
-#include "analysis.h"
-#include "temporal_network.h"
-#include "network.h"
-#include "networkx.hpp"
-#include "NextReaction.h"
-#include "random.h"
-#include "REGIR.h"
+#include "nextnet/algorithm.h"
+#include "nextnet/temporal_network.h"
+#include "nextnet/network.h"
+#include "nextnet/NextReaction.h"
+#include "nextnet/REGIR.h"
+#include "nextnet/random.h"
 
+#include "networkx.hpp"
 #include "simulation_wrapper.hpp"
 #include "tools.hpp"
 

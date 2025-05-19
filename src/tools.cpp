@@ -5,15 +5,14 @@
 #include <chrono>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
-#include "stdafx.h"
-#include "random.h"
-#include "tools.hpp"
-#include "NextReaction.h"
-#include "analysis.h"
-#include "networkx.hpp"
-#include "network.h"
-#include "nMGA.h"
 
+#include "nextnet/random.h"
+#include "nextnet/NextReaction.h"
+#include "nextnet/network.h"
+#include "nextnet/nMGA.h"
+
+#include "tools.hpp"
+#include "networkx.hpp"
 
 namespace py=pybind11;
 

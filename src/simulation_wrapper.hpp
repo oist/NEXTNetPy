@@ -2,15 +2,15 @@
 
 #include <iostream>
 #include <numeric>
-#include "random.h"
-#include "analysis.h"
-#include "algorithm.h"
+#include "nextnet/random.h"
+#include "nextnet/algorithm.h"
 
-#include "NextReaction.h"
+#include "nextnet/NextReaction.h"
 // #include "temporal_network.h"
-#include "nMGA.h"
+#include "nextnet/nMGA.h"
+#include "nextnet/REGIR.h"
+
 #include "networkx.hpp"
-#include "REGIR.h"
 
 
 namespace py = pybind11;

@@ -2,9 +2,10 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include "random.h"
-#include "NextReaction.h"
-#include "nMGA.h"
+#include "nextnet/random.h"
+#include "nextnet/NextReaction.h"
+#include "nextnet/nMGA.h"
+
 #include "simulation_wrapper.hpp"
 
 namespace py=pybind11;

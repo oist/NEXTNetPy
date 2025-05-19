@@ -4,11 +4,10 @@
 #include <numeric>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
-#include "stdafx.h"
-#include "random.h"
-#include "analysis.h"
-#include "NextReaction.h"
-#include "temporal_network.h"
+#include "nextnet/stdafx.h"
+#include "nextnet/random.h"
+#include "nextnet/NextReaction.h"
+#include "nextnet/temporal_network.h"
 
 #include "networkx.hpp"
 #include "simulation_wrapper.hpp"
