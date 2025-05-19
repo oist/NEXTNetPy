@@ -40,7 +40,7 @@ std::tuple<std::vector<double>, std::vector<int>> simulate_traj_regir(py::object
 
     networkx nw(py_network);
 
-    const int SIZE = (int) nw.adjacencylist.size();
+    const int SIZE = (int) nw.nodes();
 
     simulate_regir::params p;
 	p.approximation_threshold = INITIAL_INFECTED;

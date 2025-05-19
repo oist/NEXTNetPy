@@ -22,7 +22,7 @@ std::vector<std::tuple<double, int, int, int>> simulate(py::object py_nw,transmi
 
     networkx nw(py_nw);
 
-    const int SIZE = (int) nw.adjacencylist.size();
+    const int SIZE = (int) nw.nodes();
 
     bool SHUFFLE_NEIGHBOURS;
     if (EDGES_CONCURRENT || SIR)
@@ -155,7 +155,7 @@ std::tuple<std::vector<double>, std::vector<int>> simulate_single_trajectory(py:
 
     networkx nw(py_nw);
 
-    const int SIZE = (int) nw.adjacencylist.size();
+    const int SIZE = (int) nw.nodes();
 
     bool SHUFFLE_NEIGHBOURS;
     if (EDGES_CONCURRENT || SIR)
@@ -221,7 +221,7 @@ std::tuple<std::vector<double>, std::vector<double>> simulate_average_trajectory
 
     networkx nw(py_nw);
 
-    const int SIZE = (int) nw.adjacencylist.size();
+    const int SIZE = (int) nw.nodes();
 
     bool SHUFFLE_NEIGHBOURS;
     if (EDGES_CONCURRENT || SIR)

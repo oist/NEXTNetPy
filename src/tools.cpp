@@ -30,7 +30,7 @@ void export_dot(py::object network, std::string filename, bool directed){
 	
 	out << "network {\n";
 
-	const std::size_t n = nw.adjacencylist.size();
+	const std::size_t n = nw.nodes();
 	for(std::size_t i=0; i < n; ++i) {
 		out << i << " -- {";
 		const auto& nn = nw.adjacencylist[i];
