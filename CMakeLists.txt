@@ -19,9 +19,7 @@ set(LIB_SOURCES
 
 set(PY_SOURCES
     src/binding.cpp
-    src/networkx.cpp
-    src/simulation_wrapper.cpp
-    src/tools.cpp)
+    src/networkx.cpp)
 
 include_directories(AFTER SYSTEM
 	extern/boost-core/include

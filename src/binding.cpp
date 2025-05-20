@@ -10,8 +10,6 @@
 #include "nextnet/temporal_network.h"
 
 #include "networkx.hpp"
-#include "simulation_wrapper.hpp"
-#include "tools.hpp"
 
 namespace py = pybind11;
 
