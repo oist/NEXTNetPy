@@ -26,7 +26,7 @@
 [submodule "extern/boost-lexical_cast"]
 	path = extern/boost-lexical_cast
 	url = git@github.com:boostorg/lexical_cast.git
-[submodule "extern/multi_index"]
+[submodule "extern/boost-multi_index"]
 	path = extern/boost-multi_index
 	url = git@github.com:boostorg/multi_index
 [submodule "extern/boost-move"]
