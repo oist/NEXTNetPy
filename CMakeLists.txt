@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(LIB_SOURCES
     extern/NEXTNet/nextnet/network.cpp
     extern/NEXTNet/nextnet/temporal_network.cpp
+	extern/NEXTNet/nextnet/weighted_network.cpp
     extern/NEXTNet/nextnet/algorithm.cpp
     extern/NEXTNet/nextnet/random.cpp
     extern/NEXTNet/nextnet/NextReaction.cpp
