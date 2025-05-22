@@ -23,15 +23,19 @@ PYBIND11_MODULE(nextnet, handle) {
     //---------------------------------
 
     py::class_<rng_t>(handle, "rng")
-        .def(py::init<>()) 
-        .def(py::init<int>(),py::arg("seed"),
-        R"(
-        Random number generator class.
+        .def(py::init<>())
+        .def(py::init<int>(), py::arg("seed"),
+            R"(
+            **rng(seed: int = None)**
 
-        Args:
-            seed (int): The random seed to initialize the generator.
-        )"
-        );
+            A reproducible random‐number generator for stochastic simulations.
+
+            Args:
+                seed (int, optional): If provided, initializes the generator to a
+                    fixed state for reproducible outcomes. If omitted, uses a
+                    stochastic seed.
+            )"
+    );
 
     //---------------------------------
     //--------SIMULATION OBJECT--------
@@ -150,19 +154,26 @@ PYBIND11_MODULE(nextnet, handle) {
                 },
             py::arg("options"),
             py::arg("engine"),
-            R"doc(
-                Simulate the epidemic process until a stopping condition is reached.
+            R"(
+            **run(options: dict, engine: rng) -> dict**
 
-                Parameters:
-                options (dict): Optional control parameters:
-                    - "time" (float): maximum simulation time (default: ∞)
-                    - "total_infected" (int): stop after this many cumulative infections (default: ∞)
-                    - "max_infected" (int): stop if the number of current infections exceeds this (default: ∞)
-                engine (rng_t): Random number generator
+            Execute the epidemic simulation until a stopping condition is met.
 
-                Returns:
-                list of tuples (time, node, source_node, event_type)
-            )doc"
+            **Options keys (all optional):**
+            - `"time"` (float): Max simulation time (default ∞)
+            - `"total_infected"` (int): Max cumulative infections (default ∞)
+            - `"max_infected"` (int): Max concurrent infections (default ∞)
+
+            Args:
+                engine (rng): Random‐number generator instance.
+
+            Returns:
+                A dict with:
+                - `"time"`: List[float] event times  
+                - `"infected"`: List[int] current infected counts  
+                - `"recovered"`: List[int] recovered counts  
+                - `"data"`: List[(time, node, source_node, event_type)]  
+            )"
     );
             
 
@@ -172,11 +183,41 @@ PYBIND11_MODULE(nextnet, handle) {
 
 
     py::class_<network>(handle, "network", py::multiple_inheritance())
-        .def("nodes", &network::nodes)
-        .def("neighbour", &network::neighbour)
-        .def("outdegree", &network::outdegree)
-        .def("is_undirected", &network::is_undirected)
-        .def("is_simple", &network::is_simple)
+        .def("nodes",        &network::nodes,
+            R"(
+            **nodes() -> int**
+
+            Number of nodes in the network.
+            )"
+        )
+        .def("neighbour",    &network::neighbour,
+            R"(
+            **neighbour(node: int, idx: int) -> int**
+
+            Get the idx-th neighbor of `node`; returns -1 if none.
+            )"
+        )
+        .def("outdegree",    &network::outdegree,
+            R"(
+            **outdegree(node: int) -> int**
+
+            Number of outgoing edges from `node`.
+            )"
+        )
+        .def("is_undirected",&network::is_undirected,
+            R"(
+            **is_undirected() -> bool**
+
+            True if every edge is bidirectional.
+            )"
+        )
+        .def("is_simple",    &network::is_simple,
+            R"(
+            **is_simple() -> bool**
+
+            True if network has no self-loops or parallel edges.
+            )"
+        )
         .def("adjacencylist",[](network &self){
             const int n = self.nodes();
             std::vector<std::vector<int>> adj;
@@ -192,7 +233,13 @@ PYBIND11_MODULE(nextnet, handle) {
                 adj.push_back(neigh);
             }
             return adj;
-        });
+        },
+            R"(
+            **adjacencylist() -> List[List[int]]**
+
+            Returns the adjacency list: for each node, a list of neighbor indices.
+            )"
+        );
 
     py::class_<weighted_network, network>(handle, "weighted_network", py::multiple_inheritance())
         .def("weighted_adjacencylist",
@@ -214,41 +261,111 @@ PYBIND11_MODULE(nextnet, handle) {
                 return adj;
             },
             R"pbdoc(
-                weighted_adjacencylist() -> List[List[Tuple[int, float]]]
+            **weighted_adjacencylist() -> List[List[Tuple[int, float]]**
 
-                Compute and return the weighted adjacency list of this network.
+            Compute the weighted adjacency list.
 
-                Returns:
-                    A list `adj` of length `n` (number of nodes), where each
-                    `adj[i]` is itself a list of `(neighbor, weight)` pairs:
-                    
-                    - `neighbour` (int): index of a node connected to `i`
-                    - `weight`   (float): weight of the edge (i → neighbour)
-
-                Example:
-                    >>> wnet = weighted_network(...)
-                    >>> adj = wnet.weighted_adjacencylist()
-                    >>> for nbr, w in adj[0]:
-                    ...     print(f"0 → {nbr} with weight {w}")
+            Returns:
+                A list of length `n` where each entry is a list of
+                (neighbor_index, edge_weight) pairs.
             )pbdoc"
         );
 
     py::class_<networkx,network>(handle,"networkx",py::multiple_inheritance())
         .def(py::init<py::list>())
         .def(py::init<py::object>(),py::arg("networkx_graph"),
-        ""
+        R"(
+        **networkx(nx_graph: List or networkx.Graph)**
+
+        Wraps a Python NetworkX graph object for use in simulations.
+        )"
     );
+
+    py::class_<empirical_network, network>(handle, "empirical_network", py::multiple_inheritance())
+        .def(
+            // wrap the std::istream& ctor in a lambda
+            py::init([](const std::string& path,
+                        bool undirected,
+                        bool simplify,
+                        int idxbase,
+                        char sep) {
+                std::ifstream file(path);
+                if (!file.is_open()) {
+                    throw std::runtime_error("Could not open file: " + path);
+                }
+                return empirical_network(file, undirected, simplify,
+                                         static_cast<node_t>(idxbase),
+                                         sep);
+            }),
+            py::arg("path"),
+            py::arg("undirected")  = true,
+            py::arg("simplify")    = false,
+            py::arg("idxbase")     = 1,
+            py::arg("sep")         = ' ',
+            R"doc(
+                Construct an empirical_network by reading an edge list from a file.
+
+                Parameters
+                ----------
+                path : str
+                    Path to a whitespace‐separated edge list file.
+                undirected : bool, optional
+                    If true, add edges in both directions.  Default: True.
+                simplify : bool, optional
+                    If true, remove self‐loops and parallel edges.  Default: False.
+                idxbase : int, optional
+                    The node index base used in the file (e.g. 1 or 0).  Default: 1.
+                sep : char, optional
+                    Separator character between fields.  Default: ' '.
+            )doc"
+        );
+
+
     //---------------------------------
     //---------NETWORK MODELS----------
     //---------------------------------
     py::class_<watts_strogatz,network>(handle, "watts_strogatz", py::multiple_inheritance())
-        .def(py::init<node_t, int, double, rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"), py::arg("rng"));
+        .def(py::init<node_t, int, double, rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"), py::arg("rng"),
+            R"(
+            **watts_strogatz(size: int, k: int, p: float, rng: rng)**
+
+            Generate a Watts–Strogatz small‐world network.
+
+            Args:
+                size: Number of nodes.
+                k: Each node connects to k nearest neighbors.
+                p: Rewiring probability.
+                rng: RNG for random rewiring.
+            )"
+    );
 
     py::class_<erdos_renyi,network>(handle, "erdos_renyi", py::multiple_inheritance())
-        .def(py::init<int, double, rng_t&>(), py::arg("size"), py::arg("average_degree"), py::arg("rng"));
+        .def(py::init<int, double, rng_t&>(), py::arg("size"), py::arg("average_degree"), py::arg("rng"),
+            R"(
+            **erdos_renyi(size: int, average_degree: float, rng: rng)**
+
+            Generate an Erdős–Rényi random graph G(n, p).
+
+            Args:
+                size: Number of nodes n.
+                average_degree: Desired mean degree (p = average_degree/(n-1)).
+                rng: RNG for edge sampling.
+            )"
+    );
 
     py::class_<barabasi_albert,network>(handle, "barabasi_albert", py::multiple_inheritance())
-        .def(py::init<int, rng_t&, int>(), py::arg("size"), py::arg("rng"), py::arg("m")=1);
+        .def(py::init<int, rng_t&, int>(), py::arg("size"), py::arg("rng"), py::arg("m")=1,
+            R"(
+            **barabasi_albert(size: int, rng: rng, m: int = 1)**
+
+            Generate a Barabási–Albert scale‐free network.
+
+            Args:
+                size: Initial number of nodes.
+                rng: RNG for preferential attachment.
+                m: New edges per added node.
+            )"
+    );
 
     //---------------------------------
     //--------SIMULATION OBJECT--------
@@ -297,7 +414,7 @@ PYBIND11_MODULE(nextnet, handle) {
 
                     int max_steps = opts.contains("total_infected")
                         ? opts["total_infected"].cast<int>()
-                        : std::numeric_limits<int>::max();
+                        : static_cast<int>(1e10);
 
                     int threshold = opts.contains("max_infected")
                         ? opts["max_infected"].cast<int>()
@@ -377,7 +494,6 @@ PYBIND11_MODULE(nextnet, handle) {
                                 if (network_events){
                                     // record
                                     int event_type = static_cast<int>(ev.kind) + 1;
-                                    
                                     trajectory.emplace_back(
                                         ev.time,
                                         ev.target_node,
@@ -407,43 +523,25 @@ PYBIND11_MODULE(nextnet, handle) {
             py::arg("options"),
             py::arg("engine"),
             R"doc(
-            Simulate an epidemic spreading over a temporal network using the next-reaction method.
+            **run(options: dict, engine: rng) -> dict**
 
-            The simulation runs until one of the following stopping conditions is met:
-            - the maximum simulation time is reached,
-            - the total number of cumulative infections exceeds a limit,
-            - the current number of infected individuals exceeds a threshold.
+            Execute the next‐reaction epidemic simulation on a temporal network.
 
-            Parameters:
-            -----------
-            options : dict (optional)
-                Dictionary of control parameters:
-                - "time" (float): Maximum simulation time (default: infinity).
-                - "total_infected" (int): Stop the simulation after this many cumulative infections (default: unlimited).
-                - "max_infected" (int): Stop if the current number of infected nodes exceeds this threshold (default: unlimited).
-                - "network_events" (bool): Whether to record network dynamics (default: False).
-                - "epidemic_events" (bool): Whether to record epidemic events (default: True).
+            **Options (all optional):**
+            - `"time"` (float): Max simulation time (∞)
+            - `"total_infected"` (int): Max cumulative infections (∞)
+            - `"max_infected"` (int): Max concurrent infections (∞)
+            - `"network_events"` (bool): Record network events? (default False)
+            - `"epidemic_events"` (bool): Record epidemic events? (default True)
 
-            engine : rng_t
-                A random number generator instance for stochastic simulation.
-
-            Returns:
-            --------
-            dict
-                A dictionary with the following keys:
-                - "time": List of times at which epidemic events occurred.
-                - "infected": List tracking the number of currently infected nodes over time.
-                - "recovered": List tracking the number of recovered nodes over time (if SIR model).
-                - "data": List of tuples (time, node, source_node, event_type), where event_type is:
-                    - 0 for infection,
-                    - 1 for recovery,
-                    - 2 for link addition (network event),
-                    - 3 for link removal (network event)
-                    - 4 for instantaneous link (network event).
+            Returns a dict:
+            - `"time"`: times of epidemic events  
+            - `"infected"`: infected count over time  
+            - `"recovered"`: recovered count over time  
+            - `"data"`: List of (time, node, source_node, event_type) where
+                - 0 = infection, 1 = recovery, 2/3/4 = network events
             )doc"
-
     );
-
 
     //---------------------------------
     //-------TEMPORAL NETWORKS---------
@@ -453,23 +551,49 @@ PYBIND11_MODULE(nextnet, handle) {
         .def("step", &temporal_network::step)
         .def("notify_epidemic_event", &temporal_network::notify_epidemic_event);
 
-
     py::class_<activity_driven_network,temporal_network>(handle, "activity_driven_network", py::multiple_inheritance())
-        .def(py::init<std::vector<double>, double, double, double, rng_t&>(), py::arg("activity_rates"), py::arg("eta"), py::arg("m"), py::arg("recovery_rate"), py::arg("rng"));
+        .def(py::init<std::vector<double>, double, double, double, rng_t&>(), py::arg("activity_rates"), py::arg("eta"), py::arg("m"), py::arg("recovery_rate"), py::arg("rng"),
+        R"(
+        **activity_driven_network(activity_rates, eta, m, recovery_rate, rng)**
+
+        Temporal network where nodes activate at given rates.
+
+        Args:
+            activity_rates (List[float]): Activation rate per node.
+            eta (float): Probability scaling for link‐formation.
+            m (float): Number of links created per activation.
+            recovery_rate (float): Recovery rate (for SIR dynamics).
+            rng (rng): RNG for stochastic activations.
+        )"    
+    );
 
     // py::class_<temporal_sirx_network,temporal_network>(handle, "temporal_sirx_network", py::multiple_inheritance())
     //     .def(py::init<network&, double, double, rng_t&>(), py::arg("network"), py::arg("kappa0"), py::arg("kappa"), py::arg("rng"));
 
-    // py::class_<empirical_contact_network, temporal_network>(handle, "empirical_contact_network", py::multiple_inheritance())
-    //     .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
-    //         empirical_contact_network::edge_duration_kind contact_type = 
-    //             is_finite_duration ? empirical_contact_network::finite_duration : empirical_contact_network::infitesimal_duration;
-    //         std::fstream file(path_to_file);
-    //         if (!file)
-    //             throw std::runtime_error("failed to open file" + path_to_file);
-    //         return new empirical_contact_network(file, contact_type, dt);
-    //     }));
+    py::class_<empirical_contact_network, temporal_network>(handle, "empirical_temporal_network", py::multiple_inheritance())
+        .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
+            empirical_contact_network::edge_duration_kind contact_type = 
+                is_finite_duration ? empirical_contact_network::finite_duration : empirical_contact_network::infitesimal_duration;
+            std::fstream file(path_to_file);
+            if (!file)
+                throw std::runtime_error("failed to open file" + path_to_file);
+            return new empirical_contact_network(file, contact_type, dt);
+        }),py::arg("file"),py::arg("finite_duration"),py::arg("dt"),
+        
+        R"(
+        **empirical_temporal_network(file: str,
+                                     finite_duration: bool,
+                                     dt: float)**
 
+        Build from empirical contact‐sequence data in `file`.
+
+        Args:
+            file (str): Path to the contact list.
+            finite_duration (bool): Treat edge durations as finite.
+            dt (float): Time resolution for instantaneous contacts.
+        )"
+
+    );
 
     //---------------------------------
     //---------DISTRIBUTIONS-----------
