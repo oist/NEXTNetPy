@@ -77,3 +77,4 @@ plt.show()
 
 
 ## Documentation
+https://samuelcure.github.io/NextNetPy-Doc/
