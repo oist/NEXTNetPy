@@ -69,7 +69,6 @@ PYBIND11_MODULE(nextnet, handle) {
             [](simulate_next_reaction &self,
                 const std::vector<std::pair<int,double>>& infections)
              {
-                 // you could validate or transform here
                  self.add_infections(infections);
              },
             py::arg("infections_list"),
@@ -77,7 +76,6 @@ PYBIND11_MODULE(nextnet, handle) {
 
         .def("run",
                 [](simulate_next_reaction &self, py::dict opts, rng_t &engine) {
-                    // pull out options or use defaults
                     double max_time = opts.contains("time")
                         ? opts["time"].cast<double>()
                         : std::numeric_limits<double>::infinity();
@@ -90,7 +88,6 @@ PYBIND11_MODULE(nextnet, handle) {
                         ? opts["max_infected"].cast<int>()
                         : static_cast<int>(1e10);
 
-                    // containers
                     std::vector<std::tuple<double,int,int,int>> trajectory;
                     std::vector<double> times;
                     std::vector<int> infected_traj;
@@ -115,7 +112,6 @@ PYBIND11_MODULE(nextnet, handle) {
                                 cumul_nb_infected++;
                                 break;
                             case epidemic_event_kind::reset:
-                                // a “recovery” event
                                 current_nb_infected--;
                                 current_nb_recovered++;
                                 event_type = 1;
@@ -127,7 +123,8 @@ PYBIND11_MODULE(nextnet, handle) {
                         // stop criteria
                         if (point->time   > max_time ||
                             cumul_nb_infected > max_steps ||
-                            current_nb_infected > threshold)
+                            current_nb_infected > threshold ||
+                            current_nb_infected <= 0)
                         {
                             break;
                         }
@@ -324,6 +321,7 @@ PYBIND11_MODULE(nextnet, handle) {
     //---------------------------------
     //---------NETWORK MODELS----------
     //---------------------------------
+
     py::class_<watts_strogatz,network>(handle, "watts_strogatz", py::multiple_inheritance())
         .def(py::init<node_t, int, double, rng_t&>(), py::arg("size"), py::arg("k"), py::arg("p"), py::arg("rng"),
             R"(
@@ -335,7 +333,7 @@ PYBIND11_MODULE(nextnet, handle) {
                 size: Number of nodes.
                 k: Each node connects to k nearest neighbors.
                 p: Rewiring probability.
-                rng: RNG for random rewiring.
+                rng: RNG generator.
             )"
     );
 
@@ -349,7 +347,7 @@ PYBIND11_MODULE(nextnet, handle) {
             Args:
                 size: Number of nodes n.
                 average_degree: Desired mean degree (p = average_degree/(n-1)).
-                rng: RNG for edge sampling.
+                rng: RNG generator.
             )"
     );
 
@@ -362,10 +360,93 @@ PYBIND11_MODULE(nextnet, handle) {
 
             Args:
                 size: Initial number of nodes.
-                rng: RNG for preferential attachment.
+                rng: RNG generator.
                 m: New edges per added node.
             )"
     );
+
+    py::class_<config_model,network>(handle, "configuration_model", py::multiple_inheritance())
+        .def(py::init<std::vector<int>, rng_t&>(), py::arg("degreelist"), py::arg("rng"),
+            R"(
+            **configuration_model(degreelist: int, rng: rng)**
+
+            Generate a network with a prescribed degree distribution
+
+            Args:
+                size: Initial number of nodes.
+                rng: RNG generator.
+            )"
+    );
+
+
+    py::class_<config_model_clustered_serrano, network>(handle, "configuration_model_clustered",py::multiple_inheritance())
+        .def(py::init<
+                std::vector<int>,              // degrees
+                std::vector<int>,              // triangles
+                double,                        // beta
+                rng_t&                         // engine
+            >(),
+            py::arg("degrees"),
+            py::arg("triangles"),
+            py::arg("beta"),
+            py::arg("engine"),
+            R"pbdoc(
+                Constructor with explicit triangle counts per degree class.
+
+                Args:
+                    degrees (List[int]): node degrees.
+                    triangles (List[int]): triangles per degree class.
+                    beta (float): degree-class probability parameter P(k).
+                    engine (rng_t): random number generator.
+            )pbdoc"
+        )
+        .def(py::init<
+                std::vector<int>,              // degrees
+                std::function<double(int)>,    // ck(k)
+                double,                        // beta
+                rng_t&                         // engine
+            >(),
+            py::arg("degrees"),
+            py::arg("ck"),
+            py::arg("beta"),
+            py::arg("engine"),
+            R"pbdoc(
+                Constructor with clustering function c(k).
+
+                Args:
+                    degrees (List[int]): node degrees.
+                    ck (Callable[[int], float]): clustering probability function.
+                    beta (float): degree-class probability parameter P(k).
+                    engine (rng_t): random number generator.
+            )pbdoc"
+        )
+        .def(py::init<
+                std::vector<int>,              // degrees
+                double,                        // alpha
+                double,                        // beta
+                rng_t&                         // engine
+            >(),
+            py::arg("degrees"),
+            py::arg("alpha"),
+            py::arg("beta"),
+            py::arg("engine"),
+            R"pbdoc(
+                Constructor with alpha exponent for c(k)=0.5*(k-1)^alpha.
+
+                Args:
+                    degrees (List[int]): node degrees.
+                    alpha (float): exponent parameter for c(k).
+                    beta (float): degree-class probability parameter P(k).
+                    engine (rng_t): random number generator.
+            )pbdoc"
+        )
+
+        .def_readwrite(
+            "triangles_unsatisfied",
+            &config_model_clustered_serrano::triangles_unsatisfied,
+            "True if the requested triangles count could not be satisfied."
+    );
+
 
     //---------------------------------
     //--------SIMULATION OBJECT--------
@@ -399,7 +480,6 @@ PYBIND11_MODULE(nextnet, handle) {
             [](simulate_on_temporal_network &self,
                 const std::vector<std::pair<int,double>>& infections)
              {
-                 // you could validate or transform here
                  self.simulation.add_infections(infections);
              },
             py::arg("infections_list"),
@@ -467,7 +547,7 @@ PYBIND11_MODULE(nextnet, handle) {
                                 }
 
                                 // stop criteria
-                                if (ev.time   > max_time || cumul_nb_infected > max_steps || current_nb_infected > threshold)
+                                if (ev.time   > max_time || cumul_nb_infected > max_steps || current_nb_infected > threshold || current_nb_infected <= 0)
                                     break;
 
                                 if (epidemic_events){
@@ -539,7 +619,7 @@ PYBIND11_MODULE(nextnet, handle) {
             - `"infected"`: infected count over time  
             - `"recovered"`: recovered count over time  
             - `"data"`: List of (time, node, source_node, event_type) where
-                - 0 = infection, 1 = recovery, 2/3/4 = network events
+            - 0 = infection, 1 = recovery, 2 = link added, 3 = link removed, 4 = instant link.
             )doc"
     );
 
@@ -616,26 +696,68 @@ PYBIND11_MODULE(nextnet, handle) {
 
     py::class_<transmission_time_exponential, transmission_time>(handle, "transmission_time_exponential")
         .def(py::init<double>(), py::arg("rate"));
-    #if 0
+
+    py::class_<transmission_time_infectiousness, transmission_time>(handle, "transmission_time_infectiousness")
+        .def(py::init<std::vector<double>,std::vector<double>>(), py::arg("tau"),py::arg("lambda"));
+
     //---------------------------------
     //-----------TOOLS ----------------
     //---------------------------------
 
-    // Define connectivity matrix function
-    handle.def("connectivity_matrix",&connectivity_matrix,
+double assortativity(network &nw);
+
+    handle.def("assortativity",
+        &assortativity,
         py::arg("network"),
-        py::arg("clustering")=0,
-        R"(
-        Computes the connectivity matrix for the network.
+        R"pbdoc(
+            Compute the assortativity coefficient of a network.
 
-        Args:
-            network (network): The network structure on which to compute the connectivity matrix.
-            clustering (int, optional): Clustering parameter (default: 0).
+            Args:
+                network (network): The network to analyze.
 
-        Returns:
-            matrix: The connectivity matrix of the network.
-        )"
+            Returns:
+                float: the assortativity coefficient.
+        )pbdoc"
     );
-#endif
+
+    handle.def("reproduction_matrix",
+        [](network &nw) {
+            double out_r = 0.0, out_c = 0.0;
+            double out_k1 = 0.0, out_k2 = 0.0, out_k3 = 0.0;
+            double out_m1 = 0.0, out_m2 = 0.0;
+            double out_R0 = 0.0, out_R_r = 0.0, R_pert = 0.0;
+
+            auto mat = reproduction_matrix(
+                nw,
+                &out_r, &out_c,
+                &out_k1, &out_k2, &out_k3,
+                &out_m1, &out_m2,
+                &out_R0, &out_R_r,
+                &R_pert
+            );
+
+            std::vector<double> params = {
+                out_r, out_c,
+                out_k1, out_k2, out_k3,
+                out_m1, out_m2,
+                out_R0, out_R_r,
+                R_pert
+            };
+            return py::make_tuple(mat, params);
+        },
+        py::arg("network"),
+        R"pbdoc(
+            Compute the reproduction matrix and return summary parameters.
+
+            Args:
+                network (network): The network to analyze.
+
+            Returns:
+                tuple:
+                - matrix (List[List[float]]): the reproduction matrix.
+                - params_list (List[float]): [r, c, k1, k2, k3, m1, m2, R0, R_r, R_pert].
+        )pbdoc"
+    );
+
 
 }
