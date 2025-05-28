@@ -75,7 +75,7 @@ PYBIND11_MODULE(nextnet, handle) {
             "Add a batch of initial or outside infections; pass a list of (node, time) pairs.")
 
         .def("run",
-                [](simulate_next_reaction &self, py::dict opts, rng_t &engine) {
+                [](simulate_next_reaction &self,rng_t &engine, py::dict opts) {
                     double max_time = opts.contains("time")
                         ? opts["time"].cast<double>()
                         : std::numeric_limits<double>::infinity();
@@ -149,8 +149,8 @@ PYBIND11_MODULE(nextnet, handle) {
                     result["data"]      = trajectory;
                     return result;
                 },
-            py::arg("options"),
             py::arg("engine"),
+            py::arg("options")=py::dict(),
             R"(
             **run(options: dict, engine: rng) -> dict**
 
@@ -486,7 +486,7 @@ PYBIND11_MODULE(nextnet, handle) {
             "Add a batch of initial or outside infections; pass a list of (node, time) pairs.")
 
         .def("run",
-                [](simulate_on_temporal_network &self, py::dict opts, rng_t &engine) {
+                [](simulate_on_temporal_network &self, rng_t &engine,py::dict opts) {
                     // pull out options or use defaults
                     double max_time = opts.contains("time")
                         ? opts["time"].cast<double>()
@@ -600,8 +600,8 @@ PYBIND11_MODULE(nextnet, handle) {
                     result["data"]      = trajectory;
                     return result;
                 },
-            py::arg("options"),
-            py::arg("engine"),
+                py::arg("engine"),
+                py::arg("options")=py::dict(),
             R"doc(
             **run(options: dict, engine: rng) -> dict**
 
