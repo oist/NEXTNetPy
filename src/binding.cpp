@@ -650,30 +650,62 @@ PYBIND11_MODULE(nextnet, handle) {
     // py::class_<temporal_sirx_network,temporal_network>(handle, "temporal_sirx_network", py::multiple_inheritance())
     //     .def(py::init<network&, double, double, rng_t&>(), py::arg("network"), py::arg("kappa0"), py::arg("kappa"), py::arg("rng"));
 
-    py::class_<empirical_contact_network, temporal_network>(handle, "empirical_temporal_network", py::multiple_inheritance())
-        .def(py::init([](std::string path_to_file, bool is_finite_duration, double dt) {
-            empirical_contact_network::edge_duration_kind contact_type = 
-                is_finite_duration ? empirical_contact_network::finite_duration : empirical_contact_network::infitesimal_duration;
-            std::fstream file(path_to_file);
-            if (!file)
-                throw std::runtime_error("failed to open file" + path_to_file);
-            return new empirical_contact_network(file, contact_type, dt);
-        }),py::arg("file"),py::arg("finite_duration"),py::arg("dt"),
-        
-        R"(
-        **empirical_temporal_network(file: str,
-                                     finite_duration: bool,
-                                     dt: float)**
+    py::class_<empirical_contact_network, temporal_network>(handle, "empirical_contact_network", py::multiple_inheritance())
+        .def(
+            py::init([](const std::string & path_to_file,
+                        bool               is_finite_duration,
+                        double             dt,
+                        double             weight)
+            {
+                // edge type
+                empirical_contact_network::edge_duration_kind contact_type = is_finite_duration
+                    ? empirical_contact_network::edge_duration_kind::finite_duration
+                    : empirical_contact_network::edge_duration_kind::infitesimal_duration;
 
-        Build from empirical contact‐sequence data in `file`.
+                // open file
+                auto file = std::make_shared<std::fstream>(path_to_file, std::ios::in);
+                if (! file->is_open()) {
+                    throw std::runtime_error("failed to open file: " + path_to_file);
+                }
 
-        Args:
-            file (str): Path to the contact list.
-            finite_duration (bool): Treat edge durations as finite.
-            dt (float): Time resolution for instantaneous contacts.
-        )"
+                return new empirical_contact_network(*file, contact_type, dt, weight);
+            }),
+            py::arg("path_to_file"),
+            py::arg("finite_duration"),
+            py::arg("dt"),
+            py::arg("weight") = 1.0,
+            R"pbdoc(
+                empirical_contact_network(path_to_file: str,
+                                         finite_duration: bool,
+                                         dt: float,
+                                         weight: float = 1.0)
 
-    );
+                Build an empirical_contact_network from a contact‐sequence file.
+
+                Parameters
+                ----------
+                path_to_file : str
+                    Path to the file containing contact times (one line per contact).
+                finite_duration : bool
+                    If True, interpret edges as having a finite duration `dt`; 
+                    otherwise, treat them as instantaneous.
+                dt : float
+                    Time‐step (duration) to use when you specify `finite_duration == True`.
+                weight : float, optional (default=1.0)
+                    An uniform weight to assign to each edge. Defaults to 1.0.
+            )pbdoc"
+        )
+
+        .def(
+            "compute_number_of_edges",
+            &empirical_contact_network::compute_number_of_edges,
+            py::arg("engine"),
+            R"pbdoc(
+                compute_number_of_edges(engine: rng_t) -> List[List[float]]
+
+                Returns the time trajectory of the number of edges present in the network.
+            )pbdoc"
+        );
 
     //---------------------------------
     //---------DISTRIBUTIONS-----------
@@ -704,7 +736,6 @@ PYBIND11_MODULE(nextnet, handle) {
     //-----------TOOLS ----------------
     //---------------------------------
 
-double assortativity(network &nw);
 
     handle.def("assortativity",
         &assortativity,
