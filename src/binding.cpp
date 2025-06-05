@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <numeric>
+#include <random>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
 #include "nextnet/stdafx.h"
@@ -23,7 +24,11 @@ PYBIND11_MODULE(nextnet, handle) {
     //---------------------------------
 
     py::class_<rng_t>(handle, "rng")
-        .def(py::init<>())
+        .def(py::init<>([]() {
+            std::random_device rd;
+            std::seed_seq seed{ rd() };
+            return rng_t(seed);
+         }))
         .def(py::init<int>(), py::arg("seed"),
             R"(
             **rng(seed: int = None)**
@@ -35,7 +40,7 @@ PYBIND11_MODULE(nextnet, handle) {
                     fixed state for reproducible outcomes. If omitted, uses a
                     stochastic seed.
             )"
-    );
+        );
 
     //---------------------------------
     //--------SIMULATION OBJECT--------
