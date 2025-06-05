@@ -13,6 +13,7 @@ tar -czf "$archive" \
 	pyproject.toml \
 	CMakeLists.txt \
 	src/* \
+	python/nextnet/* \
 	extern/pybind11/CMakeLists.txt \
 	extern/pybind11/tools/*.cmake \
 	extern/pybind11/include/* \
