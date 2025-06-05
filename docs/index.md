@@ -7,6 +7,17 @@ NEXT-Net allows users to efficiently simulate epidemics (SI/SIR/SIS) on networks
 
 The main algorithms and their performance are discussed in our [preprint](https://arxiv.org/abs/2412.07095).
 
+## Installation
+
+Download the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy-v\<version\>-pkg.tar.gz* and install with
+
+    pip install NEXTNetPy-v<version>-pkg.tar.gz
+   
+Since *NEXT-Net* is implemented in C++, a C++ compiler is required to install *NEXTNetPy*. Alternatively, if [Git](https://git-scm.com/downloads) is available, the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy* can be downloaded, built and installed with
+
+    git clone --recurse-submodules --branch latest-release https://github.com/oist/NEXTNetPy.git
+    cd NEXTNetPy
+    pip install .    
 
 ## Getting Started
 To get started with NEXT-Net, check out the [Getting Started](getting_started.md) guide for installation and basic usage instructions.
@@ -20,7 +31,6 @@ To get started with NEXT-Net, check out the [Getting Started](getting_started.md
 Explore the example simulations:
 - [Basic SI/SIR/SIS Simulations](examples/simulations_examples.md)
 - [Temporal Simulations](examples/simulations_temporal.md)
-
 
 ## Contact & Support
 For questions, support, or if you think you found a bug, feel free to reach out via GitHub Issues or email samuel.cure@oist.jp
