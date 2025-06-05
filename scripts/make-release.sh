@@ -18,4 +18,4 @@ echo "Building full archive for version $ver (including submodules)" >&2
 mkdir -p archives
 rm -f  archives/NEXTNetPy-v$ver-full.tar
 rm -f  archives/NEXTNetPy-v$ver-full.tar.gz
-./scripts/build-archive.sh archives/NEXTNetR-v$ver-pkg.tar.gz
+./scripts/build-archive.sh archives/NEXTNetPy-v$ver-pkg.tar.gz
