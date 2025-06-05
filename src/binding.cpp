@@ -121,10 +121,9 @@ PYBIND11_MODULE(nextnet, handle) {
                         }
 
                         // stop criteria
-                        if (point->time   > max_time ||
-                            cumul_nb_infected > max_steps ||
-                            current_nb_infected > threshold ||
-                            current_nb_infected <= 0)
+                        if (point->time >= max_time ||
+                            cumul_nb_infected >= max_steps ||
+                            current_nb_infected >= threshold)
                         {
                             break;
                         }
@@ -547,7 +546,9 @@ PYBIND11_MODULE(nextnet, handle) {
                                 }
 
                                 // stop criteria
-                                if (ev.time   > max_time || cumul_nb_infected > max_steps || current_nb_infected > threshold || current_nb_infected <= 0)
+                                if ((ev.time >= max_time) ||
+                                    (cumul_nb_infected >= max_steps) ||
+                                    (current_nb_infected >= threshold))
                                     break;
 
                                 if (epidemic_events){
