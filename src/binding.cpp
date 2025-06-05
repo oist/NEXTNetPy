@@ -86,7 +86,7 @@ PYBIND11_MODULE(nextnet, handle) {
 
                     int threshold = opts.contains("max_infected")
                         ? opts["max_infected"].cast<int>()
-                        : static_cast<int>(1e10);
+                        : std::numeric_limits<int>::max();
 
                     std::vector<std::tuple<double,int,int,int>> trajectory;
                     std::vector<double> times;
@@ -493,11 +493,11 @@ PYBIND11_MODULE(nextnet, handle) {
 
                     int max_steps = opts.contains("total_infected")
                         ? opts["total_infected"].cast<int>()
-                        : static_cast<int>(1e10);
+                        : std::numeric_limits<int>::max();
 
                     int threshold = opts.contains("max_infected")
                         ? opts["max_infected"].cast<int>()
-                        : static_cast<int>(1e10);
+                        : std::numeric_limits<int>::max();
                     
                     bool network_events  = opts.contains("network_events")
                         ? opts["network_events"].cast<bool>()
