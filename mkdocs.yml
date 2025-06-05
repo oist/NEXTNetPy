@@ -15,7 +15,8 @@ nav:
   - Home: index.md
   - Getting Started: getting_started.md
   - Documentation:
-      - Simulations: simulations.md
+      - Simulations: simulations_static.md
+      - Simulations on Temporal Networks: simulations_temporal.md
       - Transmission Distributions: transmission_distributions.md
       - Networks: networks.md
   - Tutorial + Examples:

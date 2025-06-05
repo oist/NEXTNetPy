@@ -4,7 +4,7 @@ List of the current distributions available to generate infection times.
 
 ## Available Transmission Distributions
 
-### 1. `Gamma`
+### `Gamma`
 A gamma-distributed transmission time model.
 
 **Constructor**
@@ -17,10 +17,10 @@ transmission_time_gamma(double mean, double variance, double pinf=0.0)
 
 **Example:**
 ```python
-psi = nn.transmission_time_gamma(3.0, 1.5)
+psi = nn.transmission_time_gamma(3.0, )
 ```
 
-### 2. `Weibull `
+### `Weibull `
 A Weibull-distributed transmission time model.
 
 **Constructor**
@@ -36,7 +36,7 @@ transmission_time_weibull(double shape, double scale, double pinf=0.0)
 psi = nn.transmission_time_weibull(2.0, 5.0)
 ```
 
-### 3. `Lognormal `
+### `Lognormal `
 A lognormal-distributed transmission time model.
 
 **Constructor**
@@ -52,7 +52,7 @@ transmission_time_lognormal(double mean, double variance, double pinf=0.0)
 psi = nn.transmission_time_lognormal(3.0, 1.2)
 ```
 
-### 4. `Exponential`
+### `Exponential`
 An exponentially-distributed transmission time model.
 
 **Constructor**
@@ -66,7 +66,7 @@ transmission_time_exponential(double rate)
 psi = nn.transmission_time_exponential(0.5)
 ```
 
-### 5. `Delta (deterministic)`
+### `Delta (deterministic)`
 A deterministic transmission time model where all transmission times are fixed.
 
 **Constructor**
@@ -80,7 +80,7 @@ transmission_time_deterministic(double tau)
 psi = nn.transmission_time_deterministic(4)
 ```
 
-### 6. `Infectiousness (custom distribution)`
+### `Infectiousness (custom distribution)`
 A transmission time $\psi(\tau)$ that is defined from the infectiousness, or hazard rate $\lambda(\tau)$. The user enters an array `tau` and an array `infectiousness` of same length to represent $\lambda(\tau)$. The resulting distribution is then given by
 $$ \psi(\tau)=\lambda(\tau)\exp\left(-\int_0^\tau \lambda(\tau')\mathrm{d}\tau'\right).$$
 
@@ -103,3 +103,4 @@ psi = nn.transmission_time_infectiousness(tau,infectiousness)
 - `transmission_time_infectiousness` linearly interpolates the values of the infectiousness.
 - Beyond `tmax`, the infectiousness is assumed to be constant and takes the last value of the `infectiousness` array.
 - The first value of the `infectiousness` array cannot be zero currently (v.0.4.0).
+- This function can be particularly useful for simulations on temporal networks where the user might be more interested in defining the infection times from the infectiousness, or hazard rate, rather than the first infection time attempt.
