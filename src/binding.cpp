@@ -718,7 +718,16 @@ PYBIND11_MODULE(nextnet, handle) {
     //---------------------------------
     
     py::class_<transmission_time>(handle, "transmission_time")
-        .def("sample", &transmission_time::sample);
+        .def("sample", &transmission_time::sample,
+             py::arg("engine"), py::arg("t") = 0.0, py::arg("w") = 1.0)
+        .def("density", (double (transmission_time::*)(double, double, double) const)(&transmission_time::density),
+             py::arg("tau"), py::arg("t") = 0.0, py::arg("w") = 1.0)
+        .def("survivalprobability", (double (transmission_time::*)(double, double, double) const)(&transmission_time::survivalprobability),
+             py::arg("tau"), py::arg("t") = 0.0, py::arg("w") = 1.0)
+        .def("survivalquantile", (double (transmission_time::*)(double, double, double) const)(&transmission_time::survivalquantile),
+             py::arg("tau"), py::arg("t") = 0.0, py::arg("w") = 1.0)
+        .def("hazardrate", &transmission_time::hazardrate,
+             py::arg("hazardrate"));
 
     py::class_<transmission_time_gamma, transmission_time>(handle, "transmission_time_gamma")
         .def(py::init<double, double, double>(), py::arg("mean"), py::arg("variance"), py::arg("pinf") = 0.0);
