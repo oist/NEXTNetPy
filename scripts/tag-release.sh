@@ -35,8 +35,7 @@ if [ $(git ls-remote --tags origin v$ver | wc -l) != 0 ]; then
 fi
 
 echo "Updating pyproject.toml" >&2
-version = "0.4.0"
-sed -i.bak 's/^version *=\(.*˜)$/version = "'"$ver"'"/' pyproject.toml
+sed -i.bak 's/^version *=\(.*\)$/version = "'"$ver"'"/' pyproject.toml
 rm pyproject.toml.bak
 
 echo "Comitting version bump to $ver" >&2
