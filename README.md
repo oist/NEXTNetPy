@@ -2,6 +2,8 @@
 
 *NEXTNetR* (**N**ext-reaction-based **E**pidemics e**X**tended to **T**emporal **Net**works) is a Python package for the efficient simulation of epidemics on complex networks (including weighted and temporal networks) with arbitrary transmission and recovery time distributions. *NEXTNetPy* is a pybind11-based Python wrapper around the C++ library [*NEXTNet*](https://github.com/oist/NEXTNet).
 
+See the [*NEXTNetPy* website](https://oist.github.io/NEXTNetPy/) for a reference and usage examples.
+
 # Installation
 
 Download the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy-v\<version\>-pkg.tar.gz* and install with
@@ -68,4 +70,5 @@ plt.show()
 
 
 ## Documentation
-https://samuelcure.github.io/NextNetPy-Doc/
+
+https://oist.github.io/NEXTNetPy/
