@@ -1,73 +1,70 @@
 [submodule "extern/pybind11"]
 	path = extern/pybind11
-	url = ../../pybind/pybind11
+	url = https://github.com/pybind/pybind11
 	branch = stable
 [submodule "extern/NEXTNet"]
 	path = extern/NEXTNet
-	url = git@github.com:oist/NEXTNet.git
-[submodule "extern/epidemics"]
-	path = extern/epidemics
-	url = git@github.com:samuelcure/Epidemics-On-Networks.git
+	url = https://github.com/oist/NEXTNet.git
 [submodule "extern/boost-core"]
 	path = extern/boost-core
-	url = git@github.com:boostorg/core.git
+	url = https://github.com/boostorg/core.git
 [submodule "extern/boost-utility"]
 	path = extern/boost-utility
-	url = git@github.com:boostorg/utility.git
+	url = https://github.com/boostorg/utility.git
 [submodule "extern/boost-math"]
 	path = extern/boost-math
-	url = git@github.com:boostorg/math.git
+	url = https://github.com/boostorg/math.git
 [submodule "extern/boost-config"]
 	path = extern/boost-config
-	url = git@github.com:boostorg/config.git
+	url = https://github.com/boostorg/config.git
 [submodule "extern/boost-range"]
 	path = extern/boost-range
-	url = git@github.com:boostorg/range.git
+	url = https://github.com/boostorg/range.git
 [submodule "extern/boost-lexical_cast"]
 	path = extern/boost-lexical_cast
-	url = git@github.com:boostorg/lexical_cast.git
+	url = https://github.com/boostorg/lexical_cast.git
 [submodule "extern/boost-multi_index"]
 	path = extern/boost-multi_index
-	url = git@github.com:boostorg/multi_index
+	url = https://github.com/boostorg/multi_index
 [submodule "extern/boost-move"]
 	path = extern/boost-move
-	url = git@github.com:boostorg/move
+	url = https://github.com/boostorg/move
 [submodule "extern/boost-mpl"]
 	path = extern/boost-mpl
-	url = git@github.com:boostorg/mpl
+	url = https://github.com/boostorg/mpl
 [submodule "extern/boost-preprocessor"]
 	path = extern/boost-preprocessor
-	url = git@github.com:boostorg/preprocessor
+	url = https://github.com/boostorg/preprocessor
 [submodule "extern/boost-type_traits"]
 	path = extern/boost-type_traits
-	url = git@github.com:boostorg/type_traits.git
+	url = https://github.com/boostorg/type_traits.git
 [submodule "extern/boost-static_assert"]
 	path = extern/boost-static_assert
-	url = git@github.com:boostorg/static_assert.git
+	url = https://github.com/boostorg/static_assert.git
 [submodule "extern/boost-throw_exception"]
 	path = extern/boost-throw_exception
-	url = git@github.com:boostorg/throw_exception.git
+	url = https://github.com/boostorg/throw_exception.git
 [submodule "extern/boost-assert"]
 	path = extern/boost-assert
-	url = git@github.com:boostorg/assert.git
+	url = https://github.com/boostorg/assert.git
 [submodule "extern/boost-tuple"]
 	path = extern/boost-tuple
-	url = git@github.com:boostorg/tuple.git
+	url = https://github.com/boostorg/tuple.git
 [submodule "extern/boost-iterator"]
 	path = extern/boost-iterator
-	url = git@github.com:boostorg/iterator.git
+	url = https://github.com/boostorg/iterator.git
 [submodule "extern/boost-detail"]
 	path = extern/boost-detail
-	url = git@github.com:boostorg/detail.git
+	url = https://github.com/boostorg/detail.git
 [submodule "extern/boost-bind"]
 	path = extern/boost-bind
-	url = git@github.com:boostorg/bind.git
+	url = https://github.com/boostorg/bind.git
 [submodule "extern/boost-container_hash"]
 	path = extern/boost-container_hash
-	url = git@github.com:boostorg/container_hash.git
+	url = https://github.com/boostorg/container_hash.git
 [submodule "extern/boost-describe"]
 	path = extern/boost-describe
-	url = git@github.com:boostorg/describe.git
+	url = https://github.com/boostorg/describe.git
 [submodule "extern/boost-mp11"]
 	path = extern/boost-mp11
 	url = https://github.com/boostorg/mp11

@@ -51,6 +51,12 @@ include_directories(AFTER SYSTEM
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 message(STATUS "Found Python version: ${Python3_VERSION}")
 
+# Keep things single-threaded, also avoid problems with std::unary_function
+# which was removed with C++ 17
+add_compile_definitions(_PSTL_PAR_BACKEND_SERIAL)
+add_compile_definitions(NEXTNET_BOOST_NO_CXX17_HDR_EXECUTION)
+add_compile_definitions(NEXTNET_BOOST_NO_CXX98_FUNCTION_BASE)
+
 message("Including pybind11 as a submodule")
 add_subdirectory(extern/pybind11)
 pybind11_add_module(nextnet ${LIB_SOURCES} ${PY_SOURCES})

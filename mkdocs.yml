@@ -1,0 +1,37 @@
+site_name: NEXT-Net Documentation
+site_description: Documentation for NEXT-Net.
+theme: 
+  name: 'material'
+  palette:
+    # You can pick a scheme: light, dark, etc.
+    scheme: default
+    primary: '#C80019'
+    accent: '#C80019'
+  logo: assets/images/logo.png
+  favicon: assets/images/logo_web.png
+
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Documentation:
+      - Simulations: simulations.md
+      - Transmission Distributions: transmission_distributions.md
+      - Networks: networks.md
+  - Tutorial + Examples:
+      - Simulation of SI/SIR/SIS on a Network: examples/simulations_examples.md
+
+
+
+markdown_extensions:
+  - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra_css:
+  - css/extra.css

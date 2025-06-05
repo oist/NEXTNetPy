@@ -1,0 +1,21 @@
+on:
+  push:
+    branches: [main]
+
+name: mkdocs.yaml
+
+permissions: read-all
+
+jobs:
+  mkdocs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

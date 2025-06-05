@@ -2,21 +2,20 @@
 requires = [
     "setuptools>=61.0",
     "scikit-build-core>=0.4.0",
-    "cmake>=3.15",
     "wheel",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "nextnet" 
-version = "0.4.0"
+version = "0.9.5-2"
 description = "Python bindings for NEXT-NET, a simulator of epidemics on complex networks."
 readme = "README.md"
 requires-python = ">=3.7"
 license = { text = "LGPLv3" }
 authors = [
     { name = "Samuel Cure", email = "samuel.cure@oist.jp" },
-    { name = "Florian Pflug"  }
+    { name = "Florian G. Pflug", email = "florian.pflug@oist.jp"  }
 ]
 dependencies = [
     "numpy",
