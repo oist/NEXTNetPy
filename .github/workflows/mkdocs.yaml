@@ -9,8 +9,6 @@ permissions: read-all
 jobs:
   mkdocs:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
     steps:
@@ -19,3 +17,5 @@ jobs:
           submodules: recursive
 
       - uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
