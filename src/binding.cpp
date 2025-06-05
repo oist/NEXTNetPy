@@ -119,11 +119,11 @@ PYBIND11_MODULE(nextnet, handle) {
                             default:
                                 break;
                         }
-
+                        
                         // stop criteria
-                        if (point->time >= max_time ||
-                            cumul_nb_infected >= max_steps ||
-                            current_nb_infected >= threshold)
+                        if ((point->time >= max_time) ||
+                            (cumul_nb_infected >= max_steps) ||
+                            (current_nb_infected >= threshold))
                         {
                             break;
                         }
