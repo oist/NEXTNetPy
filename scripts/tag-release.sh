@@ -18,8 +18,8 @@ case $ver in
 	;;
 esac
 
-if [ "$(git symbolic-ref --short HEAD)" != "master" ]; then
-	echo "Currently checkout out branch must be 'master'" >&2
+if [ "$(git symbolic-ref --short HEAD)" != "main" ]; then
+	echo "Currently checkout out branch must be 'main'" >&2
 	exit 1
 fi
 
@@ -47,7 +47,7 @@ echo "Tagging as v$ver and latest" >&2
 git tag -f v$ver
 
 echo "Pushing to origin" >&2
-git push origin master v$ver
+git push origin main v$ver
 
 echo "Updating 'latest-release' on origin" >&2
 git push -f origin v$ver:refs/tags/latest-release
