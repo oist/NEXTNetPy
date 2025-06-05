@@ -1,29 +1,20 @@
 # NEXT-NetPy
 
-*NEXT-NetPy* is a python module can simulate non-Markovian epidemics on arbitrary networks. NEXT-NetPy is based on a pybind11 wrapper around the C++ simulator https://github.com/oist/NEXTNet
+*NEXTNetR* (**N**ext-reaction-based **E**pidemics e**X**tended to **T**emporal **Net**works) is a Python package for the efficient simulation of epidemics on complex networks (including weighted and temporal networks) with arbitrary transmission and recovery time distributions. *NEXTNetPy* is a pybind11-based Python wrapper around the C++ library [*NEXTNet*](https://github.com/oist/NEXTNet).
 
-## Set up
+# Installation
 
-### From Release
-Download the latest release and in a new terminal window run:
+Download the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy-v\<version\>-pkg.tar.gz* and install with
 
-```bash
-pip install nextnet-0.2.0.tar.gz
-```
-### From Source
+    pip install NEXTNetPy-v<version>-pkg.tar.gz
+   
+Since *NEXT-Net* is implemented in C++, a C++ compiler is required to install *NEXTNetPy*. Alternatively, if [Git](https://git-scm.com/downloads) is available, the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy* can be downloaded, built and installed with
 
-In a new terminal window run:
-```bash
-#Download the repository
-git clone git@github.com:oist/NEXTNetPy.git
-cd NEXTNetPy
-# Download the required dependencies (boost, pybind11)
-git submodule update --init --recursive
-# install the python package
-pip install .
-```
+    git clone --recurse-submodules --branch latest-release https://github.com/oist/NEXTNetPy.git
+    cd NEXTNetPy
+    pip install .    
 
-## Getting started
+# Getting started
 
 Here is an example of how to run a SIR simulation on a Barabasi-Albert random graph using networkx.
 
