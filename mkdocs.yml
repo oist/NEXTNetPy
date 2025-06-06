@@ -14,14 +14,11 @@ theme:
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
-  - Documentation:
-      - Simulations: simulations_static.md
+  - References:
+      - Simulations on Static Networks: simulations_static.md
       - Simulations on Temporal Networks: simulations_temporal.md
       - Transmission Distributions: transmission_distributions.md
       - Networks: networks.md
-  - Tutorial + Examples:
-      - Simulation of SI/SIR/SIS on a Network: examples/simulations_examples.md
-
 
 
 markdown_extensions:
@@ -33,6 +30,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - attr_list
 
 extra_css:
   - css/extra.css

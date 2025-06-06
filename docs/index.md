@@ -24,15 +24,11 @@ Since *NEXT-Net* is implemented in C++, a C++ compiler is required to install *N
 To get started with NEXT-Net, check out the [Getting Started](getting_started.md) guide for installation and basic usage instructions.
 
 ### Documentation Sections
-- [Simulations on Static Networks](simulations_static.md): Learn how to set up and run simulations.
-- [Simulations on Temporal Networks](simulations_static.md): Learn how to set up and run simulations.
+- [Simulations on Static Networks](simulations_static.md): Set up and run an epidemic on a static network.
+- [Simulations on Temporal Networks](simulations_static.md): Set up and run an epidemic on a temporal network..
 - [Transmission Distributions](transmission_distributions.md): Overview of available transmission models.
-- [Networks](networks.md): Information on network structures supported by NEXT-Net.
+- [Networks](networks.md): Information on the network structures supported by NEXT-Net.
 
-### Tutorials & Examples
-Explore the example simulations:
-- [Basic SI/SIR/SIS Simulations](examples/simulations_examples.md)
-- [Temporal Simulations](examples/simulations_temporal.md)
 
 ### Contact & Support
 For questions, support, or if you think you found a bug, feel free to reach out via GitHub Issues or email us. (samuel.cure@oist.jp)

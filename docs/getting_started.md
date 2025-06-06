@@ -2,14 +2,18 @@
 
 ## Set Up
 
-NEXT-Net can be installed from a release package or built from source. Follow the instructions below to set up the library based on your preferred method.
+### Installation
 
-### Installation from Release
-To install the latest release, [download](https://github.com/oist/NEXTNetPy/releases) the latest release and run the following command in a terminal:
+Download the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy-v\<version\>-pkg.tar.gz* and install with
 
-```bash
-pip install nextnet-0.4.0.tar.gz
-```
+    pip install NEXTNetPy-v<version>-pkg.tar.gz
+   
+Since *NEXT-Net* is implemented in C++, a C++ compiler is required to install *NEXTNetPy*. Alternatively, if [Git](https://git-scm.com/downloads) is available, the [latest released](https://github.com/oist/NEXTNetPy/releases) version of *NEXTNetPy* can be downloaded, built and installed with
+
+    git clone --recurse-submodules --branch latest-release https://github.com/oist/NEXTNetPy.git
+    cd NEXTNetPy
+    pip install .  
+
 
 ## How to Use
 
@@ -43,7 +47,7 @@ VARIANCE_RECOVERY= 3
 rho = nn.transmission_time_lognormal(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
 # Define the simulation object
-sim = nn.simulate(graph,psi,rho,SIR=True)
+sim = nn.simulation(graph,psi,rho,SIR=True)
 
 # Add initial infections (node 0 infected at time t=0)
 initial_infected = [(0,0)]
@@ -62,10 +66,7 @@ plt.xlabel("time")
 plt.ylabel("number of infected")
 plt.show()
 ```
-
-<p align="center">
-  <img src="assets/images/example_SIR.png" alt="Alt text for the image" width="300"/>
-</p>
+![Image missing](assets/images/example_sir.png){align=center, width = 300}
 
 
 For more advanced use cases and additional features, refer to the full documentation.

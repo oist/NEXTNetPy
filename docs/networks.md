@@ -227,4 +227,11 @@ empirical_temporal_network(
 * **`dt`** (`float`): Time resolution for discretizing instantaneous contacts.
 
 ---
-*Note: The documentation is currently being written, typos and small mistakes may be remaining.*
+
+#### `brownian_proximity_network`
+
+*Not available on the Python library yet (v.1.0). It is accessible on the R library.*
+
+#### `temporal_sirx_network`
+
+*Not available on the Python library yet (v.1.0). It is accessible on the R library.*
