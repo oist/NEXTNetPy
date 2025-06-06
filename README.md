@@ -44,7 +44,7 @@ VARIANCE_RECOVERY= 3
 rho = nn.transmission_time_lognormal(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
 # Define the simulation object
-sim = nn.simulate(graph,psi,rho,SIR=True)
+sim = nn.simulation(graph,psi,rho,SIR=True)
 
 # Add initial infections (node 0 infected at time t=0)
 initial_infected = [(0,0)]
