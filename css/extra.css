@@ -1,0 +1,8 @@
+:root {
+    --md-primary-fg-color: #b22b2b;
+    --md-primary-bg-color: #b22b2b;
+}
+
+.md-header, .md-header a {
+    color: white !important; /* Ensure it contrasts with the background */
+}
