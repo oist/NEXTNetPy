@@ -17,8 +17,9 @@ VARIANCE_RECOVERY= 3
 rho = nn.transmission_time_lognormal(MEAN_RECOVERY,VARIANCE_RECOVERY)
 
 # To simulate a SIR epidemic with one initial infected individual
-times, infected = nn.simulate(graph,psi,rho,SIR=True,initial_infected=1)
+sim = nn.simulation(nn.networkx(graph),psi,rho,SIR=True)
+sim.add_infections([(0,0)])
+results = sim.run(engine=nn.rng(1))
 
-
-plt.plot(times,infected)
+plt.plot(results["time"], results["infected"])
 plt.savefig("out/test.pdf")
