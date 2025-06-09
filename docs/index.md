@@ -1,6 +1,6 @@
 # NEXT-Net
 
-*NEXT-Net-Py* is a python library that can simulate epidemics with arbitrary infection distributions on large networks in an efficient way. The core algorithms are written in C++, which makes the simulations *very* fast (link to the original *NEXT-Net* [repository](https://github.com/oist/NEXTNet)) and wrapped using pybind11. We also have a R [library](https://github.com/oist/NEXTNetR).
+*NEXT-Net-Py* is a python library that can simulate epidemics with arbitrary infection distributions on large networks in an efficient way. The core algorithms are written in C++, which makes the simulations *very* fast (link to the original *NEXT-Net* [repository](https://github.com/oist/NEXTNet)) and wrapped using pybind11. We also have a [R package](https://oist.github.io/NEXTNetR).
 
 
 ## Overview
