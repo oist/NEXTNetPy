@@ -10,7 +10,7 @@ theme:
   logo: assets/images/logo.png
   favicon: assets/images/logo_web.png
 repo_url: https://github.com/oist/NEXTNetPy
-repo_name: NextNet
+repo_name: NEXTNetPy
 
 nav:
   - Home: index.md
