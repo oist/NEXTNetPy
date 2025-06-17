@@ -46,28 +46,32 @@ r, c, k1, k2, k3, m1, m2, R0, R_r, R_pert = params
 print(f"r = {r}, c = {c}, k1 = {k1}, ...")
 ```
 
----
 ### `generalised_logistic_curve`
 
 A simple implementation of the logistic function using `numpy`. Careful: this function actually returns the log of the generalized logistic function. (currently in v.1.0)
 
+
+**Function**
+
 ```python
 def generalised_logistic_curve(t,t0,rate,I0,nu,N):
+  """
+  The logistic function with three parameters: N, I0, rate.
+  
+  Parameters:
+  - t: Independent variable (array)
+  - N: Carrying capacity (size of network)
+  - I0: Initial number of infected
+  - rate: Exponential growth rate of epidemic
+  """
 
-    """
-    The logistic function with three parameters: N, I0, rate.
-    
-    Parameters:
-    - t: Independent variable (array)
-    - N: Carrying capacity (size of network)
-    - I0: Initial number of infected
-    - rate: Exponential growth rate of epidemic
-    """
-
-    Q = -1 + np.power(N/I0,nu)
-    
-    return np.log(N) - 1/nu*np.log(1+Q * np.exp(-rate*nu*(t-t0)))
+  Q = -1 + np.power(N/I0,nu)
+  
+  return np.log(N) - 1/nu*np.log(1+Q * np.exp(-rate*nu*(t-t0)))
 ```
+
+
+
 ---
 ### `measure_rate`
 
