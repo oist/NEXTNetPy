@@ -12,6 +12,7 @@
 #include "nextnet/weighted_network.h"
 
 #include "networkx.hpp"
+#include "simulations.hpp"
 
 namespace py = pybind11;
 
@@ -176,7 +177,8 @@ PYBIND11_MODULE(nextnet, handle) {
                 - `"data"`: List[(time, node, source_node, event_type)]  
             )"
     );
-            
+    
+    
 
     //---------------------------------
     //------------NETWORKS-------------
@@ -751,6 +753,23 @@ PYBIND11_MODULE(nextnet, handle) {
     //-----------TOOLS ----------------
     //---------------------------------
 
+
+    handle.def("simulate_average",
+        py::overload_cast<py::object, transmission_time&, transmission_time*, bool, double, bool, int, int,int,bool,bool,bool>(&simulate_average), 
+        py::arg("graph"),
+        py::arg("infection_time"),
+        py::arg("recovery_time")=nullptr,
+        py::arg("SIR")=true,
+        py::arg("TMAX")=1000,
+        py::arg("concurrent_edges")=true,
+        py::arg("initial_infected")=1,
+        py::arg("seed")=0, 
+        py::arg("nb_simulations")=1,
+        py::arg("trim")=true,
+        py::arg("verbose")=false,
+        py::arg("initial_with_bias")=false,
+        "Simulate average trajectory on a networkx graph"
+    );
 
     handle.def("assortativity",
         &assortativity,
