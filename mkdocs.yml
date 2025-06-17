@@ -2,6 +2,7 @@ site_name: NEXT-Net Documentation
 site_description: Documentation for NEXT-Net.
 theme: 
   name: 'material'
+  custom_dir : docs/overrides
   palette:
     # You can pick a scheme: light, dark, etc.
     scheme: default
@@ -20,10 +21,23 @@ nav:
       - Simulations on Temporal Networks: simulations_temporal.md
       - Transmission Distributions: transmission_distributions.md
       - Networks: networks.md
+      - Tools: tools.md
+  - Tutorials:
+      - Clustered Networks: tutorials/clustered.ipynb
+      - Activity Driven Networks: tutorials/activity_driven.ipynb
+      - Temporal Networks From Data: tutorials/temporal_empirical.ipynb
 
+plugins:
+    - mkdocs-jupyter:
+        execute: true
+        ignore_h1_titles: True
+        include_source: True
+        custom_mathjax_url: "../../assets/javascripts/MathJax-3.2.2/es5/tex-mml-chtml.js"
 
 markdown_extensions:
   - codehilite
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -35,3 +49,7 @@ markdown_extensions:
 
 extra_css:
   - css/extra.css
+
+extra_javascript:
+  - assets/javascripts/mathjax.js
+  - assets/javascripts/MathJax-3.2.2/es5/tex-mml-chtml.js
