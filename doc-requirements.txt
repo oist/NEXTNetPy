@@ -1,1 +1,5 @@
 mkdocs-jupyter
+numpy
+matplotlib
+networkx
+nextnet @ git+https://github.com/oist/NEXTNetPy@latest-release
