@@ -57,6 +57,9 @@ add_compile_definitions(_PSTL_PAR_BACKEND_SERIAL)
 add_compile_definitions(NEXTNET_BOOST_NO_CXX17_HDR_EXECUTION)
 add_compile_definitions(NEXTNET_BOOST_NO_CXX98_FUNCTION_BASE)
 
+# Disable FORTIFY_SOURCE
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U_FORTIFY_SOURCE")
+
 message("Including pybind11 as a submodule")
 add_subdirectory(extern/pybind11)
 pybind11_add_module(nextnet ${LIB_SOURCES} ${PY_SOURCES})
