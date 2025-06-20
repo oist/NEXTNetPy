@@ -1,0 +1,1138 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for NEXT-Net.">
+      
+      
+      
+      
+        <link rel="prev" href="../transmission_distributions/">
+      
+      
+        <link rel="next" href="../tools/">
+      
+      
+      <link rel="icon" href="../assets/images/logo_web.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Networks - NEXT-Net Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="#C80019" data-md-color-accent="#C80019">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#networks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="NEXT-Net Documentation" class="md-header__button md-logo" aria-label="NEXT-Net Documentation" data-md-component="logo">
+      
+  <img src="../assets/images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NEXT-Net Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Networks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oist/NEXTNetPy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    NEXTNetPy
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="NEXT-Net Documentation" class="md-nav__button md-logo" aria-label="NEXT-Net Documentation" data-md-component="logo">
+      
+  <img src="../assets/images/logo.png" alt="logo">
+
+    </a>
+    NEXT-Net Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oist/NEXTNetPy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    NEXTNetPy
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    References
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulations_static/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simulations on Static Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulations_temporal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simulations on Temporal Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transmission_distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transmission Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Networks
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#static-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static networks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Static networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-networks-from-the-networkx-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using networks from the NetworkX library
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#networks-from-a-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Networks from a file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Networks from a file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empirical_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      empirical_network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random-graph-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Random Graph Models
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Random Graph Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watts_strogatz" class="md-nav__link">
+    <span class="md-ellipsis">
+      watts_strogatz
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erdos_renyi" class="md-nav__link">
+    <span class="md-ellipsis">
+      erdos_renyi
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#barabasi_albert" class="md-nav__link">
+    <span class="md-ellipsis">
+      barabasi_albert
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      configuration_model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_model_clustered" class="md-nav__link">
+    <span class="md-ellipsis">
+      configuration_model_clustered
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temporal-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Temporal networks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Temporal networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#activity_driven_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      activity_driven_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empirical_temporal_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      empirical_temporal_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brownian_proximity_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      brownian_proximity_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#temporal_sirx_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      temporal_sirx_network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tools
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/clustered/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Clustered Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/activity_driven/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Activity Driven Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/temporal_empirical/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Temporal Networks From Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#static-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static networks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Static networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-networks-from-the-networkx-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using networks from the NetworkX library
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#networks-from-a-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Networks from a file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Networks from a file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empirical_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      empirical_network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random-graph-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Random Graph Models
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Random Graph Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#watts_strogatz" class="md-nav__link">
+    <span class="md-ellipsis">
+      watts_strogatz
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erdos_renyi" class="md-nav__link">
+    <span class="md-ellipsis">
+      erdos_renyi
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#barabasi_albert" class="md-nav__link">
+    <span class="md-ellipsis">
+      barabasi_albert
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      configuration_model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_model_clustered" class="md-nav__link">
+    <span class="md-ellipsis">
+      configuration_model_clustered
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temporal-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Temporal networks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Temporal networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#activity_driven_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      activity_driven_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empirical_temporal_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      empirical_temporal_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#brownian_proximity_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      brownian_proximity_network
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#temporal_sirx_network" class="md-nav__link">
+    <span class="md-ellipsis">
+      temporal_sirx_network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+
+
+
+                  
+
+  
+  
+
+
+<h1 id="networks">Networks</h1>
+<p>This document describes the available network classes for building graphs in NextNet.</p>
+<h2 id="static-networks">Static networks</h2>
+<p>All static networks inherit the follow common methods:</p>
+<ul>
+<li>
+<p><strong><code>nodes() -&gt; int</code></strong>
+  Number of nodes in the network.</p>
+</li>
+<li>
+<p><strong><code>neighbour(node: int, idx: int) -&gt; int</code></strong>
+  Get the <code>idx</code>th neighbor of <code>node</code>, or <code>-1</code> if none.</p>
+</li>
+<li>
+<p><strong><code>outdegree(node: int) -&gt; int</code></strong>
+  Number of outgoing edges from <code>node</code>.</p>
+</li>
+<li>
+<p><strong><code>is_undirected() -&gt; bool</code></strong>
+  True if every edge is bidirectional.</p>
+</li>
+<li>
+<p><strong><code>is_simple() -&gt; bool</code></strong>
+  True if the network has no self‑loops or parallel edges.</p>
+</li>
+<li>
+<p><strong><code>adjacencylist() -&gt; List[List[int]]</code></strong>
+  Returns the full adjacency list: for each node, list of neighbor indices.</p>
+</li>
+<li>
+<p>(only if weighted) <strong><code>weighted_adjacencylist() -&gt; List[List[Tuple[int, float]]]</code></strong>
+  Compute the weighted adjacency list. Returns, for each node, a list of <code>(neighbor_index, weight)</code> pairs.</p>
+</li>
+</ul>
+<h3 id="using-networks-from-the-networkx-library">Using networks from the NetworkX library</h3>
+<p>the NextNet python library  is made so that it operates with the <a href="https://networkx.org/">networkx library</a> which offers a great way to generate and analyse a large collection of random networks. </p>
+<p>Constructors:</p>
+<ul>
+<li><strong><code>networkx(adjacency_list: list)</code></strong></li>
+<li><strong><code>networkx(nx_graph: networkx.Graph)</code></strong></li>
+</ul>
+<p>Wraps a Python NetworkX graph for use in simulations. It works with any networkx graph object, as long as the nodes are labeled as integers.</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mi">5</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">p</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="n">n</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">gx</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">fast_gnp_random_graph</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">gx</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">convert_node_labels_to_integers</span><span class="p">(</span><span class="n">gx</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">g</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">networkx</span><span class="p">(</span><span class="n">gx</span><span class="p">)</span>
+</span></code></pre></div></p>
+<hr />
+<h3 id="networks-from-a-file">Networks from a file</h3>
+<h4 id="empirical_network"><code>empirical_network</code></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">empirical_network</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                  <span class="n">undirected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                  <span class="n">simplify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                  <span class="n">idxbase</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                  <span class="n">sep</span><span class="p">:</span> <span class="n">char</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Construct from an edge‐list file.</p>
+<ul>
+<li><strong><code>path</code></strong>: path to whitespace‐separated edge list</li>
+<li><strong><code>undirected</code></strong>: add edges in both directions (default <code>True</code>)</li>
+<li><strong><code>simplify</code></strong>: remove self‑loops and parallel edges (default <code>False</code>)</li>
+<li><strong><code>idxbase</code></strong>: node index base in file (e.g. <code>0</code> or <code>1</code>, default <code>1</code>)</li>
+<li><strong><code>sep</code></strong>: field separator (default <code>' '</code>)</li>
+</ul>
+<hr />
+<h3 id="random-graph-models">Random Graph Models</h3>
+<h4 id="watts_strogatz"><code>watts_strogatz</code></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">watts_strogatz</span><span class="p">(</span><span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>               <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>               <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>               <span class="n">rng</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Generate a Watts–Strogatz small‑world network.</p>
+<ul>
+<li><strong><code>size</code></strong>: number of nodes</li>
+<li><strong><code>k</code></strong>: each node connects to <code>k</code> nearest neighbors</li>
+<li><strong><code>p</code></strong>: rewiring probability</li>
+<li><strong><code>rng</code></strong>: random number generator</li>
+</ul>
+<hr />
+<h4 id="erdos_renyi"><code>erdos_renyi</code></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">erdos_renyi</span><span class="p">(</span><span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>            <span class="n">average_degree</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>            <span class="n">rng</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Generate an Erdős–Rényi random graph G(n, p) where <code>p = average_degree/(n-1)</code>.</p>
+<ul>
+<li><strong><code>size</code></strong>: number of nodes <code>n</code></li>
+<li><strong><code>average_degree</code></strong>: desired mean degree</li>
+<li><strong><code>rng</code></strong>: random number generator</li>
+</ul>
+<hr />
+<h4 id="barabasi_albert"><code>barabasi_albert</code></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">barabasi_albert</span><span class="p">(</span><span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>                 <span class="n">rng</span><span class="p">:</span> <span class="n">rng</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>                 <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Generate a Barabási–Albert scale‑free network.</p>
+<ul>
+<li><strong><code>size</code></strong>: initial number of nodes</li>
+<li><strong><code>rng</code></strong>: random number generator</li>
+<li><strong><code>m</code></strong>: new edges added per added node (default <code>1</code>)</li>
+</ul>
+<hr />
+<h4 id="configuration_model"><code>configuration_model</code></h4>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">py</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">configuration_model</span><span class="p">,</span><span class="w"> </span><span class="n">network</span><span class="o">&gt;</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;configuration_model&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">py</span><span class="o">::</span><span class="n">multiple_inheritance</span><span class="p">())</span>
+</span></code></pre></div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">configuration_model</span><span class="p">(</span><span class="n">degreelist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>                    <span class="n">rng</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Generate a random network with a prescribed degree sequence.</p>
+<ul>
+<li><strong><code>degreelist</code></strong>: list of desired node degrees</li>
+<li><strong><code>rng</code></strong>: random number generator</li>
+</ul>
+<p><strong>Remark:</strong> The sum of the degree list needs to be even.</p>
+<hr />
+<h4 id="configuration_model_clustered"><code>configuration_model_clustered</code></h4>
+<p>This allows the generated networks from a prescribed degree sequence and tune the clustering. This is a personal implementation of the algorithm presented in the article by <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.72.036133">Serrano and Boguñá: Tuning clustering in random networks with arbitrary degree distributions</a>. If you use this function in your research, please cite the original paper.</p>
+<p>Three constructors:</p>
+<ol>
+<li><strong>Explicit triangles per class</strong>:</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">configuration_model_clustered</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">degrees</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">triangles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<ol>
+<li><strong>Clustering function c(k)</strong>:</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">configuration_model_clustered</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">degrees</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">ck</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<ol>
+<li><strong>Alpha exponent form</strong>:</li>
+</ol>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">configuration_model_clustered</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">degrees</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">engine</span><span class="p">:</span> <span class="n">rng</span><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li>
+<p><strong><code>triangles_unsatisfied</code></strong> (<code>bool</code>): indicates if requested triangles count could not be met.</p>
+</li>
+<li>
+<p>See details in original paper.</p>
+</li>
+</ul>
+<h2 id="temporal-networks">Temporal networks</h2>
+<p>All temporal networks inherit from the base <code>temporal_network</code> interface and extend the static <code>network</code> functionality.</p>
+<hr />
+<h4 id="activity_driven_network"><code>activity_driven_network</code></h4>
+<p>A mechanistic temporal network model where nodes activate stochastically and form temporary links.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">activity_driven_network</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">activity_rates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">eta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">recovery_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">rng</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong><code>activity_rates</code></strong> (<code>List[float]</code>): Activation rate for each node.</li>
+<li><strong><code>eta</code></strong> (<code>float</code>): Scaling factor for link‐formation probability.</li>
+<li><strong><code>m</code></strong> (<code>float</code>): Number of links created per activation event.</li>
+<li><strong><code>recovery_rate</code></strong> (<code>float</code>): Recovery rate for SIR/SIS dynamics when used as a coupled network.</li>
+<li><strong><code>rng</code></strong> (<code>rng</code>): Random‐number generator for stochastic activations.</li>
+</ul>
+<hr />
+<h4 id="empirical_temporal_network"><code>empirical_temporal_network</code></h4>
+<p>Constructs a temporal network from empirical contact‐sequence data (edge list with timestamps).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">empirical_temporal_network</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">finite_duration</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong><code>file</code></strong> (<code>str</code>): Path to the contact‐list file. Each line should specify a contact event (e.g., <code>time, node_i, node_j</code>).</li>
+<li><strong><code>finite_duration</code></strong> (<code>bool</code>): If <code>True</code>, treat each listed contact as lasting until its next appearance; if <code>False</code>, treat contacts as instantaneous at resolution <code>dt</code>.</li>
+<li><strong><code>dt</code></strong> (<code>float</code>): Time resolution for discretizing instantaneous contacts.</li>
+</ul>
+<hr />
+<h4 id="brownian_proximity_network"><code>brownian_proximity_network</code></h4>
+<p><em>Not available on the Python library yet (v.1.0). It is accessible on the R library.</em></p>
+<h4 id="temporal_sirx_network"><code>temporal_sirx_network</code></h4>
+<p><em>Not available on the Python library yet (v.1.0). It is accessible on the R library.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+        <script src="../assets/javascripts/mathjax.js"></script>
+      
+        <script src="../assets/javascripts/MathJax-3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
