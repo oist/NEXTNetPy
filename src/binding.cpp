@@ -52,9 +52,11 @@ PYBIND11_MODULE(nextnet, handle) {
         .def(py::init([](network& nw,
                         transmission_time& psi,
                         transmission_time* rho,
-                        bool SIR) {
+                        bool SIR,
+                        bool allow_reinfections) {
 
                 simulate_next_reaction::params p;
+                p.exact_reinfection = allow_reinfections;
                 p.shuffle_neighbours = false;
                 p.edges_concurrent = true;
                 p.SIR = SIR;
@@ -65,6 +67,7 @@ PYBIND11_MODULE(nextnet, handle) {
             py::arg("infection_time"),
             py::arg("recovery_time")=nullptr,
             py::arg("SIR")=true,
+            py::arg("allow_reinfections")=true,
             py::keep_alive<1,2>(),
             py::keep_alive<1,3>(),
             py::keep_alive<1,4>(),
