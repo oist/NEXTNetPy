@@ -287,6 +287,15 @@ PYBIND11_MODULE(nextnet, handle) {
         )"
     );
 
+    py::class_<weighted_networkx,network>(handle,"weighted_networkx",py::multiple_inheritance())
+        .def(py::init<py::object>(),py::arg("networkx_graph"),
+        R"(
+        **networkx(nx_graph: networkx.Graph)**
+
+        Wraps a Python NetworkX graph object for use in simulations.
+        )"
+    );
+
     py::class_<empirical_network, network>(handle, "empirical_network", py::multiple_inheritance())
         .def(
             // wrap the std::istream& ctor in a lambda

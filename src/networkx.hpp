@@ -3,6 +3,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "nextnet/network.h"
+#include "nextnet/weighted_network.h"
 
 namespace py = pybind11;
 
@@ -15,4 +16,9 @@ public:
 
     // OR Initialise network with networkx object
     networkx(py::object network);
+};
+
+class weighted_networkx : public virtual weighted_adjacencylist_network {
+public:
+    weighted_networkx(py::object network);
 };

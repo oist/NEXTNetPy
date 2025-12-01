@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "networkx.hpp"
+#include "nextnet/weighted_network.h"
 
 namespace py = pybind11;
 
@@ -32,6 +33,70 @@ networkx::networkx(py::object network){
         }
     }
 }
+
+// weighted_networkx::weighted_networkx(py::object network) {
+
+//     int SIZE = py::int_(network.attr("number_of_nodes")());
+
+//     adjacencylist.resize(SIZE);
+//     for (int i = 0; i < SIZE; ++i) {
+//         py::iterator it = network.attr("neighbors")(i);
+//         while (it != py::iterator::sentinel()) {
+//             const int j = py::cast<int>(*it);
+
+//             // Get edge data dict for (i, j)
+//             py::object edge_data = network.attr("get_edge_data")(i, j);
+
+//             // Default weight if not present or no edge data
+//             double w = 1.0;
+
+//             if (!edge_data.is_none()) {
+//                 // edge_data is a dict; use .get("weight", default)
+//                 py::object w_obj =
+//                     edge_data.attr("get")("weight", py::float_(1.0));
+//                 w = w_obj.cast<double>();
+//             }
+
+//             adjacencylist[i].emplace_back(j, w);
+//             ++it;
+//         }
+//     }
+// }
+
+weighted_networkx::weighted_networkx(py::object network) {
+
+    const int SIZE = py::int_(network.attr("number_of_nodes")());
+
+    adjacencylist.resize(SIZE);
+
+    // Cache Python callables/keys
+    py::object get_edge_data = network.attr("get_edge_data");
+    py::object neighbors     = network.attr("neighbors");
+    py::str weight_key("weight");
+
+    for (int i = 0; i < SIZE; ++i) {
+        py::iterator it = neighbors(i);
+        while (it != py::iterator::sentinel()) {
+            const int j = py::cast<int>(*it);
+
+            // get_edge_data(i, j) -> dict or None
+            py::object edge_data_obj = get_edge_data(i, j);
+
+            double w = 1.0;  // default
+
+            if (!edge_data_obj.is_none()) {
+                py::dict edge_data(edge_data_obj);
+                if (edge_data.contains(weight_key)) {
+                    w = py::cast<double>(edge_data[weight_key]);
+                }
+            }
+
+            adjacencylist[i].emplace_back(j, w);
+            ++it;
+        }
+    }
+}
+    
 
 #if 0
 
