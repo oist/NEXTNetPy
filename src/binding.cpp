@@ -97,7 +97,7 @@ PYBIND11_MODULE(nextnet, handle) {
                         ? opts["max_infected"].cast<int>()
                         : std::numeric_limits<int>::max();
 
-                    std::vector<std::tuple<double,int,int,int>> trajectory;
+                    std::vector<std::tuple<double,int,int,double,int>> trajectory;
                     std::vector<double> times;
                     std::vector<int> infected_traj;
                     std::vector<int> recovered_traj;
@@ -114,6 +114,7 @@ PYBIND11_MODULE(nextnet, handle) {
                             break;
 
                         int event_type = 0;
+                        double weight = 1.0;
                         switch (point->kind) {
                             case epidemic_event_kind::outside_infection:
                             case epidemic_event_kind::infection:
@@ -145,6 +146,7 @@ PYBIND11_MODULE(nextnet, handle) {
                             point->time,
                             point->node,
                             point->source_node,
+                            point-> weight,
                             event_type
                         );
                     }
